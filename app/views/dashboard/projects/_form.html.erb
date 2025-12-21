@@ -1,0 +1,38 @@
+<%= form_with model: [:dashboard, project], class: "space-y-6" do |f| %>
+  <% if project.errors.any? %>
+    <div class="px-4 py-3 rounded-lg text-[14px]" style="background: #FEE8E8; color: #8B2D2D;">
+      <ul class="list-disc list-inside space-y-1">
+        <% project.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="space-y-2">
+    <%= f.label :name, class: "block text-[13px] font-medium", style: "color: #6B6760;" %>
+    <%= f.text_field :name, class: "w-full px-4 py-3 text-[15px] rounded-lg outline-none transition-all focus:ring-2", style: "background: #FFFFFE; border: 1px solid #E8E5E0; color: #1A1A1A; --tw-ring-color: #D97757;", placeholder: "My Project" %>
+  </div>
+
+  <div class="space-y-2">
+    <%= f.label :retention_days, "Log retention", class: "block text-[13px] font-medium", style: "color: #6B6760;" %>
+    <div class="flex items-center gap-3">
+      <%= f.number_field :retention_days, class: "w-24 px-4 py-3 text-[15px] rounded-lg outline-none transition-all focus:ring-2", style: "background: #FFFFFE; border: 1px solid #E8E5E0; color: #1A1A1A; --tw-ring-color: #D97757;", min: 1, max: 365 %>
+      <span class="text-[14px]" style="color: #8B8780;">days</span>
+    </div>
+    <p class="text-[12px]" style="color: #8B8780;">Logs older than this will be eligible for archiving</p>
+  </div>
+
+  <div class="space-y-2">
+    <label class="flex items-center gap-3 cursor-pointer">
+      <%= f.check_box :archive_enabled, class: "w-4 h-4 rounded", style: "accent-color: #D97757;" %>
+      <span class="text-[14px] font-medium" style="color: #1A1A1A;">Enable auto-archive</span>
+    </label>
+    <p class="text-[12px] ml-7" style="color: #8B8780;">Automatically delete old logs daily based on retention period</p>
+  </div>
+
+  <div class="flex items-center gap-4 pt-2">
+    <%= f.submit class: "px-5 py-2.5 text-[14px] font-medium rounded-lg cursor-pointer transition-colors", style: "background: #1A1A1A; color: #FFFFFE;" %>
+    <%= link_to 'Cancel', dashboard_projects_path, class: "px-5 py-2.5 text-[14px] font-medium rounded-lg transition-colors", style: "color: #6B6760;" %>
+  </div>
+<% end %>

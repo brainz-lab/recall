@@ -1,0 +1,138 @@
+<div class="space-y-6" data-controller="expand">
+  <!-- Header -->
+  <div class="flex items-center gap-4">
+    <%= link_to dashboard_project_logs_path(@project, q: "request:#{@request_id}"),
+        class: "flex items-center gap-2 text-[13px] font-medium transition-colors",
+        style: "color: #6B6760;" do %>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Back to Logs
+    <% end %>
+  </div>
+
+  <!-- Request Info Card -->
+  <div class="px-6 py-5 rounded-xl" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+    <div class="flex flex-col gap-4">
+      <div>
+        <div class="text-[12px] font-medium mb-1" style="color: #6B6760;">Request Trace</div>
+        <div class="text-[18px] font-mono font-semibold" style="color: #1A1A1A;"><%= @request_id %></div>
+      </div>
+      <div class="flex flex-wrap gap-6 text-[13px]" style="color: #6B6760;">
+        <div class="flex items-center gap-2">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+          </svg>
+          <span><strong style="color: #1A1A1A;"><%= @duration_ms %>ms</strong> duration</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8M16 17H8M10 9H8"/>
+          </svg>
+          <span><strong style="color: #1A1A1A;"><%= @log_count %></strong> logs</span>
+        </div>
+        <% if @services.any? %>
+          <div class="flex items-center gap-2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
+            </svg>
+            <span><strong style="color: #1A1A1A;"><%= @services.join(', ') %></strong></span>
+          </div>
+        <% end %>
+        <div class="flex items-center gap-2">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+          </svg>
+          <span><%= @first_log.timestamp.strftime('%b %d, %Y %H:%M:%S') %></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Level Summary -->
+  <div class="flex flex-wrap gap-3">
+    <%
+      level_styles = {
+        "debug" => { bg: "#F5F3F0", color: "#6B6760", border: "#E8E5E0" },
+        "info" => { bg: "#EFF6FF", color: "#1D4ED8", border: "#BFDBFE" },
+        "warn" => { bg: "#FFFBEB", color: "#B45309", border: "#FDE68A" },
+        "error" => { bg: "#FEF2F2", color: "#DC2626", border: "#FECACA" },
+        "fatal" => { bg: "#450A0A", color: "#FCA5A5", border: "#7F1D1D" }
+      }
+    %>
+    <% %w[debug info warn error fatal].each do |level| %>
+      <% count = @levels[level] || 0 %>
+      <% next if count == 0 %>
+      <% style = level_styles[level] %>
+      <div class="px-4 py-2 rounded-lg text-[13px] font-medium"
+           style="background: <%= style[:bg] %>; color: <%= style[:color] %>; border: 1px solid <%= style[:border] %>;">
+        <%= level.upcase %> <span class="font-semibold"><%= count %></span>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Timeline -->
+  <div class="rounded-xl overflow-hidden" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+    <div class="px-5 py-3" style="border-bottom: 1px solid #E8E5E0;">
+      <h3 class="text-[14px] font-semibold" style="color: #1A1A1A;">Timeline</h3>
+    </div>
+
+    <div class="relative">
+      <!-- Timeline line -->
+      <div class="absolute left-[140px] top-0 bottom-0 w-px" style="background: #E8E5E0;"></div>
+
+      <% previous_time = nil %>
+      <% @logs.each_with_index do |log, index| %>
+        <%
+          delta_ms = previous_time ? ((log.timestamp - previous_time) * 1000).round : 0
+          previous_time = log.timestamp
+          style = level_styles[log.level] || level_styles["info"]
+        %>
+        <div class="relative flex" style="border-bottom: 1px solid #F0EDE8;" data-controller="expand">
+          <!-- Timestamp & Delta -->
+          <div class="w-[140px] flex-shrink-0 px-4 py-4 text-right">
+            <div class="text-[12px] font-mono" style="color: #1A1A1A;">
+              <%= log.timestamp.strftime('%H:%M:%S') %><span style="color: #B0ACA5;">.<%= log.timestamp.strftime('%L') %></span>
+            </div>
+            <% if index > 0 %>
+              <div class="text-[11px] font-mono mt-0.5" style="color: <%= delta_ms > 100 ? '#D97706' : '#B0ACA5' %>;">
+                +<%= delta_ms %>ms
+              </div>
+            <% end %>
+          </div>
+
+          <!-- Timeline dot -->
+          <div class="absolute left-[136px] top-5 w-2 h-2 rounded-full" style="background: <%= style[:color] %>;"></div>
+
+          <!-- Log content -->
+          <div class="flex-1 py-4 pr-5 pl-6">
+            <div class="flex items-start gap-3 cursor-pointer" data-action="click->expand#toggle">
+              <span class="log-level log-level-<%= log.level %> px-2 py-0.5 text-[11px] font-medium rounded-full flex-shrink-0">
+                <%= log.level.upcase %>
+              </span>
+              <div class="flex-1 min-w-0">
+                <div class="text-[14px] font-mono" style="color: #1A1A1A;"><%= log.message %></div>
+                <% if log.service %>
+                  <div class="text-[12px] mt-1" style="color: #8B8780;">
+                    service: <%= log.service %>
+                  </div>
+                <% end %>
+              </div>
+              <% if log.data.present? %>
+                <svg class="w-4 h-4 flex-shrink-0 transition-transform" style="color: #B0ACA5;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+              <% end %>
+            </div>
+
+            <% if log.data.present? %>
+              <div class="hidden mt-3 p-3 rounded-lg" style="background: #FAF9F7;" data-expand-target="content">
+                <%= interactive_json(log.data) %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

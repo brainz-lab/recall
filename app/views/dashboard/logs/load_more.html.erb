@@ -1,0 +1,3 @@
+<%= turbo_frame_tag "load_more" do %>
+  <%= render partial: "log_rows", locals: { logs: @logs, has_more: @has_more, next_offset: @next_offset, query: @query } %>
+<% end %>

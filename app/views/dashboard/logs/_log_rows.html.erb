@@ -1,0 +1,100 @@
+<% logs.each do |log| %>
+  <div class="log-row" data-controller="expand" style="border-bottom: 1px solid #F0EDE8;">
+    <div class="flex items-center gap-4 px-5 py-3 cursor-pointer transition-colors hover:bg-[#FAF9F7]" data-action="click->expand#toggle">
+      <span class="text-[12px] font-mono w-24" style="color: #B0ACA5;"><%= log.timestamp.strftime('%H:%M:%S') %></span>
+      <button data-action="click->query#filter" data-query="level:<%= log.level %>"
+              class="log-level log-level-<%= log.level %> px-2 py-0.5 text-[11px] font-medium rounded-full hover:ring-2 hover:ring-offset-1"
+              title="Filter by <%= log.level %>">
+        <%= log.level.upcase %>
+      </button>
+      <span class="flex-1 text-[14px] font-mono truncate" style="color: #1A1A1A;"><%= log.message %></span>
+      <% if log.commit %>
+        <button data-action="click->query#filter" data-query="commit:<%= log.commit %>"
+                class="text-[11px] font-mono px-2 py-1 rounded hover:ring-2 hover:ring-offset-1"
+                style="background: #F5F3F0; color: #8B8780;"
+                title="Filter by commit <%= log.commit[0..6] %>">
+          <%= log.commit[0..6] %>
+        </button>
+      <% end %>
+    </div>
+    <div class="hidden px-5 pb-4" style="background: #FAF9F7;" data-expand-target="content">
+      <% if log.data.present? %>
+        <div class="mb-3 p-2 rounded" style="background: #FFFFFE;">
+          <%= interactive_json(log.data) %>
+        </div>
+      <% end %>
+      <div class="flex flex-wrap gap-4 text-[12px]" style="color: #8B8780;">
+        <% if log.session_id %>
+          <button data-action="click->query#filter" data-query="session:<%= log.session_id %>"
+                  class="hover:underline cursor-pointer" style="color: #1D4ED8;" title="Filter by this session">
+            Session: <%= log.session_id %>
+          </button>
+        <% else %>
+          <span>Session: —</span>
+        <% end %>
+        <% if log.request_id %>
+          <%= link_to trace_dashboard_project_logs_path(@project, request_id: log.request_id),
+              class: "hover:underline cursor-pointer flex items-center gap-1",
+              style: "color: #1D4ED8;",
+              title: "View request trace",
+              data: { turbo_frame: "_top" } do %>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+            </svg>
+            Request: <%= log.request_id %>
+          <% end %>
+        <% else %>
+          <span>Request: —</span>
+        <% end %>
+        <% if log.branch %>
+          <button data-action="click->query#filter" data-query="branch:<%= log.branch %>"
+                  class="hover:underline cursor-pointer" style="color: #1D4ED8;" title="Filter by this branch">
+            Branch: <%= log.branch %>
+          </button>
+        <% else %>
+          <span>Branch: —</span>
+        <% end %>
+        <% if log.commit %>
+          <button data-action="click->query#filter" data-query="commit:<%= log.commit %>"
+                  class="hover:underline cursor-pointer" style="color: #1D4ED8;" title="Filter by this commit">
+            Commit: <%= log.commit[0..6] %>
+          </button>
+        <% end %>
+        <% if log.environment %>
+          <button data-action="click->query#filter" data-query="env:<%= log.environment %>"
+                  class="hover:underline cursor-pointer" style="color: #1D4ED8;" title="Filter by this environment">
+            Env: <%= log.environment %>
+          </button>
+        <% end %>
+        <% if log.service %>
+          <button data-action="click->query#filter" data-query="service:<%= log.service %>"
+                  class="hover:underline cursor-pointer" style="color: #1D4ED8;" title="Filter by this service">
+            Service: <%= log.service %>
+          </button>
+        <% end %>
+        <% if log.host %>
+          <button data-action="click->query#filter" data-query="host:<%= log.host %>"
+                  class="hover:underline cursor-pointer" style="color: #1D4ED8;" title="Filter by this host">
+            Host: <%= log.host %>
+          </button>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<% if has_more %>
+  <%= turbo_frame_tag "load_more",
+      src: dashboard_project_logs_path(@project, q: query, offset: next_offset),
+      loading: :lazy do %>
+    <div class="py-4 text-center">
+      <div class="inline-flex items-center gap-2 text-[13px]" style="color: #8B8780;">
+        <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Loading more logs...
+      </div>
+    </div>
+  <% end %>
+<% end %>

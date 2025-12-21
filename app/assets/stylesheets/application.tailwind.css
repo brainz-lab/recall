@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+/* Log level styles - Anthropic aesthetic */
+.log-level-debug {
+  background: #F0EDE8;
+  color: #8B8780;
+}
+.log-level-info {
+  background: #E8F0F5;
+  color: #4A6B7C;
+}
+.log-level-warn {
+  background: #FDF6E3;
+  color: #9A7B2C;
+}
+.log-level-error {
+  background: #FEE8E8;
+  color: #C94A4A;
+}
+.log-level-fatal {
+  background: #F3E8F5;
+  color: #7C4A8B;
+}

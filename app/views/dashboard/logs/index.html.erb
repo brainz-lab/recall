@@ -1,0 +1,432 @@
+<div class="space-y-6" data-controller="query live-tail saved-search query-help export" data-live-tail-project-id-value="<%= @project.id %>" data-export-project-id-value="<%= @project.id %>">
+
+  <!-- Query Bar -->
+  <div class="px-5 py-4 rounded-xl" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+    <%= form_with url: dashboard_project_logs_path(@project), method: :get, data: { turbo_frame: "logs" } do |f| %>
+      <div class="flex gap-3">
+        <%= f.text_field :q, value: @query,
+            placeholder: 'level:error since:1h "payment" data.user.id:123',
+            class: "flex-1 px-4 py-3 text-[14px] font-mono rounded-lg outline-none transition-all focus:ring-2",
+            style: "background: #F5F3F0; border: 1px solid transparent; color: #1A1A1A; --tw-ring-color: #D97757;",
+            data: { query_target: "input", saved_search_target: "queryInput", live_tail_target: "input" } %>
+        <button type="button" data-action="click->query-help#open"
+                class="px-3 py-3 text-[14px] font-medium rounded-lg transition-colors"
+                style="background: #F5F3F0; color: #6B6760; border: 1px solid #E8E5E0;"
+                title="Query syntax help">
+          ?
+        </button>
+        <%= f.submit "Search", class: "px-5 py-3 text-[14px] font-medium rounded-lg cursor-pointer transition-colors", style: "background: #1A1A1A; color: #FFFFFE;" %>
+        <% if @query.present? %>
+          <button type="button" data-action="click->saved-search#openModal"
+                  class="px-4 py-3 text-[14px] font-medium rounded-lg transition-colors"
+                  style="background: #F5F3F0; color: #6B6760; border: 1px solid #E8E5E0;">
+            Save
+          </button>
+        <% end %>
+        <button type="button" data-action="click->export#open"
+                class="px-4 py-3 text-[14px] font-medium rounded-lg transition-colors flex items-center gap-2"
+                style="background: #F5F3F0; color: #6B6760; border: 1px solid #E8E5E0;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Export
+        </button>
+      </div>
+    <% end %>
+
+    <div class="flex flex-wrap items-center gap-2 mt-4">
+      <%
+        error_count = @log_counts&.dig("error") || 0
+        fatal_count = @log_counts_24h&.dig("fatal") || 0
+        filters = [
+          ["Errors", "level:error since:1h", error_count, "#DC2626"],
+          ["Fatal", "level:fatal since:24h", fatal_count, "#991B1B"],
+          ["Last 15m", "since:15m", nil, nil],
+          ["Last hour", "since:1h", nil, nil]
+        ]
+      %>
+      <% filters.each do |label, query, count, badge_color| %>
+        <button data-action="click->query#filter" data-query="<%= query %>"
+                class="px-3 py-1.5 text-[12px] font-medium rounded-full transition-colors flex items-center gap-1.5"
+                style="background: #F5F3F0; color: #6B6760;">
+          <%= label %>
+          <% if count && count > 0 %>
+            <span class="text-[11px] font-semibold" style="color: <%= badge_color %>;">
+              <%= count > 99 ? "99+" : count %>
+            </span>
+          <% end %>
+        </button>
+      <% end %>
+
+      <% if @saved_searches.any? %>
+        <span class="mx-2" style="color: #E8E5E0;">|</span>
+        <% @saved_searches.each do |saved| %>
+          <div class="group flex items-center gap-1">
+            <button data-action="click->query#filter" data-query="<%= saved.query %>"
+                    class="px-3 py-1.5 text-[12px] font-medium rounded-full transition-colors"
+                    style="background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE;">
+              <%= saved.name %>
+            </button>
+            <%= button_to dashboard_project_saved_search_path(@project, saved),
+                method: :delete,
+                form: { data: { turbo_confirm: "Delete this saved search?" } },
+                class: "opacity-0 group-hover:opacity-100 p-1 text-[11px] rounded transition-opacity",
+                style: "color: #DC2626;" do %>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 6L6 18M6 6l12 12"/>
+              </svg>
+            <% end %>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Save Search Modal -->
+  <div data-saved-search-target="modal" class="hidden fixed inset-0 z-50">
+    <div class="absolute inset-0 bg-black/30" data-action="click->saved-search#closeModal"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md p-6 rounded-xl" style="background: #FFFFFE;">
+      <h3 class="text-[16px] font-semibold mb-4" style="color: #1A1A1A;">Save Search</h3>
+      <%= form_with model: SavedSearch.new, url: dashboard_project_saved_searches_path(@project), method: :post do |f| %>
+        <%= f.hidden_field :query, value: @query, data: { saved_search_target: "queryField" } %>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-[13px] font-medium mb-1" style="color: #6B6760;">Name</label>
+            <%= f.text_field :name, placeholder: "e.g., Production errors",
+                class: "w-full px-4 py-3 text-[14px] rounded-lg outline-none",
+                style: "background: #F5F3F0; border: 1px solid #E8E5E0; color: #1A1A1A;",
+                data: { saved_search_target: "nameInput" } %>
+          </div>
+          <div>
+            <label class="block text-[13px] font-medium mb-1" style="color: #6B6760;">Query</label>
+            <div class="px-4 py-3 rounded-lg text-[13px] font-mono" style="background: #F5F3F0; color: #6B6760;">
+              <%= @query.presence || "No query" %>
+            </div>
+          </div>
+          <div class="flex gap-3 justify-end pt-2">
+            <button type="button" data-action="click->saved-search#closeModal"
+                    class="px-4 py-2 text-[14px] font-medium rounded-lg"
+                    style="color: #6B6760;">
+              Cancel
+            </button>
+            <%= f.submit "Save Search", class: "px-4 py-2 text-[14px] font-medium rounded-lg cursor-pointer", style: "background: #1A1A1A; color: #FFFFFE;" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Query Help Modal -->
+  <div data-query-help-target="modal" data-action="keydown@window->query-help#closeOnEscape" class="hidden fixed inset-0 z-50">
+    <div class="absolute inset-0 bg-black/30" data-action="click->query-help#close"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl max-h-[80vh] overflow-y-auto p-6 rounded-xl" style="background: #FFFFFE;">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-[18px] font-semibold" style="color: #1A1A1A;">Query Syntax</h3>
+        <button data-action="click->query-help#close" class="p-2 rounded-lg hover:bg-[#F5F3F0]" style="color: #6B6760;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="space-y-6 text-[13px]" style="color: #1A1A1A;">
+        <!-- Basic Syntax -->
+        <div>
+          <h4 class="font-semibold mb-2" style="color: #D97757;">Basic Syntax</h4>
+          <p class="mb-2" style="color: #6B6760;">Combine filters with spaces (AND). Use <code class="px-1.5 py-0.5 rounded" style="background: #F5F3F0;">field:value</code> format.</p>
+          <div class="font-mono text-[12px] p-3 rounded-lg" style="background: #F5F3F0; color: #6B6760;">
+            level:error since:1h "payment failed"
+          </div>
+        </div>
+
+        <!-- OR Operator -->
+        <div>
+          <h4 class="font-semibold mb-2" style="color: #D97757;">OR Operator</h4>
+          <p class="mb-2" style="color: #6B6760;">Use <code class="px-1.5 py-0.5 rounded" style="background: #F5F3F0;">OR</code> to match any of multiple conditions:</p>
+          <div class="space-y-2 font-mono text-[12px]">
+            <div class="p-2 rounded" style="background: #F5F3F0;">
+              <span style="color: #6B6760;">Errors or warnings:</span><br>
+              <span style="color: #D97757;">level:error OR level:warn</span>
+            </div>
+            <div class="p-2 rounded" style="background: #F5F3F0;">
+              <span style="color: #6B6760;">Multiple services:</span><br>
+              <span style="color: #D97757;">service:api OR service:worker</span>
+            </div>
+            <div class="p-2 rounded" style="background: #F5F3F0;">
+              <span style="color: #6B6760;">Complex conditions:</span><br>
+              <span style="color: #D97757;">level:error env:production OR level:fatal</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filters Table -->
+        <div>
+          <h4 class="font-semibold mb-3" style="color: #D97757;">Available Filters</h4>
+          <table class="w-full text-[12px]">
+            <thead>
+              <tr style="border-bottom: 1px solid #E8E5E0;">
+                <th class="text-left py-2 font-medium" style="color: #6B6760;">Filter</th>
+                <th class="text-left py-2 font-medium" style="color: #6B6760;">Example</th>
+                <th class="text-left py-2 font-medium" style="color: #6B6760;">Description</th>
+              </tr>
+            </thead>
+            <tbody class="font-mono" style="color: #1A1A1A;">
+              <tr style="border-bottom: 1px solid #F0EDE8;">
+                <td class="py-2">level:</td>
+                <td class="py-2" style="color: #D97757;">level:error</td>
+                <td class="py-2 font-sans" style="color: #6B6760;">debug, info, warn, error, fatal</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #F0EDE8;">
+                <td class="py-2">level:</td>
+                <td class="py-2" style="color: #D97757;">level:error,fatal</td>
+                <td class="py-2 font-sans" style="color: #6B6760;">Multiple levels (comma-separated)</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #F0EDE8;">
+                <td class="py-2">level:</td>
+                <td class="py-2" style="color: #D97757;">level:!debug</td>
+                <td class="py-2 font-sans" style="color: #6B6760;">Exclude level (negation)</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #F0EDE8;">
+                <td class="py-2">since:</td>
+                <td class="py-2" style="color: #D97757;">since:1h</td>
+                <td class="py-2 font-sans" style="color: #6B6760;">Time ago: 15m, 1h, 7d, 2w</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #F0EDE8;">
+                <td class="py-2">until:</td>
+                <td class="py-2" style="color: #D97757;">until:30m</td>
+                <td class="py-2 font-sans" style="color: #6B6760;">Before time ago</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #F0EDE8;">
+                <td class="py-2">env:</td>
+                <td class="py-2" style="color: #D97757;">env:production</td>
+                <td class="py-2 font-sans" style="color: #6B6760;">Environment filter</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #F0EDE8;">
+                <td class="py-2">service:</td>
+                <td class="py-2" style="color: #D97757;">service:api</td>
+                <td class="py-2 font-sans" style="color: #6B6760;">Service name</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #F0EDE8;">
+                <td class="py-2">host:</td>
+                <td class="py-2" style="color: #D97757;">host:web-01</td>
+                <td class="py-2 font-sans" style="color: #6B6760;">Server hostname</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #F0EDE8;">
+                <td class="py-2">commit:</td>
+                <td class="py-2" style="color: #D97757;">commit:a1b2c3d</td>
+                <td class="py-2 font-sans" style="color: #6B6760;">Git commit SHA</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #F0EDE8;">
+                <td class="py-2">branch:</td>
+                <td class="py-2" style="color: #D97757;">branch:main</td>
+                <td class="py-2 font-sans" style="color: #6B6760;">Git branch</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #F0EDE8;">
+                <td class="py-2">session:</td>
+                <td class="py-2" style="color: #D97757;">session:abc123</td>
+                <td class="py-2 font-sans" style="color: #6B6760;">Session ID</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #F0EDE8;">
+                <td class="py-2">request:</td>
+                <td class="py-2" style="color: #D97757;">request:req_xyz</td>
+                <td class="py-2 font-sans" style="color: #6B6760;">Request ID</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Data Filters -->
+        <div>
+          <h4 class="font-semibold mb-3" style="color: #D97757;">JSON Data Filters</h4>
+          <table class="w-full text-[12px]">
+            <thead>
+              <tr style="border-bottom: 1px solid #E8E5E0;">
+                <th class="text-left py-2 font-medium" style="color: #6B6760;">Type</th>
+                <th class="text-left py-2 font-medium" style="color: #6B6760;">Example</th>
+                <th class="text-left py-2 font-medium" style="color: #6B6760;">Description</th>
+              </tr>
+            </thead>
+            <tbody class="font-mono" style="color: #1A1A1A;">
+              <tr style="border-bottom: 1px solid #F0EDE8;">
+                <td class="py-2">Exact</td>
+                <td class="py-2" style="color: #D97757;">data.user_id:123</td>
+                <td class="py-2 font-sans" style="color: #6B6760;">Exact value match</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #F0EDE8;">
+                <td class="py-2">Nested</td>
+                <td class="py-2" style="color: #D97757;">data.user.email:a@b.com</td>
+                <td class="py-2 font-sans" style="color: #6B6760;">Nested JSON path</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #F0EDE8;">
+                <td class="py-2">Wildcard</td>
+                <td class="py-2" style="color: #D97757;">data.key:user:*</td>
+                <td class="py-2 font-sans" style="color: #6B6760;">Pattern matching with *</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #F0EDE8;">
+                <td class="py-2">Numeric</td>
+                <td class="py-2" style="color: #D97757;">data.amount:>100</td>
+                <td class="py-2 font-sans" style="color: #6B6760;">Comparison: >, <, >=, <=</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #F0EDE8;">
+                <td class="py-2">Quoted</td>
+                <td class="py-2" style="color: #D97757;">data.query:"SELECT * FROM"</td>
+                <td class="py-2 font-sans" style="color: #6B6760;">Values with spaces</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Text Search -->
+        <div>
+          <h4 class="font-semibold mb-2" style="color: #D97757;">Text Search</h4>
+          <p class="mb-2" style="color: #6B6760;">Use quotes for message text search:</p>
+          <div class="font-mono text-[12px] p-3 rounded-lg" style="background: #F5F3F0; color: #6B6760;">
+            "payment failed" level:error
+          </div>
+        </div>
+
+        <!-- Commands -->
+        <div>
+          <h4 class="font-semibold mb-2" style="color: #D97757;">Commands (Pipe Syntax)</h4>
+          <table class="w-full text-[12px]">
+            <tbody class="font-mono" style="color: #1A1A1A;">
+              <tr style="border-bottom: 1px solid #F0EDE8;">
+                <td class="py-2" style="color: #D97757;">| stats</td>
+                <td class="py-2 font-sans" style="color: #6B6760;">Show count statistics</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #F0EDE8;">
+                <td class="py-2" style="color: #D97757;">| stats by:level</td>
+                <td class="py-2 font-sans" style="color: #6B6760;">Group by level, commit, hour, day</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #F0EDE8;">
+                <td class="py-2" style="color: #D97757;">| first 50</td>
+                <td class="py-2 font-sans" style="color: #6B6760;">First N results (oldest first)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Examples -->
+        <div>
+          <h4 class="font-semibold mb-2" style="color: #D97757;">Examples</h4>
+          <div class="space-y-2 font-mono text-[12px]">
+            <div class="p-2 rounded" style="background: #F5F3F0;">
+              <span style="color: #6B6760;">Errors in last hour:</span><br>
+              <span style="color: #D97757;">level:error since:1h</span>
+            </div>
+            <div class="p-2 rounded" style="background: #F5F3F0;">
+              <span style="color: #6B6760;">Payment issues for user:</span><br>
+              <span style="color: #D97757;">"payment" data.user_id:123 level:error,warn</span>
+            </div>
+            <div class="p-2 rounded" style="background: #F5F3F0;">
+              <span style="color: #6B6760;">Stats by level in production:</span><br>
+              <span style="color: #D97757;">env:production since:24h | stats by:level</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Export Modal -->
+  <div data-export-target="modal" data-action="keydown@window->export#closeOnEscape" class="hidden fixed inset-0 z-50">
+    <div class="absolute inset-0 bg-black/30" data-action="click->export#close"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md p-6 rounded-xl" style="background: #FFFFFE;">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-[18px] font-semibold" style="color: #1A1A1A;">Export Logs</h3>
+        <button data-action="click->export#close" class="p-2 rounded-lg hover:bg-[#F5F3F0]" style="color: #6B6760;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <form data-export-target="form" data-action="submit->export#submit" class="space-y-4">
+        <div>
+          <label class="block text-[13px] font-medium mb-1" style="color: #6B6760;">Format</label>
+          <select data-export-target="formatSelect"
+                  class="w-full px-4 py-3 text-[14px] rounded-lg outline-none"
+                  style="background: #F5F3F0; border: 1px solid #E8E5E0; color: #1A1A1A;">
+            <option value="json">JSON</option>
+            <option value="csv">CSV</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-[13px] font-medium mb-1" style="color: #6B6760;">Query Filter (optional)</label>
+          <input type="text" data-export-target="queryInput"
+                 placeholder="level:error env:production"
+                 class="w-full px-4 py-3 text-[14px] font-mono rounded-lg outline-none"
+                 style="background: #F5F3F0; border: 1px solid #E8E5E0; color: #1A1A1A;">
+          <p class="text-[11px] mt-1" style="color: #8B8780;">Leave empty to export all logs</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-[13px] font-medium mb-1" style="color: #6B6760;">Since</label>
+            <input type="text" data-export-target="sinceInput"
+                   placeholder="24h, 7d, or date"
+                   class="w-full px-4 py-3 text-[14px] rounded-lg outline-none"
+                   style="background: #F5F3F0; border: 1px solid #E8E5E0; color: #1A1A1A;">
+          </div>
+          <div>
+            <label class="block text-[13px] font-medium mb-1" style="color: #6B6760;">Until</label>
+            <input type="text" data-export-target="untilInput"
+                   placeholder="1h, now, or date"
+                   class="w-full px-4 py-3 text-[14px] rounded-lg outline-none"
+                   style="background: #F5F3F0; border: 1px solid #E8E5E0; color: #1A1A1A;">
+          </div>
+        </div>
+
+        <div class="flex gap-3 justify-end pt-2">
+          <button type="button" data-action="click->export#close"
+                  class="px-4 py-2 text-[14px] font-medium rounded-lg"
+                  style="color: #6B6760;">
+            Cancel
+          </button>
+          <button type="submit"
+                  class="px-4 py-2 text-[14px] font-medium rounded-lg cursor-pointer flex items-center gap-2"
+                  style="background: #1A1A1A; color: #FFFFFE;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Download
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <%= turbo_frame_tag "logs" do %>
+    <!-- Controls -->
+    <div class="flex justify-between items-center mb-4">
+      <span class="text-[13px]" style="color: #8B8780;">
+        <%= @logs.is_a?(Hash) ? 'Statistics' : "#{@logs.size} logs" %>
+      </span>
+      <label class="flex items-center gap-2 cursor-pointer">
+        <input type="checkbox" data-action="change->live-tail#toggle" class="w-4 h-4 rounded" style="accent-color: #D97757;">
+        <span class="text-[13px]" style="color: #6B6760;">Live tail</span>
+      </label>
+    </div>
+    <% if @logs.is_a?(Hash) %>
+      <div class="px-5 py-5 rounded-xl" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+        <pre class="text-[13px] font-mono" style="color: #6B6760;"><%= JSON.pretty_generate(@logs) %></pre>
+      </div>
+    <% else %>
+      <div class="rounded-xl overflow-hidden" style="background: #FFFFFE; border: 1px solid #E8E5E0;" data-live-tail-target="container">
+        <% if @logs.empty? %>
+          <div class="py-12 text-center" data-live-tail-target="empty">
+            <p class="text-[14px]" style="color: #8B8780;">No logs found</p>
+          </div>
+        <% else %>
+          <%= render partial: "log_rows", locals: { logs: @logs, has_more: @has_more, next_offset: @next_offset, query: @query } %>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+</div>

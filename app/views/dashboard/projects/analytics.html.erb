@@ -1,0 +1,321 @@
+<div class="space-y-6">
+  <!-- Header with time range and filters -->
+  <div class="flex flex-col gap-4">
+    <div class="flex justify-between items-center">
+      <h1 class="text-[24px] font-semibold" style="color: #1A1A1A;">Analytics</h1>
+      <div class="flex gap-2">
+        <% %w[24h 7d 30d].each do |range| %>
+          <%= link_to analytics_dashboard_project_path(@project, range: range, level: @level_filter, env: @env_filter, service: @service_filter),
+              class: "px-4 py-2 text-[13px] font-medium rounded-lg transition-colors",
+              style: @range == range ? "background: #1A1A1A; color: #FFFFFE;" : "background: #F5F3F0; color: #6B6760;" do %>
+            <%= range == "24h" ? "24 Hours" : range == "7d" ? "7 Days" : "30 Days" %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="flex flex-wrap gap-3 items-center">
+      <span class="text-[12px] font-medium" style="color: #6B6760;">Filters:</span>
+
+      <!-- Level Filter -->
+      <% if @available_levels.any? %>
+        <select onchange="applyFilter('level', this.value)"
+                class="px-3 py-1.5 text-[12px] rounded-lg outline-none cursor-pointer"
+                style="background: #F5F3F0; border: 1px solid #E8E5E0; color: #1A1A1A;">
+          <option value="">All Levels</option>
+          <% @available_levels.each do |level| %>
+            <option value="<%= level %>" <%= @level_filter == level ? "selected" : "" %>><%= level.upcase %></option>
+          <% end %>
+        </select>
+      <% end %>
+
+      <!-- Environment Filter -->
+      <% if @available_envs.any? %>
+        <select onchange="applyFilter('env', this.value)"
+                class="px-3 py-1.5 text-[12px] rounded-lg outline-none cursor-pointer"
+                style="background: #F5F3F0; border: 1px solid #E8E5E0; color: #1A1A1A;">
+          <option value="">All Environments</option>
+          <% @available_envs.each do |env| %>
+            <option value="<%= env %>" <%= @env_filter == env ? "selected" : "" %>><%= env %></option>
+          <% end %>
+        </select>
+      <% end %>
+
+      <!-- Service Filter -->
+      <% if @available_services.any? %>
+        <select onchange="applyFilter('service', this.value)"
+                class="px-3 py-1.5 text-[12px] rounded-lg outline-none cursor-pointer"
+                style="background: #F5F3F0; border: 1px solid #E8E5E0; color: #1A1A1A;">
+          <option value="">All Services</option>
+          <% @available_services.each do |service| %>
+            <option value="<%= service %>" <%= @service_filter == service ? "selected" : "" %>><%= service %></option>
+          <% end %>
+        </select>
+      <% end %>
+
+      <% if @level_filter || @env_filter || @service_filter %>
+        <%= link_to analytics_dashboard_project_path(@project, range: @range),
+            class: "px-3 py-1.5 text-[12px] font-medium rounded-lg",
+            style: "color: #DC2626;" do %>
+          Clear Filters
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="px-5 py-4 rounded-xl" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+      <div class="text-[12px] font-medium mb-1" style="color: #6B6760;">Total Logs</div>
+      <div class="text-[28px] font-semibold" style="color: #1A1A1A;"><%= number_with_delimiter(@total_logs) %></div>
+    </div>
+    <div class="px-5 py-4 rounded-xl" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+      <div class="text-[12px] font-medium mb-1" style="color: #6B6760;">Errors</div>
+      <div class="text-[28px] font-semibold" style="color: #DC2626;"><%= number_with_delimiter(@logs_by_level["error"] || 0) %></div>
+    </div>
+    <div class="px-5 py-4 rounded-xl" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+      <div class="text-[12px] font-medium mb-1" style="color: #6B6760;">Fatal</div>
+      <div class="text-[28px] font-semibold" style="color: #991B1B;"><%= number_with_delimiter(@logs_by_level["fatal"] || 0) %></div>
+    </div>
+    <div class="px-5 py-4 rounded-xl" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+      <div class="text-[12px] font-medium mb-1" style="color: #6B6760;">Warnings</div>
+      <div class="text-[28px] font-semibold" style="color: #D97706;"><%= number_with_delimiter(@logs_by_level["warn"] || 0) %></div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Logs Over Time Chart -->
+    <div class="px-5 py-4 rounded-xl" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+      <h3 class="text-[14px] font-semibold mb-4" style="color: #1A1A1A;">Logs Over Time</h3>
+      <div class="h-64">
+        <canvas id="logsChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Errors Over Time Chart -->
+    <div class="px-5 py-4 rounded-xl" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+      <h3 class="text-[14px] font-semibold mb-4" style="color: #1A1A1A;">Errors Over Time</h3>
+      <div class="h-64">
+        <canvas id="errorsChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Row -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Logs by Level -->
+    <div class="px-5 py-4 rounded-xl" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+      <h3 class="text-[14px] font-semibold mb-4" style="color: #1A1A1A;">By Level</h3>
+      <div class="space-y-3">
+        <%
+          level_colors = { "debug" => "#9CA3AF", "info" => "#3B82F6", "warn" => "#F59E0B", "error" => "#EF4444", "fatal" => "#991B1B" }
+          total = [@logs_by_level.values.sum, 1].max
+        %>
+        <% %w[debug info warn error fatal].each do |level| %>
+          <% count = @logs_by_level[level] || 0 %>
+          <% pct = (count.to_f / total * 100).round(1) %>
+          <div class="flex items-center gap-3">
+            <%= link_to analytics_dashboard_project_path(@project, range: @range, level: level, env: @env_filter, service: @service_filter),
+                class: "text-[12px] font-medium w-12 uppercase hover:underline",
+                style: "color: #{level_colors[level]};" do %>
+              <%= level %>
+            <% end %>
+            <div class="flex-1 h-2 rounded-full" style="background: #F5F3F0;">
+              <div class="h-2 rounded-full transition-all" style="width: <%= pct %>%; background: <%= level_colors[level] %>;"></div>
+            </div>
+            <span class="text-[12px] font-mono w-16 text-right" style="color: #6B6760;"><%= number_with_delimiter(count) %></span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- By Environment -->
+    <div class="px-5 py-4 rounded-xl" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+      <h3 class="text-[14px] font-semibold mb-4" style="color: #1A1A1A;">By Environment</h3>
+      <% if @logs_by_environment.any? %>
+        <div class="space-y-2">
+          <% @logs_by_environment.sort_by { |_, v| -v }.each do |env, count| %>
+            <%= link_to analytics_dashboard_project_path(@project, range: @range, level: @level_filter, env: env, service: @service_filter),
+                class: "flex justify-between items-center py-2 hover:bg-[#FAF9F7] -mx-2 px-2 rounded transition-colors",
+                style: "border-bottom: 1px solid #F0EDE8;" do %>
+              <span class="text-[13px] font-medium" style="color: #1A1A1A;"><%= env %></span>
+              <span class="text-[13px] font-mono" style="color: #6B6760;"><%= number_with_delimiter(count) %></span>
+            <% end %>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-[13px] py-4 text-center" style="color: #8B8780;">No environment data</p>
+      <% end %>
+    </div>
+
+    <!-- By Service -->
+    <div class="px-5 py-4 rounded-xl" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+      <h3 class="text-[14px] font-semibold mb-4" style="color: #1A1A1A;">By Service</h3>
+      <% if @logs_by_service.any? %>
+        <div class="space-y-2">
+          <% @logs_by_service.sort_by { |_, v| -v }.each do |service, count| %>
+            <%= link_to analytics_dashboard_project_path(@project, range: @range, level: @level_filter, env: @env_filter, service: service),
+                class: "flex justify-between items-center py-2 hover:bg-[#FAF9F7] -mx-2 px-2 rounded transition-colors",
+                style: "border-bottom: 1px solid #F0EDE8;" do %>
+              <span class="text-[13px] font-medium" style="color: #1A1A1A;"><%= service %></span>
+              <span class="text-[13px] font-mono" style="color: #6B6760;"><%= number_with_delimiter(count) %></span>
+            <% end %>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-[13px] py-4 text-center" style="color: #8B8780;">No service data</p>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Top Errors -->
+  <div class="px-5 py-4 rounded-xl" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+    <h3 class="text-[14px] font-semibold mb-4" style="color: #1A1A1A;">Top Error Messages</h3>
+    <% if @top_errors.any? %>
+      <div class="space-y-2">
+        <% @top_errors.each do |(message, count)| %>
+          <div class="flex items-start gap-3 py-3" style="border-bottom: 1px solid #F0EDE8;">
+            <span class="text-[12px] font-semibold px-2 py-1 rounded" style="background: #FEE2E2; color: #DC2626;"><%= count %></span>
+            <span class="flex-1 text-[13px] font-mono truncate" style="color: #1A1A1A;"><%= message %></span>
+            <%= link_to dashboard_project_logs_path(@project, q: "\"#{message.truncate(50)}\" level:error,fatal"),
+                class: "text-[12px] px-2 py-1 rounded transition-colors",
+                style: "background: #F5F3F0; color: #6B6760;" do %>
+              View
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-[13px] py-4 text-center" style="color: #8B8780;">No errors in this period</p>
+    <% end %>
+  </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js" data-turbo-track="reload"></script>
+<script>
+  // Filter function
+  function applyFilter(key, value) {
+    const url = new URL(window.location.href);
+    if (value) {
+      url.searchParams.set(key, value);
+    } else {
+      url.searchParams.delete(key);
+    }
+    Turbo.visit(url.toString());
+  }
+
+  // Store chart instances for cleanup
+  window.analyticsCharts = window.analyticsCharts || {};
+
+  function initializeCharts() {
+    // Chart data from Rails (embedded in data attributes)
+    const logsData = <%= raw @chart_data.to_json %>;
+    const errorsData = <%= raw @error_chart_data.to_json %>;
+
+    // Common chart options
+    const commonOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        intersect: false,
+        mode: 'index'
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1A1A1A',
+          titleFont: { size: 12, family: 'Inter' },
+          bodyFont: { size: 12, family: 'Inter' },
+          padding: 10,
+          cornerRadius: 8
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: {
+            font: { size: 10, family: 'Inter' },
+            color: '#8B8780',
+            maxRotation: 45
+          }
+        },
+        y: {
+          beginAtZero: true,
+          grid: { color: '#F0EDE8' },
+          ticks: {
+            font: { size: 10, family: 'Inter' },
+            color: '#8B8780',
+            precision: 0
+          }
+        }
+      }
+    };
+
+    // Destroy existing charts if they exist
+    if (window.analyticsCharts.logsChart) {
+      window.analyticsCharts.logsChart.destroy();
+    }
+    if (window.analyticsCharts.errorsChart) {
+      window.analyticsCharts.errorsChart.destroy();
+    }
+
+    // Get canvas elements
+    const logsCanvas = document.getElementById('logsChart');
+    const errorsCanvas = document.getElementById('errorsChart');
+
+    if (logsCanvas && typeof Chart !== 'undefined') {
+      // Logs Chart
+      window.analyticsCharts.logsChart = new Chart(logsCanvas, {
+        type: 'line',
+        data: {
+          labels: logsData.labels,
+          datasets: [{
+            data: logsData.values,
+            borderColor: '#D97757',
+            backgroundColor: 'rgba(217, 119, 87, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.3,
+            pointRadius: 3,
+            pointHoverRadius: 5,
+            pointBackgroundColor: '#D97757'
+          }]
+        },
+        options: commonOptions
+      });
+    }
+
+    if (errorsCanvas && typeof Chart !== 'undefined') {
+      // Errors Chart
+      window.analyticsCharts.errorsChart = new Chart(errorsCanvas, {
+        type: 'line',
+        data: {
+          labels: errorsData.labels,
+          datasets: [{
+            data: errorsData.values,
+            borderColor: '#DC2626',
+            backgroundColor: 'rgba(220, 38, 38, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.3,
+            pointRadius: 3,
+            pointHoverRadius: 5,
+            pointBackgroundColor: '#DC2626'
+          }]
+        },
+        options: commonOptions
+      });
+    }
+  }
+
+  // Initialize on Turbo load and regular page load
+  document.addEventListener('turbo:load', initializeCharts);
+
+  // Also run immediately if Turbo already loaded
+  if (document.readyState === 'complete') {
+    initializeCharts();
+  }
+</script>

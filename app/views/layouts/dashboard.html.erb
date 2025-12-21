@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <title>Recall</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
+</head>
+<body class="h-full font-sans antialiased" style="font-family: 'Inter', system-ui, sans-serif; background: #FAF9F7;">
+  <div class="min-h-full">
+    <!-- Header -->
+    <header class="border-b" style="border-color: #E8E5E0; background: #FFFFFE;">
+      <div class="max-w-5xl mx-auto px-6">
+        <div class="flex h-16 items-center justify-between">
+          <%= link_to dashboard_root_path, class: "flex items-center gap-2.5" do %>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <circle cx="10" cy="10" r="8" fill="#D97757"/>
+            </svg>
+            <span class="text-[15px] font-semibold tracking-tight" style="color: #1A1A1A;">Recall</span>
+          <% end %>
+          <% if @project&.persisted? %>
+            <div class="flex items-center gap-6">
+              <div class="flex items-center gap-3">
+                <span style="color: #C4C0B8;">/</span>
+                <%= link_to @project.name, dashboard_project_logs_path(@project), class: "text-[14px] hover:underline", style: "color: #6B6760;" %>
+              </div>
+              <div class="flex items-center gap-4">
+                <%= link_to dashboard_project_logs_path(@project), class: "text-[13px] font-medium transition-colors", style: controller_name == 'logs' ? "color: #1A1A1A;" : "color: #8B8780;" do %>
+                  Logs
+                <% end %>
+                <%= link_to analytics_dashboard_project_path(@project), class: "text-[13px] font-medium transition-colors", style: action_name == 'analytics' ? "color: #1A1A1A;" : "color: #8B8780;" do %>
+                  Analytics
+                <% end %>
+                <%= link_to setup_dashboard_project_path(@project), class: "text-[13px] font-medium transition-colors", style: action_name == 'setup' ? "color: #1A1A1A;" : "color: #8B8780;" do %>
+                  Setup
+                <% end %>
+                <%= link_to mcp_setup_dashboard_project_path(@project), class: "text-[13px] font-medium transition-colors", style: action_name == 'mcp_setup' ? "color: #1A1A1A;" : "color: #8B8780;" do %>
+                  MCP
+                <% end %>
+                <%= link_to edit_dashboard_project_path(@project), class: "text-[13px] font-medium transition-colors", style: action_name == 'edit' ? "color: #1A1A1A;" : "color: #8B8780;" do %>
+                  Settings
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main class="max-w-5xl mx-auto px-6 py-10">
+      <% if notice %>
+        <div class="mb-6 px-4 py-3 rounded-lg text-[14px]" style="background: #E8F5E8; color: #2D5A2D;">
+          <%= notice %>
+        </div>
+      <% end %>
+      <% if alert %>
+        <div class="mb-6 px-4 py-3 rounded-lg text-[14px]" style="background: #FEE8E8; color: #8B2D2D;">
+          <%= alert %>
+        </div>
+      <% end %>
+      <%= yield %>
+    </main>
+  </div>
+</body>
+</html>

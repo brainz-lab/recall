@@ -1,0 +1,26 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: bin/dev
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@brainzlab-db-1/recall_development
+      RAILS_ENV: development
+    volumes:
+      - .:/rails
+      - bundle:/usr/local/bundle
+      - node_modules:/rails/node_modules
+    networks:
+      - brainzlab
+
+networks:
+  brainzlab:
+    external: true
+    name: brainzlab_default
+
+volumes:
+  bundle:
+  node_modules:
