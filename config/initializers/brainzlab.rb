@@ -1,7 +1,33 @@
 # frozen_string_literal: true
 
-# Self-logging for Recall
-# Uses direct database inserts to avoid HTTP infinite loops
+# Self-logging and error tracking for Recall
+# Uses direct database inserts for logging to avoid HTTP infinite loops
+# Uses SDK for Reflex error tracking (with loop prevention)
+
+# Configure BrainzLab SDK for Reflex error tracking
+BrainzLab.configure do |config|
+  # App name for auto-provisioning
+  config.app_name = "recall"
+
+  # Disable Recall logging via SDK (we use direct DB inserts)
+  config.recall_enabled = false
+
+  # Enable Reflex error tracking
+  config.reflex_enabled = true
+  config.reflex_url = ENV.fetch("REFLEX_URL", "http://reflex.localhost")
+  config.reflex_master_key = ENV["REFLEX_MASTER_KEY"]
+
+  # Exclude common Rails exceptions
+  config.reflex_excluded_exceptions = [
+    "ActionController::RoutingError",
+    "ActionController::InvalidAuthenticityToken",
+    "ActionController::UnknownFormat"
+  ]
+
+  # Service identification
+  config.service = "recall"
+  config.environment = Rails.env
+end
 
 # Middleware to capture request context for self-logging
 class RecallSelfLogMiddleware
@@ -23,13 +49,17 @@ end
 Rails.application.config.middleware.insert_after ActionDispatch::Session::CookieStore, RecallSelfLogMiddleware
 
 Rails.application.config.after_initialize do
-  # Find or create the recall project
+  # Provision Reflex project early
+  BrainzLab::Reflex.ensure_provisioned!
+
+  # Find or create the recall project for self-logging
   project = Project.find_or_create_by!(name: "recall") do |p|
     p.ingest_key = "rcl_ingest_#{SecureRandom.hex(16)}"
     p.api_key = "rcl_api_#{SecureRandom.hex(16)}"
   end
 
   Rails.logger.info "[Recall] Self-logging enabled for project: #{project.id}"
+  Rails.logger.info "[Recall] Reflex error tracking: #{BrainzLab.configuration.reflex_enabled ? 'enabled' : 'disabled'}"
 
   # Subscribe to request completion events
   ActiveSupport::Notifications.subscribe("process_action.action_controller") do |*args|
@@ -44,30 +74,33 @@ Rails.application.config.after_initialize do
     request_id = Thread.current[:recall_request_id]
     session_id = Thread.current[:recall_session_id]
 
-    begin
-      LogEntry.create!(
-        project: project,
-        timestamp: Time.current,
-        level: payload[:status].to_i >= 400 ? "error" : "info",
-        message: "#{payload[:method]} #{payload[:path]}",
-        service: "recall",
-        environment: Rails.env,
-        request_id: request_id,
-        session_id: session_id,
-        host: Socket.gethostname,
-        data: {
-          controller: payload[:controller],
-          action: payload[:action],
-          status: payload[:status],
-          duration_ms: event.duration.round(1),
-          view_ms: payload[:view_runtime]&.round(1),
-          db_ms: payload[:db_runtime]&.round(1),
-          format: payload[:format],
-          params: payload[:params].except("controller", "action").to_h
-        }
-      )
-    rescue StandardError => e
-      Rails.logger.error "[Recall] Self-logging failed: #{e.message}"
+    # Use without_capture to prevent infinite loops when logging fails
+    BrainzLab::Reflex.without_capture do
+      begin
+        LogEntry.create!(
+          project: project,
+          timestamp: Time.current,
+          level: payload[:status].to_i >= 400 ? "error" : "info",
+          message: "#{payload[:method]} #{payload[:path]}",
+          service: "recall",
+          environment: Rails.env,
+          request_id: request_id,
+          session_id: session_id,
+          host: Socket.gethostname,
+          data: {
+            controller: payload[:controller],
+            action: payload[:action],
+            status: payload[:status],
+            duration_ms: event.duration.round(1),
+            view_ms: payload[:view_runtime]&.round(1),
+            db_ms: payload[:db_runtime]&.round(1),
+            format: payload[:format],
+            params: payload[:params].except("controller", "action").to_h
+          }
+        )
+      rescue StandardError => e
+        Rails.logger.error "[Recall] Self-logging failed: #{e.message}"
+      end
     end
   end
 
@@ -76,25 +109,27 @@ Rails.application.config.after_initialize do
     event = ActiveSupport::Notifications::Event.new(*args)
     job = event.payload[:job]
 
-    begin
-      LogEntry.create!(
-        project: project,
-        timestamp: Time.current,
-        level: "info",
-        message: "Job #{job.class.name}",
-        service: "recall",
-        environment: Rails.env,
-        host: Socket.gethostname,
-        data: {
-          job_class: job.class.name,
-          job_id: job.job_id,
-          queue_name: job.queue_name,
-          duration_ms: event.duration.round(1),
-          executions: job.executions
-        }
-      )
-    rescue StandardError => e
-      Rails.logger.error "[Recall] Job logging failed: #{e.message}"
+    BrainzLab::Reflex.without_capture do
+      begin
+        LogEntry.create!(
+          project: project,
+          timestamp: Time.current,
+          level: "info",
+          message: "Job #{job.class.name}",
+          service: "recall",
+          environment: Rails.env,
+          host: Socket.gethostname,
+          data: {
+            job_class: job.class.name,
+            job_id: job.job_id,
+            queue_name: job.queue_name,
+            duration_ms: event.duration.round(1),
+            executions: job.executions
+          }
+        )
+      rescue StandardError => e
+        Rails.logger.error "[Recall] Job logging failed: #{e.message}"
+      end
     end
   end
 
@@ -104,26 +139,28 @@ Rails.application.config.after_initialize do
     job = event.payload[:job]
     error = event.payload[:error]
 
-    begin
-      LogEntry.create!(
-        project: project,
-        timestamp: Time.current,
-        level: "error",
-        message: "Job failed: #{job.class.name} - #{error.class}: #{error.message}",
-        service: "recall",
-        environment: Rails.env,
-        host: Socket.gethostname,
-        data: {
-          job_class: job.class.name,
-          job_id: job.job_id,
-          queue_name: job.queue_name,
-          error_class: error.class.name,
-          error_message: error.message,
-          backtrace: error.backtrace&.first(10)
-        }
-      )
-    rescue StandardError => e
-      Rails.logger.error "[Recall] Job error logging failed: #{e.message}"
+    BrainzLab::Reflex.without_capture do
+      begin
+        LogEntry.create!(
+          project: project,
+          timestamp: Time.current,
+          level: "error",
+          message: "Job failed: #{job.class.name} - #{error.class}: #{error.message}",
+          service: "recall",
+          environment: Rails.env,
+          host: Socket.gethostname,
+          data: {
+            job_class: job.class.name,
+            job_id: job.job_id,
+            queue_name: job.queue_name,
+            error_class: error.class.name,
+            error_message: error.message,
+            backtrace: error.backtrace&.first(10)
+          }
+        )
+      rescue StandardError => e
+        Rails.logger.error "[Recall] Job error logging failed: #{e.message}"
+      end
     end
   end
 end
