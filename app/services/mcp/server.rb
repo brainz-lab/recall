@@ -5,6 +5,7 @@ module Mcp
       'recall_errors' => Tools::RecallErrors,
       'recall_stats' => Tools::RecallStats,
       'recall_by_session' => Tools::RecallBySession,
+      'recall_request' => Tools::RecallRequest,
       'recall_new_session' => Tools::RecallNewSession,
       'recall_clear_session' => Tools::RecallClearSession,
     }.freeze

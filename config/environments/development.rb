@@ -3,6 +3,12 @@ require "active_support/core_ext/integer/time"
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
+  # Allow Docker service hostnames and localhost variants
+  config.hosts << "recall"
+  config.hosts << "recall:3000"
+  config.hosts << "recall.localhost"
+  config.hosts << /.*\.localhost/
+
   # Make code changes take effect immediately without server restart.
   config.enable_reloading = true
 

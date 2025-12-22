@@ -7,7 +7,15 @@ Rails.application.routes.draw do
       get 'logs', to: 'logs#index'
       get 'logs/export', to: 'logs#export'
       get 'logs/:id', to: 'logs#show'
-      resources :sessions, only: [:create, :destroy]
+      resources :sessions, only: [:index, :show, :create, :destroy] do
+        member do
+          get :logs
+        end
+      end
+
+      # Project provisioning (internal API for SDK auto-setup)
+      post 'projects/provision', to: 'projects#provision'
+      get 'projects/lookup', to: 'projects#lookup'
     end
   end
 
