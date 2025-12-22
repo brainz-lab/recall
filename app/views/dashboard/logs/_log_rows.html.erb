@@ -24,7 +24,7 @@
         </div>
       <% end %>
       <div class="flex flex-wrap gap-4 text-[12px]" style="color: #8B8780;">
-        <% if log.session_id %>
+        <% if log.session_id.present? %>
           <%= link_to session_trace_dashboard_project_logs_path(@project, session_id: log.session_id),
               class: "hover:underline cursor-pointer flex items-center gap-1",
               style: "color: #1D4ED8;",

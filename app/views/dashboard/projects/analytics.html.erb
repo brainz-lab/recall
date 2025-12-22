@@ -194,8 +194,8 @@
 </div>
 
 <!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js" data-turbo-track="reload"></script>
-<script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script data-turbo-temporary>
   // Filter function
   function applyFilter(key, value) {
     const url = new URL(window.location.href);
@@ -210,10 +210,20 @@
   // Store chart instances for cleanup
   window.analyticsCharts = window.analyticsCharts || {};
 
+  // Chart data from Rails
+  const analyticsPageData = {
+    logsData: <%= raw @chart_data.to_json %>,
+    errorsData: <%= raw @error_chart_data.to_json %>
+  };
+
   function initializeCharts() {
-    // Chart data from Rails (embedded in data attributes)
-    const logsData = <%= raw @chart_data.to_json %>;
-    const errorsData = <%= raw @error_chart_data.to_json %>;
+    // Wait for Chart.js to load
+    if (typeof Chart === 'undefined') {
+      setTimeout(initializeCharts, 50);
+      return;
+    }
+
+    const { logsData, errorsData } = analyticsPageData;
 
     // Common chart options
     const commonOptions = {
@@ -266,7 +276,7 @@
     const logsCanvas = document.getElementById('logsChart');
     const errorsCanvas = document.getElementById('errorsChart');
 
-    if (logsCanvas && typeof Chart !== 'undefined') {
+    if (logsCanvas) {
       // Logs Chart
       window.analyticsCharts.logsChart = new Chart(logsCanvas, {
         type: 'line',
@@ -288,7 +298,7 @@
       });
     }
 
-    if (errorsCanvas && typeof Chart !== 'undefined') {
+    if (errorsCanvas) {
       // Errors Chart
       window.analyticsCharts.errorsChart = new Chart(errorsCanvas, {
         type: 'line',
@@ -311,11 +321,6 @@
     }
   }
 
-  // Initialize on Turbo load and regular page load
-  document.addEventListener('turbo:load', initializeCharts);
-
-  // Also run immediately if Turbo already loaded
-  if (document.readyState === 'complete') {
-    initializeCharts();
-  }
+  // Initialize immediately - the setTimeout in initializeCharts handles waiting for Chart.js
+  initializeCharts();
 </script>

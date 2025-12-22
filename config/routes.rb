@@ -34,12 +34,14 @@ Rails.application.routes.draw do
         get :mcp_setup
         get :analytics
       end
-      resources :logs, only: [:index, :show] do
+      resources :logs, only: [:index] do
         collection do
           get 'trace/:request_id', action: :trace, as: :trace
           get 'session/:session_id', action: :session_trace, as: :session_trace
         end
       end
+      # Show route with constraint to avoid matching 'trace' or 'session'
+      get 'logs/:id', to: 'logs#show', as: :log, constraints: { id: /(?!trace|session)[^\/]+/ }
       resources :saved_searches, only: [:index, :create, :destroy]
       resources :exports, only: [:create]
       resource :archive, only: [:create, :show]

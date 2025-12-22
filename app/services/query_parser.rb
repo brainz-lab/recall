@@ -67,6 +67,9 @@ class QueryParser
     cmd = @commands.find { |c| c[:command] == 'stats' }
     group_by = cmd&.dig(:args)&.find { |a| a.start_with?('by:') }&.sub('by:', '')
 
+    # Remove default ordering for GROUP BY operations
+    scope = scope.unscope(:order)
+
     case group_by
     when 'level' then scope.group(:level).count
     when 'commit' then scope.group(:commit).count

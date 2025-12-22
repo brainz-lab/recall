@@ -12,7 +12,7 @@ class RecallSelfLogMiddleware
   def call(env)
     request = ActionDispatch::Request.new(env)
     Thread.current[:recall_request_id] = request.request_id
-    Thread.current[:recall_session_id] = request.session.id.to_s rescue nil
+    Thread.current[:recall_session_id] = request.session.id.to_s.presence rescue nil
     @app.call(env)
   ensure
     Thread.current[:recall_request_id] = nil
@@ -20,7 +20,7 @@ class RecallSelfLogMiddleware
   end
 end
 
-Rails.application.config.middleware.insert_after ActionDispatch::RequestId, RecallSelfLogMiddleware
+Rails.application.config.middleware.insert_after ActionDispatch::Session::CookieStore, RecallSelfLogMiddleware
 
 Rails.application.config.after_initialize do
   # Find or create the recall project
@@ -40,13 +40,9 @@ Rails.application.config.after_initialize do
     next if payload[:controller] == "Api::V1::IngestController"
     next if payload[:path]&.start_with?("/api/v1/log")
 
-    # Extract request_id from headers or payload
-    request_id = payload[:headers]&.env&.dig("action_dispatch.request_id") ||
-                 payload[:request]&.request_id ||
-                 Thread.current[:request_id]
-
-    # Extract session_id if available
-    session_id = payload[:request]&.session&.id&.to_s rescue nil
+    # Get request context from middleware
+    request_id = Thread.current[:recall_request_id]
+    session_id = Thread.current[:recall_session_id]
 
     begin
       LogEntry.create!(
