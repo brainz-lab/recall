@@ -86,7 +86,7 @@
       </div>
       <div class="p-4 flex flex-wrap gap-2">
         <% @request_ids.each do |request_id| %>
-          <%= link_to dashboard_project_logs_trace_path(@project, request_id),
+          <%= link_to trace_dashboard_project_logs_path(@project, request_id: request_id),
               class: "px-3 py-1.5 rounded-lg text-[12px] font-mono transition-colors hover:opacity-80",
               style: "background: #F5F3F0; color: #6B6760; border: 1px solid #E8E5E0;" do %>
             <%= request_id.truncate(20) %>
@@ -126,7 +126,7 @@
                 <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
                 <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
               </svg>
-              <%= link_to dashboard_project_logs_trace_path(@project, log.request_id),
+              <%= link_to trace_dashboard_project_logs_path(@project, request_id: log.request_id),
                   class: "text-[11px] font-mono transition-colors hover:underline",
                   style: "color: #6B6760;" do %>
                 Request: <%= log.request_id.truncate(36) %>
