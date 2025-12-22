@@ -54,6 +54,24 @@ module Dashboard
       @services = @logs.unscope(:order).where.not(service: nil).distinct.pluck(:service)
     end
 
+    def session_trace
+      @session_id = params[:session_id]
+      @logs = @project.log_entries.where(session_id: @session_id).reorder(timestamp: :asc)
+
+      if @logs.empty?
+        redirect_to dashboard_project_logs_path(@project), alert: "No logs found for session #{@session_id}"
+        return
+      end
+
+      @first_log = @logs.first
+      @last_log = @logs.last
+      @log_count = @logs.size
+      @duration_ms = ((@last_log.timestamp - @first_log.timestamp) * 1000).round
+      @levels = @logs.unscope(:order).group(:level).count
+      @services = @logs.unscope(:order).where.not(service: nil).distinct.pluck(:service)
+      @request_ids = @logs.unscope(:order).where.not(request_id: nil).distinct.pluck(:request_id)
+    end
+
     private
 
     def set_project

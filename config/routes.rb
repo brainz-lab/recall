@@ -37,6 +37,7 @@ Rails.application.routes.draw do
       resources :logs, only: [:index, :show] do
         collection do
           get 'trace/:request_id', action: :trace, as: :trace
+          get 'session/:session_id', action: :session_trace, as: :session_trace
         end
       end
       resources :saved_searches, only: [:index, :create, :destroy]

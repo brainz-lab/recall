@@ -11,7 +11,10 @@ module Api
         logs = params[:logs] || params[:_json] || []
         entries = logs.map { |l| build_entry(l) }.compact
 
-        LogEntry.insert_all(entries) if entries.any?
+        if entries.any?
+          LogEntry.insert_all(entries)
+          broadcast_batch(entries)
+        end
         render json: { ingested: entries.size }, status: :created
       end
 
@@ -46,6 +49,16 @@ module Api
         LogsChannel.broadcast_to(@project, entry.as_json) if defined?(LogsChannel)
       rescue => e
         Rails.logger.warn "Failed to broadcast log: #{e.message}"
+      end
+
+      def broadcast_batch(entries)
+        return unless defined?(LogsChannel)
+
+        entries.each do |entry|
+          LogsChannel.broadcast_to(@project, entry.as_json)
+        end
+      rescue => e
+        Rails.logger.warn "Failed to broadcast batch: #{e.message}"
       end
     end
   end
