@@ -52,6 +52,7 @@ module Dashboard
       @duration_ms = ((@last_log.timestamp - @first_log.timestamp) * 1000).round
       @levels = @logs.unscope(:order).group(:level).count
       @services = @logs.unscope(:order).where.not(service: nil).distinct.pluck(:service)
+      @session_id = @first_log.session_id
     end
 
     def session_trace

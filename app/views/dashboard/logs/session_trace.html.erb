@@ -1,7 +1,7 @@
 <div class="space-y-6" data-controller="expand">
   <!-- Header -->
-  <div class="flex items-center justify-between">
-    <%= link_to dashboard_project_logs_path(@project, q: "request:#{@request_id}"),
+  <div class="flex items-center gap-4">
+    <%= link_to dashboard_project_logs_path(@project, q: "session:#{@session_id}"),
         class: "flex items-center gap-2 text-[13px] font-medium transition-colors",
         style: "color: #6B6760;" do %>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -9,38 +9,34 @@
       </svg>
       Back to Logs
     <% end %>
-    <% if @session_id.present? %>
-      <%= link_to session_trace_dashboard_project_logs_path(@project, session_id: @session_id),
-          class: "flex items-center gap-2 text-[13px] font-medium transition-colors hover:underline",
-          style: "color: #1D4ED8;" do %>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-          <circle cx="9" cy="7" r="4"/>
-        </svg>
-        View Full Session
-      <% end %>
-    <% end %>
   </div>
 
-  <!-- Request Info Card -->
+  <!-- Session Info Card -->
   <div class="px-6 py-5 rounded-xl" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
     <div class="flex flex-col gap-4">
       <div>
-        <div class="text-[12px] font-medium mb-1" style="color: #6B6760;">Request Trace</div>
-        <div class="text-[18px] font-mono font-semibold" style="color: #1A1A1A;"><%= @request_id %></div>
+        <div class="text-[12px] font-medium mb-1" style="color: #6B6760;">Session Trace</div>
+        <div class="text-[18px] font-mono font-semibold" style="color: #1A1A1A;"><%= @session_id %></div>
       </div>
       <div class="flex flex-wrap gap-6 text-[13px]" style="color: #6B6760;">
         <div class="flex items-center gap-2">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
           </svg>
-          <span><strong style="color: #1A1A1A;"><%= @duration_ms %>ms</strong> duration</span>
+          <span><strong style="color: #1A1A1A;"><%= @duration_ms %>ms</strong> total duration</span>
         </div>
         <div class="flex items-center gap-2">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8M16 17H8M10 9H8"/>
           </svg>
           <span><strong style="color: #1A1A1A;"><%= @log_count %></strong> logs</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+          </svg>
+          <span><strong style="color: #1A1A1A;"><%= @request_ids.size %></strong> requests</span>
         </div>
         <% if @services.any? %>
           <div class="flex items-center gap-2">
@@ -82,6 +78,24 @@
     <% end %>
   </div>
 
+  <!-- Requests in Session -->
+  <% if @request_ids.size > 1 %>
+    <div class="rounded-xl overflow-hidden" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+      <div class="px-5 py-3" style="border-bottom: 1px solid #E8E5E0;">
+        <h3 class="text-[14px] font-semibold" style="color: #1A1A1A;">Requests in Session</h3>
+      </div>
+      <div class="p-4 flex flex-wrap gap-2">
+        <% @request_ids.each do |request_id| %>
+          <%= link_to dashboard_project_logs_trace_path(@project, request_id),
+              class: "px-3 py-1.5 rounded-lg text-[12px] font-mono transition-colors hover:opacity-80",
+              style: "background: #F5F3F0; color: #6B6760; border: 1px solid #E8E5E0;" do %>
+            <%= request_id.truncate(20) %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
   <!-- Timeline -->
   <div class="rounded-xl overflow-hidden" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
     <div class="px-5 py-3" style="border-bottom: 1px solid #E8E5E0;">
@@ -93,12 +107,34 @@
       <div class="absolute left-[140px] top-0 bottom-0 w-px" style="background: #E8E5E0;"></div>
 
       <% previous_time = nil %>
+      <% previous_request_id = nil %>
       <% @logs.each_with_index do |log, index| %>
         <%
           delta_ms = previous_time ? ((log.timestamp - previous_time) * 1000).round : 0
           previous_time = log.timestamp
           style = level_styles[log.level] || level_styles["info"]
+          new_request = log.request_id != previous_request_id && log.request_id.present?
+          previous_request_id = log.request_id
         %>
+
+        <% if new_request && log.request_id.present? %>
+          <!-- Request separator -->
+          <div class="relative flex items-center px-4 py-2" style="background: #FAF9F7; border-bottom: 1px solid #E8E5E0;">
+            <div class="w-[140px] flex-shrink-0"></div>
+            <div class="flex-1 flex items-center gap-2 pl-6">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #8B8780;">
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+              </svg>
+              <%= link_to dashboard_project_logs_trace_path(@project, log.request_id),
+                  class: "text-[11px] font-mono transition-colors hover:underline",
+                  style: "color: #6B6760;" do %>
+                Request: <%= log.request_id.truncate(36) %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+
         <div class="relative flex" style="border-bottom: 1px solid #F0EDE8;" data-controller="expand">
           <!-- Timestamp & Delta -->
           <div class="w-[140px] flex-shrink-0 px-4 py-4 text-right">
