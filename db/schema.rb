@@ -10,19 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_21_102000) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_23_200000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
   enable_extension "pgcrypto"
+  enable_extension "timescaledb"
 
-  create_table "log_entries", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "log_entries", primary_key: ["id", "timestamp"], force: :cascade do |t|
     t.string "branch"
     t.string "commit"
     t.datetime "created_at", null: false
     t.jsonb "data", default: {}
     t.string "environment"
     t.string "host"
+    t.uuid "id", default: -> { "gen_random_uuid()" }, null: false
     t.string "level", null: false
     t.text "message"
     t.uuid "project_id", null: false
@@ -41,34 +43,3 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_21_102000) do
     t.index ["session_id"], name: "index_log_entries_on_session_id"
     t.index ["timestamp"], name: "index_log_entries_on_timestamp"
   end
-
-  create_table "projects", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "api_key", null: false
-    t.boolean "archive_enabled", default: false
-    t.bigint "bytes_total", default: 0
-    t.datetime "created_at", null: false
-    t.string "ingest_key", null: false
-    t.datetime "last_archived_at"
-    t.bigint "logs_count", default: 0
-    t.string "name", null: false
-    t.integer "retention_days", default: 30
-    t.string "slug", null: false
-    t.datetime "updated_at", null: false
-    t.index ["api_key"], name: "index_projects_on_api_key", unique: true
-    t.index ["ingest_key"], name: "index_projects_on_ingest_key", unique: true
-    t.index ["slug"], name: "index_projects_on_slug", unique: true
-  end
-
-  create_table "saved_searches", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.string "name", null: false
-    t.uuid "project_id", null: false
-    t.string "query", null: false
-    t.datetime "updated_at", null: false
-    t.index ["project_id", "name"], name: "index_saved_searches_on_project_id_and_name", unique: true
-    t.index ["project_id"], name: "index_saved_searches_on_project_id"
-  end
-
-  add_foreign_key "log_entries", "projects"
-  add_foreign_key "saved_searches", "projects"
-end

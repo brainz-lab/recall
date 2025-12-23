@@ -71,6 +71,9 @@ end
 Rails.application.config.middleware.insert_after ActionDispatch::Session::CookieStore, RecallSelfLogMiddleware
 
 Rails.application.config.after_initialize do
+  # Skip if running migrations or if tables don't exist yet
+  next unless ActiveRecord::Base.connection.table_exists?(:projects) rescue false
+
   # Provision Reflex and Pulse projects only in local dev mode
   if local_dev_mode
     BrainzLab::Reflex.ensure_provisioned!

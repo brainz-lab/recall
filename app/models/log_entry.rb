@@ -1,4 +1,6 @@
 class LogEntry < ApplicationRecord
+  include Timescaledb::Rails::Model
+
   belongs_to :project, counter_cache: :logs_count
 
   LEVELS = %w[debug info warn error fatal].freeze
