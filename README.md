@@ -4,6 +4,8 @@ Structured logging with total memory for Rails apps.
 
 [![CI](https://github.com/brainz-lab/recall/actions/workflows/ci.yml/badge.svg)](https://github.com/brainz-lab/recall/actions/workflows/ci.yml)
 [![Docker](https://github.com/brainz-lab/recall/actions/workflows/docker.yml/badge.svg)](https://github.com/brainz-lab/recall/actions/workflows/docker.yml)
+[![Docker Hub](https://img.shields.io/docker/v/brainzllc/recall?label=Docker%20Hub)](https://hub.docker.com/r/brainzllc/recall)
+[![Docs](https://img.shields.io/badge/docs-brainzlab.ai-orange)](https://docs.brainzlab.ai/products/recall/overview)
 
 ## Overview
 
@@ -180,12 +182,16 @@ bin/rails test:system       # System tests
 bin/rubocop                 # Linting
 ```
 
+## Documentation
+
+Full documentation: [docs.brainzlab.ai/products/recall](https://docs.brainzlab.ai/products/recall/overview)
+
 ## Related
 
-- [brainzlab](https://github.com/brainz-lab/brainzlab-ruby) - Ruby SDK
-- [Platform](https://github.com/brainz-lab/platform) - Auth & billing
+- [brainzlab-ruby](https://github.com/brainz-lab/brainzlab-ruby) - Ruby SDK
 - [Reflex](https://github.com/brainz-lab/reflex) - Error tracking
 - [Pulse](https://github.com/brainz-lab/pulse) - APM
+- [Stack](https://github.com/brainz-lab/stack) - Self-hosted deployment
 
 ## License
 
