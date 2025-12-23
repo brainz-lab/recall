@@ -2,6 +2,8 @@ class LogEntry < ApplicationRecord
   include Timescaledb::Rails::Model
   include HypertableFindable
 
+  self.primary_key = "id"
+
   belongs_to :project, counter_cache: :logs_count
 
   LEVELS = %w[debug info warn error fatal].freeze
