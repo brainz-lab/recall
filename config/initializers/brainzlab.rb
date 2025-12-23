@@ -34,6 +34,7 @@ BrainzLab.configure do |config|
   config.pulse_enabled = local_dev_mode
   config.pulse_url = ENV.fetch("PULSE_URL", "http://pulse.localhost")
   config.pulse_master_key = ENV["PULSE_MASTER_KEY"]
+  config.pulse_buffer_size = 1 if Rails.env.development?  # Send immediately in dev
 
   # Exclude common Rails exceptions
   config.reflex_excluded_exceptions = [
