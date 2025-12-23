@@ -6,10 +6,16 @@
 #
 # Set BRAINZLAB_SDK_ENABLED=false to disable SDK initialization
 # Useful for running migrations before SDK is ready
+#
+# Set BRAINZLAB_LOCAL_DEV=true to enable cross-service integrations
+# (Reflex error tracking, Pulse APM). Off by default to avoid double monitoring.
 
 # Skip during asset precompilation or when explicitly disabled
 return if ENV["BRAINZLAB_SDK_ENABLED"] == "false"
 return if ENV["SECRET_KEY_BASE_DUMMY"].present?
+
+# Cross-service integrations only enabled when BRAINZLAB_LOCAL_DEV=true
+local_dev_mode = ENV["BRAINZLAB_LOCAL_DEV"] == "true"
 
 # Configure BrainzLab SDK for Reflex error tracking and Pulse APM
 BrainzLab.configure do |config|
@@ -19,13 +25,13 @@ BrainzLab.configure do |config|
   # Disable Recall logging via SDK (we use direct DB inserts)
   config.recall_enabled = false
 
-  # Enable Reflex error tracking
-  config.reflex_enabled = true
+  # Enable Reflex error tracking (only in local dev mode)
+  config.reflex_enabled = local_dev_mode
   config.reflex_url = ENV.fetch("REFLEX_URL", "http://reflex.localhost")
   config.reflex_master_key = ENV["REFLEX_MASTER_KEY"]
 
-  # Enable Pulse APM
-  config.pulse_enabled = true
+  # Enable Pulse APM (only in local dev mode)
+  config.pulse_enabled = local_dev_mode
   config.pulse_url = ENV.fetch("PULSE_URL", "http://pulse.localhost")
   config.pulse_master_key = ENV["PULSE_MASTER_KEY"]
 
@@ -61,9 +67,11 @@ end
 Rails.application.config.middleware.insert_after ActionDispatch::Session::CookieStore, RecallSelfLogMiddleware
 
 Rails.application.config.after_initialize do
-  # Provision Reflex and Pulse projects early
-  BrainzLab::Reflex.ensure_provisioned!
-  BrainzLab::Pulse.ensure_provisioned!
+  # Provision Reflex and Pulse projects only in local dev mode
+  if local_dev_mode
+    BrainzLab::Reflex.ensure_provisioned!
+    BrainzLab::Pulse.ensure_provisioned!
+  end
 
   # Find or create the recall project for self-logging
   project = Project.find_or_create_by!(name: "recall") do |p|
@@ -72,6 +80,7 @@ Rails.application.config.after_initialize do
   end
 
   Rails.logger.info "[Recall] Self-logging enabled for project: #{project.id}"
+  Rails.logger.info "[Recall] Local dev mode: #{local_dev_mode ? 'enabled' : 'disabled'}"
   Rails.logger.info "[Recall] Reflex error tracking: #{BrainzLab.configuration.reflex_enabled ? 'enabled' : 'disabled'}"
   Rails.logger.info "[Recall] Pulse APM: #{BrainzLab.configuration.pulse_enabled ? 'enabled' : 'disabled'}"
 
