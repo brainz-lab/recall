@@ -34,7 +34,7 @@ module Dashboard
     end
 
     def show
-      @log = @project.log_entries.find(params[:id])
+      @log = @project.log_entries.find_by_composite_key(params[:id])
     end
 
     def trace

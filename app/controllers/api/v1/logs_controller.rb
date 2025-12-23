@@ -16,7 +16,7 @@ module Api
       end
 
       def show
-        log = @project.log_entries.find(params[:id])
+        log = @project.log_entries.find_by_composite_key(params[:id])
         render json: log
       rescue ActiveRecord::RecordNotFound
         render json: { error: 'Not found' }, status: :not_found

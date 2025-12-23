@@ -1,5 +1,6 @@
 class LogEntry < ApplicationRecord
   include Timescaledb::Rails::Model
+  include HypertableFindable
 
   belongs_to :project, counter_cache: :logs_count
 
