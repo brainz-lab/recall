@@ -46,8 +46,11 @@ gem "thruster", require: false
 gem "image_processing", "~> 1.2"
 
 # BrainzLab SDK for logging
-# Path works in both local dev (../brainzlab-sdk) and Docker (/brainzlab-sdk)
-gem "brainzlab-sdk", path: ENV.fetch("BRAINZLAB_SDK_PATH", "../brainzlab-sdk")
+if ENV["BRAINZLAB_SDK_PATH"] || File.exist?("../brainzlab-sdk")
+  gem "brainzlab", path: ENV.fetch("BRAINZLAB_SDK_PATH", "../brainzlab-sdk")
+else
+  gem "brainzlab"
+end
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
