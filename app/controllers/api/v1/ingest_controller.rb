@@ -46,16 +46,14 @@ module Api
       end
 
       def broadcast_log(entry)
-        LogsChannel.broadcast_to(@project, entry.as_json) if defined?(LogsChannel)
+        LogsChannel.broadcast_to(@project, { type: "log", log: entry.as_json })
       rescue => e
         Rails.logger.warn "Failed to broadcast log: #{e.message}"
       end
 
       def broadcast_batch(entries)
-        return unless defined?(LogsChannel)
-
         entries.each do |entry|
-          LogsChannel.broadcast_to(@project, entry.as_json)
+          LogsChannel.broadcast_to(@project, { type: "log", log: entry })
         end
       rescue => e
         Rails.logger.warn "Failed to broadcast batch: #{e.message}"

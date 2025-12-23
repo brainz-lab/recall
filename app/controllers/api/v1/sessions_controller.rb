@@ -68,8 +68,10 @@ module Api
 
       # DELETE /api/v1/sessions/:id
       def destroy
-        deleted = @project.log_entries.where(session_id: params[:id]).delete_all
-        render json: { deleted: deleted, session_id: params[:id] }
+        session_id = params[:id]
+        deleted = @project.log_entries.where(session_id: session_id).delete_all
+        LogsChannel.broadcast_session_cleared(@project, session_id, deleted)
+        render json: { deleted: deleted, session_id: session_id }
       end
     end
   end

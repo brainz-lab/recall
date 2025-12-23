@@ -13,8 +13,35 @@ export default class extends Controller {
     this.consumer = createConsumer()
     this.subscription = this.consumer.subscriptions.create(
       { channel: "LogsChannel", project_id: this.projectIdValue },
-      { received: (log) => this.handleLog(log) }
+      { received: (data) => this.handleMessage(data) }
     )
+  }
+
+  handleMessage(data) {
+    switch (data.type) {
+      case "log":
+        this.handleLog(data.log)
+        break
+      case "session_cleared":
+        this.handleSessionCleared(data)
+        break
+      case "saved_search_created":
+      case "saved_search_deleted":
+        // Refresh saved searches list
+        Turbo.visit(window.location.href, { action: "replace" })
+        break
+      default:
+        // Legacy format - treat as log directly
+        if (data.message !== undefined) {
+          this.handleLog(data)
+        }
+    }
+  }
+
+  handleSessionCleared(data) {
+    // Remove logs with the cleared session_id from the view
+    const sessionLogs = this.containerTarget.querySelectorAll(`[data-session-id="${data.session_id}"]`)
+    sessionLogs.forEach(el => el.remove())
   }
 
   stop() {

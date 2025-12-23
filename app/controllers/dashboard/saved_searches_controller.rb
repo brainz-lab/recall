@@ -16,6 +16,7 @@ module Dashboard
 
       respond_to do |format|
         if @saved_search.save
+          LogsChannel.broadcast_saved_search_created(@project, @saved_search)
           format.html { redirect_to dashboard_project_logs_path(@project, q: @saved_search.query), notice: "Search saved!" }
           format.json { render json: @saved_search, status: :created }
           format.turbo_stream
@@ -27,7 +28,9 @@ module Dashboard
     end
 
     def destroy
+      saved_search_id = @saved_search.id
       @saved_search.destroy
+      LogsChannel.broadcast_saved_search_deleted(@project, saved_search_id)
 
       respond_to do |format|
         format.html { redirect_to dashboard_project_logs_path(@project), notice: "Search deleted." }
