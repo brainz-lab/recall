@@ -49,6 +49,9 @@ Rails.application.routes.draw do
     root to: 'projects#index'
   end
 
+  # SSO from Platform
+  get 'sso/callback', to: 'sso#callback'
+
   # Health check
   get 'up', to: ->(_) { [200, {}, ['ok']] }
 
