@@ -47,6 +47,12 @@ Rails.application.routes.draw do
       resource :archive, only: [:create, :show]
     end
     root to: 'projects#index'
+
+    # Dev Tools (development only)
+    resource :dev_tools, only: [:show], controller: 'dev_tools' do
+      post 'clean_logs'
+      post 'clean_all'
+    end
   end
 
   # SSO from Platform
