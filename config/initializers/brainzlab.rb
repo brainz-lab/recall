@@ -3,8 +3,13 @@
 # Self-logging and error tracking for Recall
 # Uses direct database inserts for logging to avoid HTTP infinite loops
 # Uses SDK for Reflex error tracking (with loop prevention)
+#
+# Set BRAINZLAB_SDK_ENABLED=false to disable SDK initialization
+# Useful for running migrations before SDK is ready
 
-# Configure BrainzLab SDK for Reflex error tracking
+return if ENV["BRAINZLAB_SDK_ENABLED"] == "false"
+
+# Configure BrainzLab SDK for Reflex error tracking and Pulse APM
 BrainzLab.configure do |config|
   # App name for auto-provisioning
   config.app_name = "recall"
@@ -16,6 +21,11 @@ BrainzLab.configure do |config|
   config.reflex_enabled = true
   config.reflex_url = ENV.fetch("REFLEX_URL", "http://reflex.localhost")
   config.reflex_master_key = ENV["REFLEX_MASTER_KEY"]
+
+  # Enable Pulse APM
+  config.pulse_enabled = true
+  config.pulse_url = ENV.fetch("PULSE_URL", "http://pulse.localhost")
+  config.pulse_master_key = ENV["PULSE_MASTER_KEY"]
 
   # Exclude common Rails exceptions
   config.reflex_excluded_exceptions = [
@@ -49,8 +59,9 @@ end
 Rails.application.config.middleware.insert_after ActionDispatch::Session::CookieStore, RecallSelfLogMiddleware
 
 Rails.application.config.after_initialize do
-  # Provision Reflex project early
+  # Provision Reflex and Pulse projects early
   BrainzLab::Reflex.ensure_provisioned!
+  BrainzLab::Pulse.ensure_provisioned!
 
   # Find or create the recall project for self-logging
   project = Project.find_or_create_by!(name: "recall") do |p|
@@ -60,6 +71,7 @@ Rails.application.config.after_initialize do
 
   Rails.logger.info "[Recall] Self-logging enabled for project: #{project.id}"
   Rails.logger.info "[Recall] Reflex error tracking: #{BrainzLab.configuration.reflex_enabled ? 'enabled' : 'disabled'}"
+  Rails.logger.info "[Recall] Pulse APM: #{BrainzLab.configuration.pulse_enabled ? 'enabled' : 'disabled'}"
 
   # Subscribe to request completion events
   ActiveSupport::Notifications.subscribe("process_action.action_controller") do |*args|
