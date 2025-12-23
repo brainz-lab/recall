@@ -46,6 +46,9 @@ BrainzLab.configure do |config|
   # Service identification
   config.service = "recall"
   config.environment = Rails.env
+
+  # Ignore internal BrainzLab hosts to prevent infinite recursion
+  config.http_ignore_hosts = %w[localhost 127.0.0.1 recall reflex pulse]
 end
 
 # Middleware to capture request context for self-logging
