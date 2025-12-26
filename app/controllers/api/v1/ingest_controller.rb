@@ -12,7 +12,9 @@ module Api
         entries = logs.map { |l| build_entry(l) }.compact
 
         if entries.any?
-          LogEntry.insert_all(entries)
+          # Use raw SQL for bulk inserts to avoid Rails 8.1 unique index validation
+          # which fails for TimescaleDB hypertables with composite primary keys
+          bulk_insert_logs(entries)
           broadcast_batch(entries)
         end
         render json: { ingested: entries.size }, status: :created
@@ -27,6 +29,11 @@ module Api
       end
 
       def build_entry(log)
+        # Convert ActionController::Parameters to hash and ensure data is JSON-serializable
+        data = log[:data]
+        data = data.to_unsafe_h if data.respond_to?(:to_unsafe_h)
+        data = (data || {}).to_json
+
         {
           id: SecureRandom.uuid,
           project_id: @project.id,
@@ -40,7 +47,7 @@ module Api
           host: log[:host],
           request_id: log[:request_id],
           session_id: log[:session_id],
-          data: log[:data] || {},
+          data: data,
           created_at: Time.current
         }
       end
@@ -57,6 +64,22 @@ module Api
         end
       rescue => e
         Rails.logger.warn "Failed to broadcast batch: #{e.message}"
+      end
+
+      def bulk_insert_logs(entries)
+        return if entries.empty?
+
+        columns = entries.first.keys
+        values = entries.map do |entry|
+          columns.map { |col| ActiveRecord::Base.connection.quote(entry[col]) }.join(", ")
+        end
+
+        sql = <<~SQL
+          INSERT INTO log_entries (#{columns.join(', ')})
+          VALUES #{values.map { |v| "(#{v})" }.join(', ')}
+        SQL
+
+        ActiveRecord::Base.connection.execute(sql)
       end
     end
   end

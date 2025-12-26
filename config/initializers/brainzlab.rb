@@ -14,25 +14,24 @@
 return if ENV["BRAINZLAB_SDK_ENABLED"] == "false"
 return if ENV["SECRET_KEY_BASE_DUMMY"].present?
 
-# Cross-service integrations only enabled when BRAINZLAB_LOCAL_DEV=true
-local_dev_mode = ENV["BRAINZLAB_LOCAL_DEV"] == "true"
-
 # Configure BrainzLab SDK for Reflex error tracking and Pulse APM
+# Recall uses direct DB inserts for its own logging (avoids HTTP loops)
+# but sends to Reflex and Pulse for cross-service monitoring
 BrainzLab.configure do |config|
   # App name for auto-provisioning
   config.app_name = "recall"
 
-  # Disable Recall logging via SDK (we use direct DB inserts)
+  # Disable Recall logging via SDK (we use direct DB inserts for self-logging)
   config.recall_enabled = false
 
-  # Enable Reflex error tracking (only in local dev mode)
-  config.reflex_enabled = local_dev_mode
-  config.reflex_url = ENV.fetch("REFLEX_URL", "http://reflex.localhost")
+  # Enable Reflex error tracking (send errors to Reflex)
+  config.reflex_enabled = ENV.fetch("REFLEX_ENABLED", "true") == "true"
+  config.reflex_url = ENV.fetch("REFLEX_URL", "http://reflex:3000")
   config.reflex_master_key = ENV["REFLEX_MASTER_KEY"]
 
-  # Enable Pulse APM (only in local dev mode)
-  config.pulse_enabled = local_dev_mode
-  config.pulse_url = ENV.fetch("PULSE_URL", "http://pulse.localhost")
+  # Enable Pulse APM (send traces with spans to Pulse)
+  config.pulse_enabled = ENV.fetch("PULSE_ENABLED", "true") == "true"
+  config.pulse_url = ENV.fetch("PULSE_URL", "http://pulse:3000")
   config.pulse_master_key = ENV["PULSE_MASTER_KEY"]
   config.pulse_buffer_size = 1 if Rails.env.development?  # Send immediately in dev
 
@@ -74,11 +73,9 @@ Rails.application.config.after_initialize do
   # Skip if running migrations or if tables don't exist yet
   next unless ActiveRecord::Base.connection.table_exists?(:projects) rescue false
 
-  # Provision Reflex and Pulse projects only in local dev mode
-  if local_dev_mode
-    BrainzLab::Reflex.ensure_provisioned!
-    BrainzLab::Pulse.ensure_provisioned!
-  end
+  # Provision Reflex and Pulse projects (auto-creates project in each service)
+  BrainzLab::Reflex.ensure_provisioned! if BrainzLab.configuration.reflex_enabled
+  BrainzLab::Pulse.ensure_provisioned! if BrainzLab.configuration.pulse_enabled
 
   # Find or create the recall project for self-logging
   project = Project.find_or_create_by!(name: "recall") do |p|
@@ -87,7 +84,6 @@ Rails.application.config.after_initialize do
   end
 
   Rails.logger.info "[Recall] Self-logging enabled for project: #{project.id}"
-  Rails.logger.info "[Recall] Local dev mode: #{local_dev_mode ? 'enabled' : 'disabled'}"
   Rails.logger.info "[Recall] Reflex error tracking: #{BrainzLab.configuration.reflex_enabled ? 'enabled' : 'disabled'}"
   Rails.logger.info "[Recall] Pulse APM: #{BrainzLab.configuration.pulse_enabled ? 'enabled' : 'disabled'}"
 
