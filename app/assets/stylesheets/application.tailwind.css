@@ -1,23 +1,362 @@
 @import "tailwindcss";
 
-/* Log level styles - Anthropic aesthetic */
+/* ============================================
+   Anthropic/Claude-Inspired Design System
+   ============================================ */
+
+/* Custom Anthropic Color Palette */
+:root {
+  /* Background tones */
+  --anthropic-cream-50: #FDFCFA;
+  --anthropic-cream-100: #FAF8F5;
+  --anthropic-cream-200: #F5F3EF;
+  --anthropic-cream-300: #EBE8E3;
+  --anthropic-cream-400: #E0DCD6;
+
+  /* Text/Ink tones */
+  --anthropic-ink-900: #1A1A1A;
+  --anthropic-ink-800: #2D2D2D;
+  --anthropic-ink-700: #404040;
+  --anthropic-ink-600: #525252;
+  --anthropic-ink-500: #6B6B6B;
+  --anthropic-ink-400: #8B8780;
+  --anthropic-ink-300: #A8A29E;
+  --anthropic-ink-200: #D4D0CA;
+
+  /* Anthropic Orange - Primary accent */
+  --anthropic-orange-50: #FFF7ED;
+  --anthropic-orange-100: #FFEDD5;
+  --anthropic-orange-200: #FED7AA;
+  --anthropic-orange-300: #FDBA74;
+  --anthropic-orange-400: #FB923C;
+  --anthropic-orange-500: #F97316;
+  --anthropic-orange-600: #EA580C;
+  --anthropic-orange-700: #C2410C;
+  --anthropic-orange-800: #9A3412;
+
+  /* Claude Coral - Secondary accent */
+  --claude-coral: #D97757;
+  --claude-coral-dark: #C4684A;
+  --claude-coral-light: #E89B7F;
+
+  /* Semantic colors */
+  --color-success: #22C55E;
+  --color-success-light: #DCFCE7;
+  --color-warning: #F59E0B;
+  --color-warning-light: #FEF3C7;
+  --color-error: #EF4444;
+  --color-error-light: #FEE2E2;
+  --color-info: #3B82F6;
+  --color-info-light: #DBEAFE;
+}
+
+/* Base typography and anti-aliasing */
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+  transition-property: background-color, border-color, color, box-shadow, transform, opacity;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Button base styles */
+.btn-primary {
+  background: linear-gradient(180deg, var(--anthropic-ink-800) 0%, var(--anthropic-ink-900) 100%);
+  color: #FFFFFF;
+  border: 1px solid var(--anthropic-ink-900);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(180deg, var(--anthropic-ink-700) 0%, var(--anthropic-ink-800) 100%);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: var(--anthropic-cream-100);
+  color: var(--anthropic-ink-700);
+  border: 1px solid var(--anthropic-cream-300);
+}
+
+.btn-secondary:hover {
+  background: var(--anthropic-cream-200);
+  border-color: var(--anthropic-cream-400);
+}
+
+/* Card styles with subtle shadow */
+.card {
+  background: #FFFFFF;
+  border: 1px solid var(--anthropic-cream-300);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px -1px rgba(0, 0, 0, 0.02);
+}
+
+.card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -2px rgba(0, 0, 0, 0.02);
+  border-color: var(--anthropic-cream-400);
+}
+
+/* Input styles */
+.input-field {
+  background: var(--anthropic-cream-50);
+  border: 1px solid var(--anthropic-cream-300);
+  border-radius: 8px;
+  color: var(--anthropic-ink-900);
+  transition: all 0.2s ease;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--claude-coral);
+  box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.15);
+  background: #FFFFFF;
+}
+
+.input-field::placeholder {
+  color: var(--anthropic-ink-400);
+}
+
+/* Subtle gradient backgrounds */
+.bg-gradient-warm {
+  background: linear-gradient(135deg, var(--anthropic-cream-50) 0%, var(--anthropic-cream-100) 100%);
+}
+
+.bg-gradient-accent {
+  background: linear-gradient(135deg, var(--anthropic-orange-50) 0%, var(--anthropic-cream-100) 100%);
+}
+
+/* Log level styles - Anthropic aesthetic with enhanced styling */
 .log-level-debug {
-  background: #F0EDE8;
+  background: linear-gradient(135deg, #F5F3EF 0%, #EBE8E3 100%);
   color: #8B8780;
+  border: 1px solid #E0DCD6;
 }
+
 .log-level-info {
-  background: #E8F0F5;
-  color: #4A6B7C;
+  background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+  color: #1D4ED8;
+  border: 1px solid #BFDBFE;
 }
+
 .log-level-warn {
-  background: #FDF6E3;
-  color: #9A7B2C;
+  background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+  color: #B45309;
+  border: 1px solid #FDE68A;
 }
+
 .log-level-error {
-  background: #FEE8E8;
-  color: #C94A4A;
+  background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%);
+  color: #DC2626;
+  border: 1px solid #FECACA;
 }
+
 .log-level-fatal {
-  background: #F3E8F5;
-  color: #7C4A8B;
+  background: linear-gradient(135deg, #450A0A 0%, #7F1D1D 100%);
+  color: #FCA5A5;
+  border: 1px solid #991B1B;
+}
+
+/* Log row hover effect */
+.log-row {
+  transition: all 0.15s ease;
+}
+
+.log-row:hover {
+  background-color: var(--anthropic-cream-50);
+}
+
+/* Code block styling */
+pre, code {
+  font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
+}
+
+.code-block {
+  background: var(--anthropic-ink-900);
+  color: var(--anthropic-cream-200);
+  border-radius: 12px;
+  border: 1px solid var(--anthropic-ink-800);
+}
+
+.code-block:hover {
+  border-color: var(--anthropic-ink-700);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--anthropic-cream-100);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--anthropic-cream-400);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--anthropic-ink-400);
+}
+
+/* Focus ring styles */
+.focus-ring:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.25);
+}
+
+/* Badge/pill styles */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 9999px;
+  transition: all 0.15s ease;
+}
+
+.badge:hover {
+  transform: scale(1.02);
+}
+
+/* Sidebar navigation item */
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--anthropic-ink-600);
+  transition: all 0.15s ease;
+}
+
+.nav-item:hover {
+  background: var(--anthropic-cream-100);
+  color: var(--anthropic-ink-900);
+}
+
+.nav-item.active {
+  background: rgba(217, 119, 87, 0.1);
+  color: var(--claude-coral);
+}
+
+/* Modal overlay */
+.modal-overlay {
+  background: rgba(26, 26, 26, 0.4);
+  backdrop-filter: blur(4px);
+}
+
+/* Modal content */
+.modal-content {
+  background: #FFFFFF;
+  border-radius: 16px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Table styles */
+.table-header {
+  background: var(--anthropic-cream-50);
+  border-bottom: 1px solid var(--anthropic-cream-300);
+}
+
+.table-row {
+  border-bottom: 1px solid var(--anthropic-cream-200);
+  transition: background-color 0.15s ease;
+}
+
+.table-row:hover {
+  background: var(--anthropic-cream-50);
+}
+
+/* Loading spinner */
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Skeleton loading */
+.skeleton {
+  background: linear-gradient(90deg, var(--anthropic-cream-200) 25%, var(--anthropic-cream-100) 50%, var(--anthropic-cream-200) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Tooltip */
+.tooltip {
+  background: var(--anthropic-ink-900);
+  color: #FFFFFF;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Subtle text highlight for links */
+a:not(.btn-primary):not(.btn-secondary) {
+  text-decoration-color: transparent;
+  transition: text-decoration-color 0.2s ease;
+}
+
+a:not(.btn-primary):not(.btn-secondary):hover {
+  text-decoration-color: currentColor;
+}
+
+/* Chart container */
+.chart-container {
+  background: #FFFFFF;
+  border: 1px solid var(--anthropic-cream-300);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+/* Stats card */
+.stats-card {
+  background: #FFFFFF;
+  border: 1px solid var(--anthropic-cream-300);
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: all 0.2s ease;
+}
+
+.stats-card:hover {
+  border-color: var(--claude-coral-light);
+  box-shadow: 0 4px 12px -2px rgba(217, 119, 87, 0.1);
+}
+
+/* Recall brand accent gradient */
+.brand-gradient {
+  background: linear-gradient(135deg, var(--claude-coral) 0%, var(--anthropic-orange-500) 100%);
+}
+
+.brand-gradient-text {
+  background: linear-gradient(135deg, var(--claude-coral) 0%, var(--anthropic-orange-500) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Selection styling */
+::selection {
+  background: rgba(217, 119, 87, 0.2);
+  color: var(--anthropic-ink-900);
 }

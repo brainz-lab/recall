@@ -2,10 +2,10 @@ class Project < ApplicationRecord
   has_many :log_entries, dependent: :delete_all
   has_many :saved_searches, dependent: :destroy
 
-  validates :name, presence: true
-  validates :slug, presence: true, uniqueness: true
-  validates :ingest_key, presence: true, uniqueness: true
-  validates :api_key, presence: true, uniqueness: true
+  validates :name, presence: true, uniqueness: true
+  validates :slug, presence: true
+  validates :ingest_key, presence: true
+  validates :api_key, presence: true
 
   before_validation :generate_slug, on: :create
   before_validation :generate_keys, on: :create

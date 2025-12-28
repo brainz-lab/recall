@@ -11,47 +11,93 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     :root {
-      --color-cream-50: #FAF9F7;
-      --color-cream-100: #F5F3EF;
-      --color-cream-200: #E8E5E0;
+      /* Anthropic-inspired warm cream background tones */
+      --color-cream-50: #FDFCFA;
+      --color-cream-100: #FAF8F5;
+      --color-cream-200: #F5F3EF;
+      --color-cream-300: #EBE8E3;
+      --color-cream-400: #E0DCD6;
+
+      /* Ink/text tones */
       --color-ink-900: #1A1A1A;
-      --color-ink-700: #3D3D3D;
+      --color-ink-800: #2D2D2D;
+      --color-ink-700: #404040;
       --color-ink-600: #525252;
       --color-ink-500: #6B6B6B;
       --color-ink-400: #8B8780;
       --color-ink-300: #A8A29E;
+      --color-ink-200: #D4D0CA;
+
+      /* Claude coral accent */
       --color-recall: #D97757;
       --color-recall-dark: #C4684A;
+      --color-recall-light: #E89B7F;
+
+      /* Anthropic orange */
+      --color-orange-500: #F97316;
+      --color-orange-600: #EA580C;
+
+      /* Semantic */
       --color-success: #22C55E;
       --color-warning: #F59E0B;
       --color-error: #EF4444;
     }
-    body { font-family: 'Inter', system-ui, sans-serif; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    /* Subtle gradient on sidebar */
+    .sidebar-gradient {
+      background: linear-gradient(180deg, #FFFFFF 0%, #FDFCFA 100%);
+    }
+    /* Brand logo gradient */
+    .brand-logo {
+      background: linear-gradient(135deg, var(--color-recall) 0%, var(--color-orange-600) 100%);
+      box-shadow: 0 2px 8px -2px rgba(217, 119, 87, 0.4);
+    }
+    /* Nav item hover/active states */
+    .nav-link {
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .nav-link:hover {
+      background: var(--color-cream-100);
+      transform: translateX(2px);
+    }
+    .nav-link-active {
+      background: rgba(217, 119, 87, 0.1);
+      color: var(--color-recall);
+    }
+    /* Smooth scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--color-cream-400); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--color-ink-400); }
   </style>
 </head>
-<body class="h-full antialiased" style="background: var(--color-cream-50);">
+<body class="h-full" style="background: linear-gradient(135deg, var(--color-cream-50) 0%, var(--color-cream-100) 100%);">
   <div class="flex h-full">
     <!-- Sidebar -->
-    <aside class="w-64 border-r flex flex-col" style="border-color: var(--color-cream-200); background: #FFFFFE;">
-      <div class="p-5 border-b" style="border-color: var(--color-cream-100);">
-        <%= link_to dashboard_root_path, class: "flex items-center gap-2.5" do %>
-          <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--color-recall);">
+    <aside class="w-64 border-r flex flex-col sidebar-gradient" style="border-color: var(--color-cream-300);">
+      <div class="p-5 border-b" style="border-color: var(--color-cream-200);">
+        <%= link_to dashboard_root_path, class: "flex items-center gap-3 group" do %>
+          <div class="w-9 h-9 rounded-xl flex items-center justify-center brand-logo transition-transform group-hover:scale-105">
             <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
               <circle cx="12" cy="12" r="8"/>
             </svg>
           </div>
-          <span class="font-semibold" style="color: var(--color-ink-900);">Recall</span>
+          <span class="text-[17px] font-semibold tracking-tight" style="color: var(--color-ink-900);">Recall</span>
         <% end %>
       </div>
 
       <% if @project&.persisted? %>
         <!-- Project Selector -->
-        <div class="px-4 py-3 border-b" style="border-color: var(--color-cream-100);">
-          <%= link_to dashboard_projects_path, class: "flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-[var(--color-cream-100)] transition" do %>
-            <div class="w-6 h-6 rounded flex items-center justify-center text-xs font-semibold" style="background: var(--color-cream-200); color: var(--color-ink-600);">
+        <div class="px-4 py-3 border-b" style="border-color: var(--color-cream-200);">
+          <%= link_to dashboard_projects_path, class: "flex items-center gap-2.5 px-2.5 py-2 rounded-lg nav-link" do %>
+            <div class="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-semibold" style="background: linear-gradient(135deg, var(--color-cream-200) 0%, var(--color-cream-300) 100%); color: var(--color-ink-600); box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);">
               <%= @project.name.first.upcase %>
             </div>
-            <span class="flex-1 text-sm font-medium truncate" style="color: var(--color-ink-700);"><%= @project.name %></span>
+            <span class="flex-1 text-[13px] font-medium truncate" style="color: var(--color-ink-700);"><%= @project.name %></span>
             <svg class="w-4 h-4" style="color: var(--color-ink-400);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
             </svg>
@@ -62,9 +108,9 @@
         <nav class="p-4 space-y-1 flex-1">
           <% logs_active = controller_name == 'logs' %>
           <%= link_to dashboard_project_logs_path(@project),
-              class: "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition",
-              style: "#{logs_active ? 'background: rgba(217, 119, 87, 0.1); color: var(--color-recall);' : 'color: var(--color-ink-600);'}" do %>
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              class: "nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium #{logs_active ? 'nav-link-active' : ''}",
+              style: logs_active ? '' : 'color: var(--color-ink-600);' do %>
+            <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
             </svg>
             Logs
@@ -72,9 +118,9 @@
 
           <% analytics_active = action_name == 'analytics' %>
           <%= link_to analytics_dashboard_project_path(@project),
-              class: "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition",
-              style: "#{analytics_active ? 'background: rgba(217, 119, 87, 0.1); color: var(--color-recall);' : 'color: var(--color-ink-600);'}" do %>
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              class: "nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium #{analytics_active ? 'nav-link-active' : ''}",
+              style: analytics_active ? '' : 'color: var(--color-ink-600);' do %>
+            <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
             </svg>
             Analytics
@@ -82,9 +128,9 @@
 
           <% setup_active = action_name == 'setup' %>
           <%= link_to setup_dashboard_project_path(@project),
-              class: "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition",
-              style: "#{setup_active ? 'background: rgba(217, 119, 87, 0.1); color: var(--color-recall);' : 'color: var(--color-ink-600);'}" do %>
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              class: "nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium #{setup_active ? 'nav-link-active' : ''}",
+              style: setup_active ? '' : 'color: var(--color-ink-600);' do %>
+            <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
             </svg>
             Setup
@@ -92,9 +138,9 @@
 
           <% mcp_active = action_name == 'mcp_setup' %>
           <%= link_to mcp_setup_dashboard_project_path(@project),
-              class: "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition",
-              style: "#{mcp_active ? 'background: rgba(217, 119, 87, 0.1); color: var(--color-recall);' : 'color: var(--color-ink-600);'}" do %>
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              class: "nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium #{mcp_active ? 'nav-link-active' : ''}",
+              style: mcp_active ? '' : 'color: var(--color-ink-600);' do %>
+            <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
             </svg>
             MCP
@@ -102,9 +148,9 @@
 
           <% settings_active = action_name == 'edit' %>
           <%= link_to edit_dashboard_project_path(@project),
-              class: "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition",
-              style: "#{settings_active ? 'background: rgba(217, 119, 87, 0.1); color: var(--color-recall);' : 'color: var(--color-ink-600);'}" do %>
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              class: "nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium #{settings_active ? 'nav-link-active' : ''}",
+              style: settings_active ? '' : 'color: var(--color-ink-600);' do %>
+            <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
             </svg>
@@ -113,11 +159,11 @@
         </nav>
 
         <% if Rails.env.development? %>
-          <div class="px-4 pb-2">
+          <div class="px-4 pb-3">
             <%= link_to dashboard_dev_tools_path,
-                class: "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition",
-                style: "background: #FEF3C7; color: #92400E;" do %>
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                class: "flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all",
+                style: "background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%); color: #92400E; border: 1px solid #FCD34D;" do %>
+              <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
               </svg>
               Dev Tools
@@ -126,12 +172,12 @@
         <% end %>
       <% else %>
         <nav class="p-4 flex-1">
-          <p class="px-3 text-xs font-medium uppercase tracking-wider mb-3" style="color: var(--color-ink-400);">Select a project</p>
+          <p class="px-3 text-[11px] font-semibold uppercase tracking-wider mb-4" style="color: var(--color-ink-400);">Select a project</p>
           <% if Rails.env.development? %>
             <%= link_to dashboard_dev_tools_path,
-                class: "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition mt-4",
-                style: "background: #FEF3C7; color: #92400E;" do %>
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                class: "flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all mt-4",
+                style: "background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%); color: #92400E; border: 1px solid #FCD34D;" do %>
+              <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
               </svg>
               Dev Tools
@@ -142,14 +188,14 @@
 
       <!-- User Menu -->
       <% if defined?(current_user) && current_user %>
-        <div class="p-4 border-t" style="border-color: var(--color-cream-100);">
-          <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold" style="background: rgba(217, 119, 87, 0.15); color: var(--color-recall);">
+        <div class="p-4 border-t" style="border-color: var(--color-cream-200);">
+          <div class="flex items-center gap-3 px-2 py-1.5 rounded-lg nav-link cursor-pointer">
+            <div class="w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-semibold" style="background: linear-gradient(135deg, rgba(217, 119, 87, 0.15) 0%, rgba(249, 115, 22, 0.15) 100%); color: var(--color-recall);">
               <%= current_user.name&.first&.upcase || current_user.email.first.upcase %>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium truncate" style="color: var(--color-ink-900);"><%= current_user.name || current_user.email.split('@').first %></p>
-              <p class="text-xs truncate" style="color: var(--color-ink-500);"><%= current_user.email %></p>
+              <p class="text-[13px] font-medium truncate" style="color: var(--color-ink-900);"><%= current_user.name || current_user.email.split('@').first %></p>
+              <p class="text-[11px] truncate" style="color: var(--color-ink-500);"><%= current_user.email %></p>
             </div>
           </div>
         </div>
@@ -159,12 +205,18 @@
     <!-- Main Content -->
     <main class="flex-1 overflow-auto">
       <% if notice %>
-        <div class="m-8 mb-0 px-4 py-3 rounded-xl text-sm font-medium" style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); color: #166534;">
+        <div class="m-8 mb-0 px-4 py-3 rounded-xl text-[13px] font-medium flex items-center gap-3" style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(34, 197, 94, 0.12) 100%); border: 1px solid rgba(34, 197, 94, 0.25); color: #166534;">
+          <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          </svg>
           <%= notice %>
         </div>
       <% end %>
       <% if alert %>
-        <div class="m-8 mb-0 px-4 py-3 rounded-xl text-sm font-medium" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: #991B1B;">
+        <div class="m-8 mb-0 px-4 py-3 rounded-xl text-[13px] font-medium flex items-center gap-3" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(239, 68, 68, 0.12) 100%); border: 1px solid rgba(239, 68, 68, 0.25); color: #991B1B;">
+          <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+          </svg>
           <%= alert %>
         </div>
       <% end %>
