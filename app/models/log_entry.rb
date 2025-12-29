@@ -22,4 +22,9 @@ class LogEntry < ApplicationRecord
   def self.recent_counts(since: 1.hour.ago)
     unscope(:order).where("timestamp >= ?", since).group(:level).count
   end
+
+  # Generate composite key for URL-safe identification (id_timestamp format)
+  def composite_key
+    "#{id}_#{timestamp.iso8601(6)}"
+  end
 end

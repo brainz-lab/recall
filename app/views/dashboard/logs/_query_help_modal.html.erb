@@ -1,0 +1,142 @@
+<%# Query Help Modal - extracted for cleaner index template %>
+<div data-query-help-target="modal" data-action="keydown@window->query-help#closeOnEscape" class="hidden fixed inset-0 z-50">
+  <div class="absolute inset-0 bg-black/30" data-action="click->query-help#close"></div>
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl max-h-[80vh] overflow-y-auto p-6 rounded-xl" style="background: #FFFFFE;">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-[18px] font-semibold" style="color: #1A1A1A;">Query Syntax</h3>
+      <button data-action="click->query-help#close" class="p-2 rounded-lg hover:bg-[#F5F3F0]" style="color: #6B6760;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="space-y-6 text-[13px]" style="color: #1A1A1A;">
+      <!-- Basic Syntax -->
+      <div>
+        <h4 class="font-semibold mb-2" style="color: #D97757;">Basic Syntax</h4>
+        <p class="mb-2" style="color: #6B6760;">Combine filters with spaces (AND). Use <code class="px-1.5 py-0.5 rounded" style="background: #F5F3F0;">field:value</code> format.</p>
+        <div class="font-mono text-[12px] p-3 rounded-lg" style="background: #F5F3F0; color: #6B6760;">
+          level:error since:1h "payment failed"
+        </div>
+      </div>
+
+      <!-- OR Operator -->
+      <div>
+        <h4 class="font-semibold mb-2" style="color: #D97757;">OR Operator</h4>
+        <p class="mb-2" style="color: #6B6760;">Use <code class="px-1.5 py-0.5 rounded" style="background: #F5F3F0;">OR</code> to match any of multiple conditions:</p>
+        <div class="space-y-2 font-mono text-[12px]">
+          <div class="p-2 rounded" style="background: #F5F3F0;">
+            <span style="color: #6B6760;">Errors or warnings:</span><br>
+            <span style="color: #D97757;">level:error OR level:warn</span>
+          </div>
+          <div class="p-2 rounded" style="background: #F5F3F0;">
+            <span style="color: #6B6760;">Multiple services:</span><br>
+            <span style="color: #D97757;">service:api OR service:worker</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filters Table -->
+      <div>
+        <h4 class="font-semibold mb-3" style="color: #D97757;">Available Filters</h4>
+        <table class="w-full text-[12px]">
+          <thead>
+            <tr style="border-bottom: 1px solid #E8E5E0;">
+              <th class="text-left py-2 font-medium" style="color: #6B6760;">Filter</th>
+              <th class="text-left py-2 font-medium" style="color: #6B6760;">Example</th>
+              <th class="text-left py-2 font-medium" style="color: #6B6760;">Description</th>
+            </tr>
+          </thead>
+          <tbody class="font-mono" style="color: #1A1A1A;">
+            <% [
+              ["level:", "level:error", "debug, info, warn, error, fatal"],
+              ["level:", "level:error,fatal", "Multiple levels (comma-separated)"],
+              ["level:", "level:!debug", "Exclude level (negation)"],
+              ["since:", "since:1h", "Time ago: 15m, 1h, 7d, 2w"],
+              ["until:", "until:30m", "Before time ago"],
+              ["env:", "env:production", "Environment filter"],
+              ["service:", "service:api", "Service name"],
+              ["host:", "host:web-01", "Server hostname"],
+              ["commit:", "commit:a1b2c3d", "Git commit SHA"],
+              ["branch:", "branch:main", "Git branch"],
+              ["session:", "session:abc123", "Session ID"],
+              ["request:", "request:req_xyz", "Request ID"]
+            ].each do |filter, example, desc| %>
+              <tr style="border-bottom: 1px solid #F0EDE8;">
+                <td class="py-2"><%= filter %></td>
+                <td class="py-2" style="color: #D97757;"><%= example %></td>
+                <td class="py-2 font-sans" style="color: #6B6760;"><%= desc %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Data Filters -->
+      <div>
+        <h4 class="font-semibold mb-3" style="color: #D97757;">JSON Data Filters</h4>
+        <table class="w-full text-[12px]">
+          <thead>
+            <tr style="border-bottom: 1px solid #E8E5E0;">
+              <th class="text-left py-2 font-medium" style="color: #6B6760;">Type</th>
+              <th class="text-left py-2 font-medium" style="color: #6B6760;">Example</th>
+              <th class="text-left py-2 font-medium" style="color: #6B6760;">Description</th>
+            </tr>
+          </thead>
+          <tbody class="font-mono" style="color: #1A1A1A;">
+            <% [
+              ["Exact", "data.user_id:123", "Exact value match"],
+              ["Nested", "data.user.email:a@b.com", "Nested JSON path"],
+              ["Wildcard", "data.key:user:*", "Pattern matching with *"],
+              ["Numeric", "data.amount:>100", "Comparison: >, <, >=, <="],
+              ["Quoted", 'data.query:"SELECT * FROM"', "Values with spaces"]
+            ].each do |type, example, desc| %>
+              <tr style="border-bottom: 1px solid #F0EDE8;">
+                <td class="py-2"><%= type %></td>
+                <td class="py-2" style="color: #D97757;"><%= example %></td>
+                <td class="py-2 font-sans" style="color: #6B6760;"><%= desc %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Commands -->
+      <div>
+        <h4 class="font-semibold mb-2" style="color: #D97757;">Commands (Pipe Syntax)</h4>
+        <table class="w-full text-[12px]">
+          <tbody class="font-mono" style="color: #1A1A1A;">
+            <% [
+              ["| stats", "Show count statistics"],
+              ["| stats by:level", "Group by level, commit, hour, day"],
+              ["| first 50", "First N results (oldest first)"]
+            ].each do |cmd, desc| %>
+              <tr style="border-bottom: 1px solid #F0EDE8;">
+                <td class="py-2" style="color: #D97757;"><%= cmd %></td>
+                <td class="py-2 font-sans" style="color: #6B6760;"><%= desc %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Examples -->
+      <div>
+        <h4 class="font-semibold mb-2" style="color: #D97757;">Examples</h4>
+        <div class="space-y-2 font-mono text-[12px]">
+          <% [
+            ["Errors in last hour:", "level:error since:1h"],
+            ["Payment issues for user:", '"payment" data.user_id:123 level:error,warn'],
+            ["Stats by level in production:", "env:production since:24h | stats by:level"]
+          ].each do |label, query| %>
+            <div class="p-2 rounded" style="background: #F5F3F0;">
+              <span style="color: #6B6760;"><%= label %></span><br>
+              <span style="color: #D97757;"><%= query %></span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

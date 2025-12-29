@@ -193,9 +193,8 @@
   </div>
 </div>
 
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script data-turbo-temporary>
+<!-- Charts initialization -->
+<script>
   // Filter function
   function applyFilter(key, value) {
     const url = new URL(window.location.href);
@@ -210,20 +209,20 @@
   // Store chart instances for cleanup
   window.analyticsCharts = window.analyticsCharts || {};
 
-  // Chart data from Rails
-  const analyticsPageData = {
+  // Chart data from Rails - stored on window so it survives script re-runs
+  window.analyticsPageData = {
     logsData: <%= raw @chart_data.to_json %>,
     errorsData: <%= raw @error_chart_data.to_json %>
   };
 
-  function initializeCharts() {
+  function initializeAnalyticsCharts() {
     // Wait for Chart.js to load
     if (typeof Chart === 'undefined') {
-      setTimeout(initializeCharts, 50);
+      setTimeout(initializeAnalyticsCharts, 50);
       return;
     }
 
-    const { logsData, errorsData } = analyticsPageData;
+    const { logsData, errorsData } = window.analyticsPageData;
 
     // Common chart options
     const commonOptions = {
@@ -267,9 +266,11 @@
     // Destroy existing charts if they exist
     if (window.analyticsCharts.logsChart) {
       window.analyticsCharts.logsChart.destroy();
+      window.analyticsCharts.logsChart = null;
     }
     if (window.analyticsCharts.errorsChart) {
       window.analyticsCharts.errorsChart.destroy();
+      window.analyticsCharts.errorsChart = null;
     }
 
     // Get canvas elements
@@ -321,6 +322,18 @@
     }
   }
 
-  // Initialize immediately - the setTimeout in initializeCharts handles waiting for Chart.js
-  initializeCharts();
+  // Initialize charts - handles both initial load and Turbo navigations
+  // Use turbo:render which fires after DOM is updated but before turbo:load
+  // Only add the listener once to prevent multiple registrations
+  if (!window.analyticsChartsListenerAdded) {
+    window.analyticsChartsListenerAdded = true;
+    document.addEventListener('turbo:render', function() {
+      if (document.getElementById('logsChart')) {
+        initializeAnalyticsCharts();
+      }
+    });
+  }
+
+  // Also initialize immediately for direct page loads
+  initializeAnalyticsCharts();
 </script>

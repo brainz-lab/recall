@@ -19,10 +19,15 @@ module Dashboard
         @next_offset = @offset + @limit
       end
 
-      # Get log counts by level for the last hour (matching filter buttons)
-      @log_counts = @project.log_entries.recent_counts(since: 1.hour.ago)
-      @log_counts_24h = @project.log_entries.recent_counts(since: 24.hours.ago)
-      @total_logs = @project.logs_count
+      # Get log counts in a single optimized query
+      # Use unscoped to remove default ordering which conflicts with GROUP BY
+      @log_counts = Rails.cache.fetch(["log_counts", @project.id, "1h", Time.current.beginning_of_hour], expires_in: 5.minutes) do
+        @project.log_entries.unscope(:order).where("timestamp > ?", 1.hour.ago).group(:level).count
+      end
+      @log_counts_24h = Rails.cache.fetch(["log_counts", @project.id, "24h", Time.current.beginning_of_hour], expires_in: 15.minutes) do
+        @project.log_entries.unscope(:order).where("timestamp > ?", 24.hours.ago).where(level: "fatal").count
+      end
+      @log_counts_24h = { "fatal" => @log_counts_24h } if @log_counts_24h.is_a?(Integer)
 
       # Disable caching for Turbo Frame requests
       response.headers["Cache-Control"] = "no-cache, no-store" if turbo_frame_request?

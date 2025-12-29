@@ -14,6 +14,9 @@
   <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
   <%= javascript_importmap_tags %>
 
+  <%# Chart.js for analytics - loaded in head so it's available on Turbo navigations %>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+
   <style>
     :root {
       /* Recall-specific brand colors */
@@ -26,7 +29,7 @@
 <body class="h-full antialiased" style="background: var(--color-cream-50);">
   <div class="flex h-full">
     <!-- Sidebar -->
-    <aside class="w-64 flex flex-col bg-white" style="border-right: 1px solid var(--color-cream-200);">
+    <aside class="w-64 flex flex-col" style="background: #fff; border-right: 1px solid var(--color-cream-200);">
       <div class="p-5" style="border-bottom: 1px solid var(--color-cream-200);">
         <%= link_to dashboard_root_path, class: "flex items-center gap-2.5" do %>
           <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--color-recall);">
@@ -39,6 +42,8 @@
       </div>
 
       <% if @project&.persisted? %>
+        <%# Cache sidebar navigation - only changes when project changes or route changes %>
+        <% cache(["sidebar_nav", @project.cache_key, controller_name, action_name]) do %>
         <!-- Project Selector -->
         <div class="px-4 py-3" style="border-bottom: 1px solid var(--color-cream-200);">
           <%= link_to dashboard_projects_path, class: "flex items-center gap-2 px-2 py-1.5 rounded-lg transition", style: "color: var(--color-ink-700);" do %>
@@ -87,6 +92,7 @@
               Dev Tools
             <% end %>
           </div>
+        <% end %>
         <% end %>
       <% else %>
         <nav class="p-4 flex-1">

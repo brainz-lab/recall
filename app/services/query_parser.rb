@@ -83,7 +83,7 @@ class QueryParser
 
   def limit
     cmd = @commands.find { |c| %w[first last].include?(c[:command]) }
-    cmd ? (cmd[:args]&.first&.to_i || 100) : 100
+    cmd ? (cmd[:args]&.first&.to_i || 25) : 25
   end
 
   private
