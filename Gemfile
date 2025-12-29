@@ -10,14 +10,14 @@ gem "pg", "~> 1.1"
 gem "timescaledb-rails"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
-# Bundle and transpile JavaScript [https://github.com/rails/jsbundling-rails]
-gem "jsbundling-rails"
+# Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
+gem "importmap-rails"
 # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
 gem "turbo-rails"
 # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
 gem "stimulus-rails"
-# Bundle and process CSS [https://github.com/rails/cssbundling-rails]
-gem "cssbundling-rails"
+# Use Tailwind CSS [https://github.com/rails/tailwindcss-rails]
+gem "tailwindcss-rails", "~> 4.0"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
@@ -56,6 +56,14 @@ if File.exist?("/brainzlab-sdk")
 else
   gem "brainzlab", "~> 0.1.1"
 end
+
+# BrainzLab UI - Unified design system with Phlex components
+if File.exist?("/brainzlab-ui")
+  gem "brainzlab-ui", path: "/brainzlab-ui"
+else
+  gem "brainzlab-ui", "~> 0.1.0"
+end
+gem "phlex-rails", "~> 2.0"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
