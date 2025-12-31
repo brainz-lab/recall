@@ -8,7 +8,7 @@ module Mcp
         properties: {
           session_id: { type: "string", description: "Session ID" }
         },
-        required: ["session_id"]
+        required: [ "session_id" ]
       }.freeze
 
       def call(args)

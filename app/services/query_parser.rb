@@ -1,6 +1,6 @@
 class QueryParser
   LEVELS = %w[debug info warn error fatal].freeze
-  TIME_UNITS = { 'm' => :minutes, 'h' => :hours, 'd' => :days, 'w' => :weeks }.freeze
+  TIME_UNITS = { "m" => :minutes, "h" => :hours, "d" => :days, "w" => :weeks }.freeze
 
   def initialize(query_string)
     @query = query_string.to_s.strip
@@ -60,22 +60,22 @@ class QueryParser
   end
 
   def stats?
-    @commands.any? { |c| c[:command] == 'stats' }
+    @commands.any? { |c| c[:command] == "stats" }
   end
 
   def apply_stats(scope)
-    cmd = @commands.find { |c| c[:command] == 'stats' }
-    group_by = cmd&.dig(:args)&.find { |a| a.start_with?('by:') }&.sub('by:', '')
+    cmd = @commands.find { |c| c[:command] == "stats" }
+    group_by = cmd&.dig(:args)&.find { |a| a.start_with?("by:") }&.sub("by:", "")
 
     # Remove default ordering for GROUP BY operations
     scope = scope.unscope(:order)
 
     case group_by
-    when 'level' then scope.group(:level).count
-    when 'commit' then scope.group(:commit).count
-    when 'environment', 'env' then scope.group(:environment).count
-    when 'hour' then scope.group_by_hour(:timestamp).count
-    when 'day' then scope.group_by_day(:timestamp).count
+    when "level" then scope.group(:level).count
+    when "commit" then scope.group(:commit).count
+    when "environment", "env" then scope.group(:environment).count
+    when "hour" then scope.group_by_hour(:timestamp).count
+    when "day" then scope.group_by_day(:timestamp).count
     else
       { total: scope.count, by_level: scope.group(:level).count }
     end
@@ -98,75 +98,75 @@ class QueryParser
     part.scan(/(\w+(?:\.\w+)*):(!)?("[^"]*"|[^\s]+)/) do |field, neg, value|
       # Remove surrounding quotes if present
       clean_value = value.start_with?('"') && value.end_with?('"') ? value[1..-2] : value
-      filters[field] = { value: clean_value, negated: neg == '!' }
+      filters[field] = { value: clean_value, negated: neg == "!" }
     end
 
     # Then extract standalone quoted text searches (not part of field:value)
     # Remove field:value patterns first, then find remaining quoted strings
-    remaining = part.gsub(/\w+(?:\.\w+)*:!?(?:"[^"]*"|[^\s]+)/, '')
+    remaining = part.gsub(/\w+(?:\.\w+)*:!?(?:"[^"]*"|[^\s]+)/, "")
     remaining.scan(/"([^"]+)"/) { |m| text_searches << m[0] }
   end
 
   def apply_filters_from(scope, filters, text_searches)
     # Level filter
-    if filters['level']
-      f = filters['level']
-      levels = f[:value].split(',') & LEVELS
+    if filters["level"]
+      f = filters["level"]
+      levels = f[:value].split(",") & LEVELS
       scope = f[:negated] ? scope.where.not(level: levels) : scope.where(level: levels)
     end
 
     # Environment filter
-    f = filters['env'] || filters['environment']
+    f = filters["env"] || filters["environment"]
     if f
       scope = f[:negated] ? scope.where.not(environment: f[:value]) : scope.where(environment: f[:value])
     end
 
     # Commit filter
-    if filters['commit']
-      scope = scope.where(commit: filters['commit'][:value])
+    if filters["commit"]
+      scope = scope.where(commit: filters["commit"][:value])
     end
 
     # Branch filter
-    if filters['branch']
-      scope = scope.where(branch: filters['branch'][:value])
+    if filters["branch"]
+      scope = scope.where(branch: filters["branch"][:value])
     end
 
     # Service filter
-    if filters['service']
-      scope = scope.where(service: filters['service'][:value])
+    if filters["service"]
+      scope = scope.where(service: filters["service"][:value])
     end
 
     # Host filter
-    if filters['host']
-      scope = scope.where(host: filters['host'][:value])
+    if filters["host"]
+      scope = scope.where(host: filters["host"][:value])
     end
 
     # Request ID filter
-    f = filters['request_id'] || filters['request']
+    f = filters["request_id"] || filters["request"]
     scope = scope.where(request_id: f[:value]) if f
 
     # Session ID filter
-    f = filters['session_id'] || filters['session']
+    f = filters["session_id"] || filters["session"]
     scope = scope.where(session_id: f[:value]) if f
 
     # Time filters
-    if filters['since']
-      scope = scope.where('timestamp >= ?', parse_time(filters['since'][:value]))
+    if filters["since"]
+      scope = scope.where("timestamp >= ?", parse_time(filters["since"][:value]))
     end
-    if filters['until']
-      scope = scope.where('timestamp <= ?', parse_time(filters['until'][:value]))
+    if filters["until"]
+      scope = scope.where("timestamp <= ?", parse_time(filters["until"][:value]))
     end
 
     # Data filters (JSONB)
     filters.each do |field, f|
-      next unless field.start_with?('data.')
-      path = field.sub('data.', '').split('.')
+      next unless field.start_with?("data.")
+      path = field.sub("data.", "").split(".")
       json_path = "{#{path.join(',')}}"
 
       if f[:value] =~ /^([><]=?)(.+)$/
         scope = scope.where("CAST(data #>> ? AS NUMERIC) #{$1} ?", json_path, $2.to_f)
-      elsif f[:value].include?('*')
-        pattern = f[:value].gsub('*', '%')
+      elsif f[:value].include?("*")
+        pattern = f[:value].gsub("*", "%")
         scope = scope.where("data #>> ? LIKE ?", json_path, pattern)
       else
         scope = scope.where("data #>> ? = ?", json_path, f[:value])
@@ -185,54 +185,54 @@ class QueryParser
   end
 
   def apply_level(scope)
-    return scope unless @filters['level']
-    f = @filters['level']
-    levels = f[:value].split(',') & LEVELS
+    return scope unless @filters["level"]
+    f = @filters["level"]
+    levels = f[:value].split(",") & LEVELS
     f[:negated] ? scope.where.not(level: levels) : scope.where(level: levels)
   end
 
   def apply_environment(scope)
-    f = @filters['env'] || @filters['environment']
+    f = @filters["env"] || @filters["environment"]
     return scope unless f
     f[:negated] ? scope.where.not(environment: f[:value]) : scope.where(environment: f[:value])
   end
 
   def apply_commit(scope)
-    return scope unless @filters['commit']
-    scope.where(commit: @filters['commit'][:value])
+    return scope unless @filters["commit"]
+    scope.where(commit: @filters["commit"][:value])
   end
 
   def apply_branch(scope)
-    return scope unless @filters['branch']
-    scope.where(branch: @filters['branch'][:value])
+    return scope unless @filters["branch"]
+    scope.where(branch: @filters["branch"][:value])
   end
 
   def apply_service(scope)
-    return scope unless @filters['service']
-    scope.where(service: @filters['service'][:value])
+    return scope unless @filters["service"]
+    scope.where(service: @filters["service"][:value])
   end
 
   def apply_host(scope)
-    return scope unless @filters['host']
-    scope.where(host: @filters['host'][:value])
+    return scope unless @filters["host"]
+    scope.where(host: @filters["host"][:value])
   end
 
   def apply_request_id(scope)
-    f = @filters['request_id'] || @filters['request']
+    f = @filters["request_id"] || @filters["request"]
     f ? scope.where(request_id: f[:value]) : scope
   end
 
   def apply_session_id(scope)
-    f = @filters['session_id'] || @filters['session']
+    f = @filters["session_id"] || @filters["session"]
     f ? scope.where(session_id: f[:value]) : scope
   end
 
   def apply_time_filters(scope)
-    if @filters['since']
-      scope = scope.where('timestamp >= ?', parse_time(@filters['since'][:value]))
+    if @filters["since"]
+      scope = scope.where("timestamp >= ?", parse_time(@filters["since"][:value]))
     end
-    if @filters['until']
-      scope = scope.where('timestamp <= ?', parse_time(@filters['until'][:value]))
+    if @filters["until"]
+      scope = scope.where("timestamp <= ?", parse_time(@filters["until"][:value]))
     end
     scope
   end
@@ -249,16 +249,16 @@ class QueryParser
 
   def apply_data_filters(scope)
     @filters.each do |field, f|
-      next unless field.start_with?('data.')
-      path = field.sub('data.', '').split('.')
+      next unless field.start_with?("data.")
+      path = field.sub("data.", "").split(".")
       json_path = "{#{path.join(',')}}"
 
       if f[:value] =~ /^([><]=?)(.+)$/
         # Numeric comparison: data.count:>10
         scope = scope.where("CAST(data #>> ? AS NUMERIC) #{$1} ?", json_path, $2.to_f)
-      elsif f[:value].include?('*')
+      elsif f[:value].include?("*")
         # Wildcard matching: data.key:user:* becomes LIKE 'user:%'
-        pattern = f[:value].gsub('*', '%')
+        pattern = f[:value].gsub("*", "%")
         scope = scope.where("data #>> ? LIKE ?", json_path, pattern)
       else
         # Exact match
@@ -274,7 +274,7 @@ class QueryParser
   end
 
   def apply_ordering(scope)
-    if @commands.any? { |c| c[:command] == 'first' }
+    if @commands.any? { |c| c[:command] == "first" }
       scope.reorder(timestamp: :asc)
     else
       scope.reorder(timestamp: :desc)

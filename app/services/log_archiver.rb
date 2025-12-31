@@ -8,13 +8,13 @@ class LogArchiver
   end
 
   def archive!(export_before_delete: false)
-    return { success: false, error: 'Archive not enabled' } unless project.archive_enabled?
-    return { success: false, error: 'No retention policy set' } unless project.retention_days.present?
+    return { success: false, error: "Archive not enabled" } unless project.archive_enabled?
+    return { success: false, error: "No retention policy set" } unless project.retention_days.present?
 
     logs_to_archive = deletable_logs
 
     if logs_to_archive.none?
-      return { success: true, archived_count: 0, message: 'No logs to archive' }
+      return { success: true, archived_count: 0, message: "No logs to archive" }
     end
 
     # Export before delete if requested
@@ -40,7 +40,7 @@ class LogArchiver
 
   def deletable_logs
     cutoff_date = project.retention_days.days.ago
-    project.log_entries.where('timestamp < ?', cutoff_date)
+    project.log_entries.where("timestamp < ?", cutoff_date)
   end
 
   def deletable_count
@@ -60,15 +60,15 @@ class LogArchiver
 
   def export_logs(scope)
     # Create exports directory if it doesn't exist
-    exports_dir = Rails.root.join('tmp', 'exports')
+    exports_dir = Rails.root.join("tmp", "exports")
     FileUtils.mkdir_p(exports_dir)
 
-    timestamp = Time.current.strftime('%Y%m%d_%H%M%S')
+    timestamp = Time.current.strftime("%Y%m%d_%H%M%S")
     filename = "#{project.name.parameterize}_archive_#{timestamp}.json"
     filepath = exports_dir.join(filename)
 
     # Export to file
-    File.open(filepath, 'w') do |file|
+    File.open(filepath, "w") do |file|
       file.write("[\n")
       first = true
       scope.find_each do |log|

@@ -84,8 +84,8 @@ class SavedSearchTest < ActiveSupport::TestCase
       updated_at: 2.days.ago
     )
 
-    ordered = SavedSearch.ordered.where(id: [search1.id, search2.id, search3.id])
-    assert_equal [search2.id, search3.id, search1.id], ordered.pluck(:id)
+    ordered = SavedSearch.ordered.where(id: [ search1.id, search2.id, search3.id ])
+    assert_equal [ search2.id, search3.id, search1.id ], ordered.pluck(:id)
   end
 
   # Functionality

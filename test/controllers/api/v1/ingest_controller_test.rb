@@ -195,7 +195,7 @@ class Api::V1::IngestControllerTest < ActionDispatch::IntegrationTest
         message: "Test",
         data: {
           user: { id: 123, name: "Test" },
-          metadata: { tags: ["a", "b"] }
+          metadata: { tags: [ "a", "b" ] }
         }
       }
     ]
@@ -221,7 +221,7 @@ class Api::V1::IngestControllerTest < ActionDispatch::IntegrationTest
 
   test "should require authentication for batch" do
     post api_v1_batch_url,
-         params: { logs: [{ level: "info", message: "Test" }] },
+         params: { logs: [ { level: "info", message: "Test" } ] },
          as: :json
 
     assert_response :unauthorized
@@ -277,7 +277,7 @@ class Api::V1::IngestControllerTest < ActionDispatch::IntegrationTest
 
   test "should properly serialize complex data structures" do
     complex_data = {
-      arrays: [1, 2, 3],
+      arrays: [ 1, 2, 3 ],
       nested: { deep: { value: "test" } },
       boolean: true,
       null_value: nil
@@ -294,7 +294,7 @@ class Api::V1::IngestControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :created
     entry = LogEntry.find(JSON.parse(response.body)["id"])
-    assert_equal [1, 2, 3], entry.data["arrays"]
+    assert_equal [ 1, 2, 3 ], entry.data["arrays"]
     assert_equal "test", entry.data["nested"]["deep"]["value"]
     assert_equal true, entry.data["boolean"]
   end

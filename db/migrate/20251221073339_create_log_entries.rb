@@ -21,10 +21,10 @@ class CreateLogEntries < ActiveRecord::Migration[8.1]
       t.datetime :created_at, null: false
     end
 
-    add_index :log_entries, [:project_id, :timestamp]
-    add_index :log_entries, [:project_id, :level]
-    add_index :log_entries, [:project_id, :commit]
-    add_index :log_entries, [:project_id, :session_id]
+    add_index :log_entries, [ :project_id, :timestamp ]
+    add_index :log_entries, [ :project_id, :level ]
+    add_index :log_entries, [ :project_id, :commit ]
+    add_index :log_entries, [ :project_id, :session_id ]
     add_index :log_entries, :request_id
     add_index :log_entries, :session_id
     add_index :log_entries, :timestamp

@@ -12,7 +12,7 @@ module Mcp
           query: { type: "string", description: "Query in Recall Query Language" },
           limit: { type: "integer", description: "Max results (default 100)", default: 100 }
         },
-        required: ["query"]
+        required: [ "query" ]
       }.freeze
 
       def call(args)

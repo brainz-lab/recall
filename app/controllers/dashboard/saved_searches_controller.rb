@@ -1,7 +1,7 @@
 module Dashboard
   class SavedSearchesController < BaseController
     before_action :set_project
-    before_action :set_saved_search, only: [:destroy]
+    before_action :set_saved_search, only: [ :destroy ]
 
     def index
       @saved_searches = @project.saved_searches.ordered

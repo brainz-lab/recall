@@ -243,7 +243,7 @@ class LogArchiverTest < ActiveSupport::TestCase
   # Error handling
   test "should handle errors gracefully" do
     # Force an error by stubbing delete_all to raise
-    @archiver.stub :delete_in_batches, -> (*args) { raise "Test error" } do
+    @archiver.stub :delete_in_batches, ->(*args) { raise "Test error" } do
       # Create old log
       @project.log_entries.create!(
         timestamp: (@project.retention_days + 1).days.ago,

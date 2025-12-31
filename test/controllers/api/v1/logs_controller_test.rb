@@ -332,6 +332,6 @@ class Api::V1::LogsControllerTest < ActionDispatch::IntegrationTest
     logs = json["logs"]
 
     # Should only include error or fatal
-    assert logs.all? { |log| ["error", "fatal"].include?(log["level"]) }
+    assert logs.all? { |log| [ "error", "fatal" ].include?(log["level"]) }
   end
 end

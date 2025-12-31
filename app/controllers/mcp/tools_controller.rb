@@ -22,9 +22,9 @@ module Mcp
       server = Mcp::Server.new(@project)
 
       case params[:method]
-      when 'tools/list'
+      when "tools/list"
         render json: { result: { tools: server.list_tools } }
-      when 'tools/call'
+      when "tools/call"
         result = server.call_tool(params.dig(:params, :name), params.dig(:params, :arguments) || {})
         render json: { result: result }
       else
@@ -35,12 +35,12 @@ module Mcp
     private
 
     def authenticate!
-      key = request.headers['Authorization']&.sub(/^Bearer\s+/, '') ||
-            request.headers['X-API-Key'] ||
+      key = request.headers["Authorization"]&.sub(/^Bearer\s+/, "") ||
+            request.headers["X-API-Key"] ||
             params[:api_key]
 
       @project = Project.find_by(api_key: key)
-      render json: { error: 'Unauthorized' }, status: :unauthorized unless @project
+      render json: { error: "Unauthorized" }, status: :unauthorized unless @project
     end
 
     def tool_params

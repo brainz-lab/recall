@@ -1,4 +1,4 @@
-require 'csv'
+require "csv"
 
 class LogExporter
   EXPORT_COLUMNS = %w[id timestamp level message environment service host commit branch session_id request_id data].freeze
@@ -47,13 +47,13 @@ class LogExporter
   end
 
   def filename
-    timestamp = Time.current.strftime('%Y%m%d_%H%M%S')
-    extension = @format == :csv ? 'csv' : 'json'
+    timestamp = Time.current.strftime("%Y%m%d_%H%M%S")
+    extension = @format == :csv ? "csv" : "json"
     "#{@project.name.parameterize}_logs_#{timestamp}.#{extension}"
   end
 
   def content_type
-    @format == :csv ? 'text/csv' : 'application/json'
+    @format == :csv ? "text/csv" : "application/json"
   end
 
   def count
@@ -78,12 +78,12 @@ class LogExporter
     # Apply date range filters
     if @since.present?
       since_time = parse_time(@since)
-      scope = scope.where('timestamp >= ?', since_time) if since_time
+      scope = scope.where("timestamp >= ?", since_time) if since_time
     end
 
     if @until_time.present?
       until_parsed = parse_time(@until_time)
-      scope = scope.where('timestamp <= ?', until_parsed) if until_parsed
+      scope = scope.where("timestamp <= ?", until_parsed) if until_parsed
     end
 
     scope.order(timestamp: :desc)
@@ -95,7 +95,7 @@ class LogExporter
     # Handle relative time like "1h", "24h", "7d"
     if value =~ /^(\d+)([mhdw])$/
       amount = $1.to_i
-      unit = { 'm' => :minutes, 'h' => :hours, 'd' => :days, 'w' => :weeks }[$2]
+      unit = { "m" => :minutes, "h" => :hours, "d" => :days, "w" => :weeks }[$2]
       return amount.send(unit).ago if unit
     end
 

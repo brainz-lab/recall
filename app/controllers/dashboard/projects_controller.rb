@@ -1,6 +1,6 @@
 module Dashboard
   class ProjectsController < BaseController
-    before_action :set_project, only: [:show, :edit, :update, :destroy, :setup, :mcp_setup, :analytics]
+    before_action :set_project, only: [ :show, :edit, :update, :destroy, :setup, :mcp_setup, :analytics ]
 
     def index
       @projects = Project.order(created_at: :desc)
@@ -17,7 +17,7 @@ module Dashboard
     def create
       @project = Project.new(project_params)
       if @project.save
-        redirect_to setup_dashboard_project_path(@project), notice: 'Project created! Follow the setup guide below.'
+        redirect_to setup_dashboard_project_path(@project), notice: "Project created! Follow the setup guide below."
       else
         render :new, status: :unprocessable_entity
       end
@@ -36,11 +36,11 @@ module Dashboard
       # Time range from params, default to 7 days
       @range = params[:range] || "7d"
       @since = case @range
-               when "24h" then 24.hours.ago
-               when "7d" then 7.days.ago
-               when "30d" then 30.days.ago
-               else 7.days.ago
-               end
+      when "24h" then 24.hours.ago
+      when "7d" then 7.days.ago
+      when "30d" then 30.days.ago
+      else 7.days.ago
+      end
 
       # Filters
       @level_filter = params[:level].presence
@@ -83,7 +83,7 @@ module Dashboard
 
     def update
       if @project.update(project_params)
-        redirect_to dashboard_project_logs_path(@project), notice: 'Project updated.'
+        redirect_to dashboard_project_logs_path(@project), notice: "Project updated."
       else
         render :edit, status: :unprocessable_entity
       end
@@ -91,7 +91,7 @@ module Dashboard
 
     def destroy
       @project.destroy
-      redirect_to dashboard_projects_path, notice: 'Project deleted.'
+      redirect_to dashboard_projects_path, notice: "Project deleted."
     end
 
     private

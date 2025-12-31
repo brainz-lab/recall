@@ -11,7 +11,7 @@ module Dashboard
       archiver = LogArchiver.new(@project)
 
       if @project.archive_enabled?
-        result = archiver.archive!(export_before_delete: params[:export_before_delete] == '1')
+        result = archiver.archive!(export_before_delete: params[:export_before_delete] == "1")
 
         if result[:success]
           redirect_to dashboard_project_archive_path(@project),
@@ -22,7 +22,7 @@ module Dashboard
         end
       else
         redirect_to dashboard_project_archive_path(@project),
-                    alert: 'Archive is not enabled for this project'
+                    alert: "Archive is not enabled for this project"
       end
     end
 

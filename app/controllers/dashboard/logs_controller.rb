@@ -21,10 +21,10 @@ module Dashboard
 
       # Get log counts in a single optimized query
       # Use unscoped to remove default ordering which conflicts with GROUP BY
-      @log_counts = Rails.cache.fetch(["log_counts", @project.id, "1h", Time.current.beginning_of_hour], expires_in: 5.minutes) do
+      @log_counts = Rails.cache.fetch([ "log_counts", @project.id, "1h", Time.current.beginning_of_hour ], expires_in: 5.minutes) do
         @project.log_entries.unscope(:order).where("timestamp > ?", 1.hour.ago).group(:level).count
       end
-      @log_counts_24h = Rails.cache.fetch(["log_counts", @project.id, "24h", Time.current.beginning_of_hour], expires_in: 15.minutes) do
+      @log_counts_24h = Rails.cache.fetch([ "log_counts", @project.id, "24h", Time.current.beginning_of_hour ], expires_in: 15.minutes) do
         @project.log_entries.unscope(:order).where("timestamp > ?", 24.hours.ago).where(level: "fatal").count
       end
       @log_counts_24h = { "fatal" => @log_counts_24h } if @log_counts_24h.is_a?(Integer)

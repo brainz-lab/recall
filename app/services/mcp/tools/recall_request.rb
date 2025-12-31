@@ -10,7 +10,7 @@ module Mcp
         properties: {
           request_id: { type: "string", description: "Request ID" }
         },
-        required: ["request_id"]
+        required: [ "request_id" ]
       }.freeze
 
       def call(args)

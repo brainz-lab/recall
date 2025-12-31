@@ -150,13 +150,13 @@ class LogEntryTest < ActiveSupport::TestCase
       message: "Test with nested data",
       data: {
         user: { id: 123, name: "Test User" },
-        metadata: { tags: ["a", "b", "c"] }
+        metadata: { tags: [ "a", "b", "c" ] }
       }
     )
     entry.reload
     assert_equal 123, entry.data["user"]["id"]
     assert_equal "Test User", entry.data["user"]["name"]
-    assert_equal ["a", "b", "c"], entry.data["metadata"]["tags"]
+    assert_equal [ "a", "b", "c" ], entry.data["metadata"]["tags"]
   end
 
   # Optional fields

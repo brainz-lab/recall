@@ -8,6 +8,6 @@ class CreateSavedSearches < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :saved_searches, [:project_id, :name], unique: true
+    add_index :saved_searches, [ :project_id, :name ], unique: true
   end
 end

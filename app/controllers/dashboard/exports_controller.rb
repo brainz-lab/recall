@@ -14,7 +14,7 @@ module Dashboard
       send_data exporter.export,
                 filename: exporter.filename,
                 type: exporter.content_type,
-                disposition: 'attachment'
+                disposition: "attachment"
     end
 
     private
@@ -24,7 +24,7 @@ module Dashboard
     end
 
     def export_format
-      %w[json csv].include?(params[:format]) ? params[:format] : 'json'
+      %w[json csv].include?(params[:format]) ? params[:format] : "json"
     end
   end
 end

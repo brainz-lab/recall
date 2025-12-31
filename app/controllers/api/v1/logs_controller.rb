@@ -19,11 +19,11 @@ module Api
         log = @project.log_entries.find_by_composite_key(params[:id])
         render json: log
       rescue ActiveRecord::RecordNotFound
-        render json: { error: 'Not found' }, status: :not_found
+        render json: { error: "Not found" }, status: :not_found
       end
 
       def export
-        format = %w[json csv].include?(params[:format]) ? params[:format] : 'json'
+        format = %w[json csv].include?(params[:format]) ? params[:format] : "json"
         exporter = LogExporter.new(
           @project,
           query: params[:q],
@@ -35,49 +35,49 @@ module Api
         send_data exporter.export,
                   filename: exporter.filename,
                   type: exporter.content_type,
-                  disposition: 'attachment'
+                  disposition: "attachment"
       end
 
       # Signal integration: Query logs with aggregation for alerting
       def query
-        log_level = params[:log_level] || 'error'
-        aggregation = params[:aggregation] || 'count'
-        window = parse_window(params[:window] || '5m')
-        query_filters = JSON.parse(params[:query] || '{}')
+        log_level = params[:log_level] || "error"
+        aggregation = params[:aggregation] || "count"
+        window = parse_window(params[:window] || "5m")
+        query_filters = JSON.parse(params[:query] || "{}")
 
         scope = @project.log_entries
-                        .where('timestamp >= ?', window.ago)
+                        .where("timestamp >= ?", window.ago)
                         .where(level: log_level)
 
         # Apply additional query filters
         query_filters.each do |key, value|
           case key
-          when 'service' then scope = scope.where(service: value)
-          when 'host' then scope = scope.where(host: value)
-          when 'environment' then scope = scope.where(environment: value)
+          when "service" then scope = scope.where(service: value)
+          when "host" then scope = scope.where(host: value)
+          when "environment" then scope = scope.where(environment: value)
           end
         end
 
         value = case aggregation
-                when 'count' then scope.count
-                when 'avg', 'sum', 'min', 'max'
+        when "count" then scope.count
+        when "avg", "sum", "min", "max"
                   # For numeric aggregations on data fields
                   scope.count # Default to count for logs
-                else
+        else
                   scope.count
-                end
+        end
 
         render json: { value: value, log_level: log_level, window: params[:window] }
       end
 
       # Signal integration: Get baseline for anomaly detection
       def baseline
-        log_level = params[:log_level] || 'error'
-        window = parse_window(params[:window] || '24h')
+        log_level = params[:log_level] || "error"
+        window = parse_window(params[:window] || "24h")
 
         # Get hourly counts for the baseline window
         hourly_counts = @project.log_entries
-                                .where('timestamp >= ?', window.ago)
+                                .where("timestamp >= ?", window.ago)
                                 .where(level: log_level)
                                 .group("date_trunc('hour', timestamp)")
                                 .count
@@ -90,21 +90,21 @@ module Api
           variance = hourly_counts.map { |c| (c - mean)**2 }.sum / hourly_counts.size
           stddev = Math.sqrt(variance)
 
-          render json: { mean: mean, stddev: [stddev, 1].max }
+          render json: { mean: mean, stddev: [ stddev, 1 ].max }
         end
       end
 
       # Signal integration: Get last data point for absence detection
       def last
-        log_level = params[:log_level] || 'error'
-        query_filters = JSON.parse(params[:query] || '{}')
+        log_level = params[:log_level] || "error"
+        query_filters = JSON.parse(params[:query] || "{}")
 
         scope = @project.log_entries.where(level: log_level)
 
         query_filters.each do |key, value|
           case key
-          when 'service' then scope = scope.where(service: value)
-          when 'host' then scope = scope.where(host: value)
+          when "service" then scope = scope.where(service: value)
+          when "host" then scope = scope.where(host: value)
           end
         end
 
@@ -129,9 +129,9 @@ module Api
 
         value = match[1].to_i
         case match[2]
-        when 'm' then value.minutes
-        when 'h' then value.hours
-        when 'd' then value.days
+        when "m" then value.minutes
+        when "h" then value.hours
+        when "d" then value.days
         else 5.minutes
         end
       end

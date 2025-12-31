@@ -14,14 +14,14 @@ class QueryParserTest < ActiveSupport::TestCase
   test "should parse level filter" do
     parser = QueryParser.new("level:error").parse
     scope = parser.apply(@project.log_entries)
-    assert_equal ["error"], scope.pluck(:level).uniq
+    assert_equal [ "error" ], scope.pluck(:level).uniq
   end
 
   test "should parse multiple levels" do
     parser = QueryParser.new("level:error,warn").parse
     scope = parser.apply(@project.log_entries)
     levels = scope.pluck(:level).uniq.sort
-    assert levels.all? { |l| ["error", "warn"].include?(l) }
+    assert levels.all? { |l| [ "error", "warn" ].include?(l) }
   end
 
   test "should parse negated level filter" do
@@ -33,61 +33,61 @@ class QueryParserTest < ActiveSupport::TestCase
   test "should parse environment filter" do
     parser = QueryParser.new("env:production").parse
     scope = parser.apply(@project.log_entries)
-    assert_equal ["production"], scope.pluck(:environment).uniq
+    assert_equal [ "production" ], scope.pluck(:environment).uniq
   end
 
   test "should accept environment as full word" do
     parser = QueryParser.new("environment:staging").parse
     scope = parser.apply(@project.log_entries)
-    assert_equal ["staging"], scope.pluck(:environment).uniq
+    assert_equal [ "staging" ], scope.pluck(:environment).uniq
   end
 
   test "should parse commit filter" do
     parser = QueryParser.new("commit:abc123").parse
     scope = parser.apply(@project.log_entries)
-    assert_equal ["abc123"], scope.pluck(:commit).uniq
+    assert_equal [ "abc123" ], scope.pluck(:commit).uniq
   end
 
   test "should parse branch filter" do
     parser = QueryParser.new("branch:main").parse
     scope = parser.apply(@project.log_entries)
-    assert_equal ["main"], scope.pluck(:branch).uniq
+    assert_equal [ "main" ], scope.pluck(:branch).uniq
   end
 
   test "should parse service filter" do
     parser = QueryParser.new("service:web").parse
     scope = parser.apply(@project.log_entries)
-    assert_equal ["web"], scope.pluck(:service).uniq
+    assert_equal [ "web" ], scope.pluck(:service).uniq
   end
 
   test "should parse host filter" do
     parser = QueryParser.new("host:server-1").parse
     scope = parser.apply(@project.log_entries)
-    assert_equal ["server-1"], scope.pluck(:host).uniq
+    assert_equal [ "server-1" ], scope.pluck(:host).uniq
   end
 
   test "should parse request_id filter" do
     parser = QueryParser.new("request_id:req_test_1").parse
     scope = parser.apply(@project.log_entries)
-    assert_equal ["req_test_1"], scope.pluck(:request_id).uniq
+    assert_equal [ "req_test_1" ], scope.pluck(:request_id).uniq
   end
 
   test "should accept request as alias for request_id" do
     parser = QueryParser.new("request:req_test_1").parse
     scope = parser.apply(@project.log_entries)
-    assert_equal ["req_test_1"], scope.pluck(:request_id).uniq
+    assert_equal [ "req_test_1" ], scope.pluck(:request_id).uniq
   end
 
   test "should parse session_id filter" do
     parser = QueryParser.new("session_id:sess_test_session_1").parse
     scope = parser.apply(@project.log_entries)
-    assert_equal ["sess_test_session_1"], scope.pluck(:session_id).uniq
+    assert_equal [ "sess_test_session_1" ], scope.pluck(:session_id).uniq
   end
 
   test "should accept session as alias for session_id" do
     parser = QueryParser.new("session:sess_test_session_1").parse
     scope = parser.apply(@project.log_entries)
-    assert_equal ["sess_test_session_1"], scope.pluck(:session_id).uniq
+    assert_equal [ "sess_test_session_1" ], scope.pluck(:session_id).uniq
   end
 
   # Time filters
@@ -268,14 +268,14 @@ class QueryParserTest < ActiveSupport::TestCase
     parser = QueryParser.new("level:error OR level:fatal").parse
     scope = parser.apply(@project.log_entries)
     levels = scope.pluck(:level).uniq
-    assert levels.all? { |l| ["error", "fatal"].include?(l) }
+    assert levels.all? { |l| [ "error", "fatal" ].include?(l) }
   end
 
   test "should parse OR with different fields" do
     parser = QueryParser.new("env:production OR env:staging").parse
     scope = parser.apply(@project.log_entries)
     envs = scope.pluck(:environment).compact.uniq
-    assert envs.all? { |e| ["production", "staging"].include?(e) }
+    assert envs.all? { |e| [ "production", "staging" ].include?(e) }
   end
 
   # Edge cases
@@ -287,7 +287,7 @@ class QueryParserTest < ActiveSupport::TestCase
   test "should handle filters with dashes" do
     parser = QueryParser.new("host:server-1").parse
     scope = parser.apply(@project.log_entries)
-    assert_equal ["server-1"], scope.pluck(:host).uniq
+    assert_equal [ "server-1" ], scope.pluck(:host).uniq
   end
 
   test "should handle filters with underscores" do
@@ -299,6 +299,6 @@ class QueryParserTest < ActiveSupport::TestCase
     parser = QueryParser.new("level:invalid,error").parse
     scope = parser.apply(@project.log_entries)
     # Should only include valid level (error)
-    assert_equal ["error"], scope.pluck(:level).uniq
+    assert_equal [ "error" ], scope.pluck(:level).uniq
   end
 end

@@ -1,5 +1,5 @@
 module Dashboard
   class BaseController < ApplicationController
-    layout 'dashboard'
+    layout "dashboard"
   end
 end

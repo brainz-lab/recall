@@ -25,7 +25,7 @@ module Api
       def log_params
         params.permit(:timestamp, :level, :message, :commit, :branch,
                       :environment, :service, :host, :request_id, :session_id, data: {})
-              .reverse_merge(timestamp: Time.current, level: 'info')
+              .reverse_merge(timestamp: Time.current, level: "info")
       end
 
       def build_entry(log)
@@ -38,7 +38,7 @@ module Api
           id: SecureRandom.uuid,
           project_id: @project.id,
           timestamp: log[:timestamp] || Time.current,
-          level: log[:level] || 'info',
+          level: log[:level] || "info",
           message: log[:message],
           commit: log[:commit],
           branch: log[:branch],
