@@ -1,9 +1,8 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  id: aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa
   project: one
-  timestamp: <%= 1.hour.ago.to_s(:db) %>
+  timestamp: <%= 1.hour.ago.to_fs(:db) %>
   level: info
   message: "Test log entry one"
   environment: production
@@ -16,9 +15,8 @@ one:
   data: { "user_id": 123, "action": "login" }
 
 two:
-  id: bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb
   project: one
-  timestamp: <%= 30.minutes.ago.to_s(:db) %>
+  timestamp: <%= 30.minutes.ago.to_fs(:db) %>
   level: error
   message: "Test error log entry"
   environment: production
@@ -31,9 +29,8 @@ two:
   data: { "error": "Something went wrong", "count": 42 }
 
 three:
-  id: cccccccc-cccc-cccc-cccc-cccccccccccc
   project: two
-  timestamp: <%= 15.minutes.ago.to_s(:db) %>
+  timestamp: <%= 15.minutes.ago.to_fs(:db) %>
   level: warn
   message: "Warning message"
   environment: staging
@@ -46,9 +43,8 @@ three:
   data: { "user_id": 456, "warning_type": "deprecation" }
 
 old_log:
-  id: dddddddd-dddd-dddd-dddd-dddddddddddd
   project: archived
-  timestamp: <%= 10.days.ago.to_s(:db) %>
+  timestamp: <%= 10.days.ago.to_fs(:db) %>
   level: debug
   message: "Old log for archival"
   environment: development
@@ -57,9 +53,8 @@ old_log:
   data: {}
 
 recent_debug:
-  id: eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee
   project: one
-  timestamp: <%= 5.minutes.ago.to_s(:db) %>
+  timestamp: <%= 5.minutes.ago.to_fs(:db) %>
   level: debug
   message: "Recent debug message"
   environment: development

@@ -21,6 +21,9 @@ gem "tailwindcss-rails", "~> 4.0"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
+# CSV library (required in Ruby 3.4+)
+gem "csv"
+
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 gem "bcrypt", "~> 3.1.7"
 
@@ -89,6 +92,7 @@ group :development, :test do
 end
 
 group :development do
+  gem "lefthook", require: false
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
 end
@@ -100,4 +104,8 @@ group :test do
 
   # Code coverage
   gem "simplecov", require: false
+
+  # Pin minitest to 5.x for Rails 8 compatibility
+  gem "minitest", "~> 5.25"
+  gem "mocha"
 end
