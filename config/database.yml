@@ -59,18 +59,16 @@ test:
 production:
   primary: &primary_production
     <<: *default
-    database: recall_production
-    username: recall
-    password: <%= ENV["RECALL_DATABASE_PASSWORD"] %>
+    url: <%= ENV["DATABASE_URL"] %>
   cache:
     <<: *primary_production
-    database: recall_production_cache
+    database: <%= ENV.fetch("CACHE_DATABASE") { "recall_cache" } %>
     migrations_paths: db/cache_migrate
   queue:
     <<: *primary_production
-    database: recall_production_queue
+    database: <%= ENV.fetch("QUEUE_DATABASE") { "recall_queue" } %>
     migrations_paths: db/queue_migrate
   cable:
     <<: *primary_production
-    database: recall_production_cable
+    database: <%= ENV.fetch("CABLE_DATABASE") { "recall_cable" } %>
     migrations_paths: db/cable_migrate
