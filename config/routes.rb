@@ -2,6 +2,10 @@ Rails.application.routes.draw do
   # API
   namespace :api do
     namespace :v1 do
+      # Browser events (from brainzlab-js SDK)
+      match "browser", to: "browser#preflight", via: :options
+      post "browser", to: "browser#create"
+
       post "log", to: "ingest#create"
       post "logs", to: "ingest#batch"
       get "logs", to: "logs#index"

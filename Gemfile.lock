@@ -1,12 +1,12 @@
 PATH
-  remote: /brainzlab-sdk
+  remote: ../brainzlab-sdk
   specs:
-    brainzlab (0.1.3)
+    brainzlab (0.1.8)
       concurrent-ruby (~> 1.0)
       logger (~> 1.5)
 
 PATH
-  remote: /brainzlab-ui
+  remote: ../brainzlab-ui
   specs:
     brainzlab-ui (0.1.0)
       phlex (~> 2.0)
