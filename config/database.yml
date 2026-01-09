@@ -59,16 +59,16 @@ test:
 production:
   primary: &primary_production
     <<: *default
-    url: <%= ENV["DATABASE_URL"] %>
+    url: <%= ENV.fetch("DATABASE_URL", "postgres://recall:recall@localhost:5432/recall_production") %>
   cache:
-    <<: *primary_production
-    database: <%= ENV.fetch("CACHE_DATABASE") { "recall_cache" } %>
+    <<: *default
+    url: <%= ENV.fetch("CACHE_DATABASE_URL") { ENV.fetch("DATABASE_URL", "").gsub(/recall_production/, "recall_production_cache") } %>
     migrations_paths: db/cache_migrate
   queue:
-    <<: *primary_production
-    database: <%= ENV.fetch("QUEUE_DATABASE") { "recall_queue" } %>
+    <<: *default
+    url: <%= ENV.fetch("QUEUE_DATABASE_URL") { ENV.fetch("DATABASE_URL", "").gsub(/recall_production/, "recall_production_queue") } %>
     migrations_paths: db/queue_migrate
   cable:
-    <<: *primary_production
-    database: <%= ENV.fetch("CABLE_DATABASE") { "recall_cable" } %>
+    <<: *default
+    url: <%= ENV.fetch("CABLE_DATABASE_URL") { ENV.fetch("DATABASE_URL", "").gsub(/recall_production/, "recall_production_cable") } %>
     migrations_paths: db/cable_migrate
