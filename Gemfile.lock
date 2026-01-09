@@ -1,18 +1,3 @@
-PATH
-  remote: ../brainzlab-sdk
-  specs:
-    brainzlab (0.1.9)
-      concurrent-ruby (~> 1.0)
-      logger (~> 1.5)
-
-PATH
-  remote: ../brainzlab-ui
-  specs:
-    brainzlab-ui (0.1.0)
-      phlex (~> 2.0)
-      phlex-rails (~> 2.0)
-      rails (>= 7.0)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -119,6 +104,13 @@ GEM
     bindex (0.8.1)
     bootsnap (1.19.0)
       msgpack (~> 1.2)
+    brainzlab (0.1.9)
+      concurrent-ruby (~> 1.0)
+      logger (~> 1.5)
+    brainzlab-ui (0.1.0)
+      phlex (~> 2.0)
+      phlex-rails (~> 2.0)
+      rails (>= 7.0)
     brakeman (7.1.1)
       racc
     builder (3.3.0)
@@ -436,8 +428,8 @@ DEPENDENCIES
   aws-sdk-s3
   bcrypt (~> 3.1.7)
   bootsnap
-  brainzlab!
-  brainzlab-ui!
+  brainzlab (~> 0.1.1)
+  brainzlab-ui (~> 0.1.0)
   brakeman
   bundler-audit
   capybara
