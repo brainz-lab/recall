@@ -73,6 +73,9 @@ Rails.application.config.after_initialize do
   # Skip if running migrations or if tables don't exist yet
   next unless ActiveRecord::Base.connection.table_exists?(:projects) rescue false
 
+  # Skip self-logging in production (avoid tracking own logs)
+  next if Rails.env.production?
+
   # Provision Reflex and Pulse projects (auto-creates project in each service)
   BrainzLab::Reflex.ensure_provisioned! if BrainzLab.configuration.reflex_enabled
   BrainzLab::Pulse.ensure_provisioned! if BrainzLab.configuration.pulse_enabled
