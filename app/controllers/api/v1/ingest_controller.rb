@@ -59,9 +59,8 @@ module Api
       end
 
       def broadcast_batch(entries)
-        entries.each do |entry|
-          LogsChannel.broadcast_to(@project, { type: "log", log: entry })
-        end
+        # Batch all entries into a single broadcast to avoid N+1 on SolidCable
+        LogsChannel.broadcast_to(@project, { type: "logs", logs: entries })
       rescue => e
         Rails.logger.warn "Failed to broadcast batch: #{e.message}"
       end

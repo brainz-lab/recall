@@ -22,6 +22,10 @@ export default class extends Controller {
       case "log":
         this.handleLog(data.log)
         break
+      case "logs":
+        // Batch of logs - process each one
+        data.logs.forEach(log => this.handleLog(log))
+        break
       case "session_cleared":
         this.handleSessionCleared(data)
         break
