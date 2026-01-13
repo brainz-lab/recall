@@ -27,9 +27,18 @@ module Dashboard
     end
 
     def setup
+      ensure_api_key!
     end
 
     def mcp_setup
+      ensure_api_key!
+    end
+
+    # Ensure the project has an API key (may be missing for older projects)
+    def ensure_api_key!
+      return if @project.api_key.present?
+
+      @project.update!(api_key: "rcl_api_#{SecureRandom.hex(16)}")
     end
 
     def analytics
