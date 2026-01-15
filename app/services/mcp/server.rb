@@ -28,7 +28,8 @@ module Mcp
       tool_class = TOOLS[name]
       raise "Unknown tool: #{name}" unless tool_class
 
-      tool_class.new(@project).call(arguments.to_h.symbolize_keys)
+      args = arguments.respond_to?(:to_unsafe_h) ? arguments.to_unsafe_h : arguments.to_h
+      tool_class.new(@project).call(args.symbolize_keys)
     end
   end
 end
