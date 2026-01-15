@@ -17,30 +17,83 @@ module Mcp
       render json: { error: e.message }, status: :unprocessable_entity
     end
 
-    # POST /mcp/rpc - JSON-RPC style (for MCP protocol)
+    # POST /mcp/rpc - JSON-RPC protocol
     def rpc
-      server = Mcp::Server.new(@project)
+      method = params[:method]
+      params_data = params[:params] || {}
 
-      case params[:method]
+      case method
+      when "initialize"
+        server_version = (Rails.application.config.version rescue "1.0.0")
+        render json: {
+          jsonrpc: "2.0",
+          id: params[:id],
+          result: {
+            protocolVersion: "2024-11-05",
+            capabilities: {
+              tools: { listChanged: false }
+            },
+            serverInfo: {
+              name: "recall",
+              version: server_version
+            }
+          }
+        }
+      when "notifications/initialized", "initialized"
+        render json: { jsonrpc: "2.0", id: params[:id], result: {} }
+      when "ping"
+        render json: { jsonrpc: "2.0", id: params[:id], result: {} }
       when "tools/list"
-        render json: { result: { tools: server.list_tools } }
+        server = Mcp::Server.new(@project)
+        render json: {
+          jsonrpc: "2.0",
+          id: params[:id],
+          result: { tools: server.list_tools }
+        }
       when "tools/call"
-        result = server.call_tool(params.dig(:params, :name), params.dig(:params, :arguments) || {})
-        render json: { result: result }
+        server = Mcp::Server.new(@project)
+        tool_name = params_data[:name]
+        raw_args = params_data[:arguments] || {}
+        arguments = raw_args.respond_to?(:permit!) ? raw_args.permit!.to_h : raw_args.to_h
+        result = server.call_tool(tool_name, arguments)
+        render json: {
+          jsonrpc: "2.0",
+          id: params[:id],
+          result: { content: [ { type: "text", text: result.to_json } ] }
+        }
       else
-        render json: { error: { code: -32601, message: "Method not found" } }
+        render json: {
+          jsonrpc: "2.0",
+          id: params[:id],
+          error: { code: -32601, message: "Unknown method: #{method}" }
+        }, status: :bad_request
       end
+    rescue => e
+      render json: {
+        jsonrpc: "2.0",
+        id: params[:id],
+        error: { code: -32603, message: e.message }
+      }, status: :unprocessable_entity
     end
 
     private
 
     def authenticate!
-      key = request.headers["Authorization"]&.sub(/^Bearer\s+/, "") ||
-            request.headers["X-API-Key"] ||
-            params[:api_key]
+      raw_key = extract_api_key
+      validation = PlatformClient.validate_key(raw_key)
 
-      @project = Project.find_by(api_key: key)
-      render json: { error: "Unauthorized" }, status: :unauthorized unless @project
+      unless validation.valid?
+        render json: { error: validation.error || "Invalid API key" }, status: :unauthorized
+        return
+      end
+
+      @project = PlatformClient.find_or_create_project(validation, raw_key)
+    end
+
+    def extract_api_key
+      auth_header = request.headers["Authorization"]
+      return auth_header.sub(/^Bearer\s+/, "") if auth_header&.start_with?("Bearer ")
+      request.headers["X-API-Key"] || params[:api_key]
     end
 
     def tool_params
