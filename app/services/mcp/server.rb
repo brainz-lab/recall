@@ -28,7 +28,7 @@ module Mcp
       tool_class = TOOLS[name]
       raise "Unknown tool: #{name}" unless tool_class
 
-      tool_class.new(@project).call(arguments.symbolize_keys)
+      tool_class.new(@project).call(arguments.to_h.symbolize_keys)
     end
   end
 end
