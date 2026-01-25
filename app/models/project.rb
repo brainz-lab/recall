@@ -10,6 +10,9 @@ class Project < ApplicationRecord
   before_validation :generate_slug, on: :create
   before_validation :generate_keys, on: :create
 
+  scope :active, -> { where(archived_at: nil) }
+  scope :archived, -> { where.not(archived_at: nil) }
+
   # Check if this project is linked to Platform
   def platform_linked?
     platform_project_id.present?
