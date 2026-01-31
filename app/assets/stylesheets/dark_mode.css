@@ -546,6 +546,71 @@ html.dark ::-webkit-scrollbar-thumb:hover {
 }
 
 /* ============================================
+   RECALL LAYOUT CLASSES
+   ============================================
+   These classes are used in the dashboard layout and must
+   respond to dark mode via CSS variables.
+*/
+
+/* Background classes */
+.recall-bg-page {
+  background-color: var(--dm-bg);
+}
+
+/* Sidebar styling */
+.recall-sidebar {
+  background-color: var(--dm-surface);
+  border-color: var(--dm-border);
+}
+
+.recall-sidebar-section {
+  border-color: var(--dm-border);
+}
+
+/* Text classes */
+.recall-text-primary {
+  color: var(--dm-text);
+}
+
+.recall-text-secondary {
+  color: var(--dm-text-secondary);
+}
+
+.recall-text-muted {
+  color: var(--dm-text-muted);
+}
+
+.recall-text-placeholder {
+  color: var(--dm-text-placeholder);
+}
+
+/* Dark mode toggle */
+.recall-dark-mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0.375rem;
+  background: transparent;
+  border: 1px solid var(--dm-border);
+  border-radius: 0.5rem;
+  color: var(--dm-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.recall-dark-mode-toggle:hover {
+  background-color: var(--dm-hover-bg);
+  color: var(--dm-text);
+}
+
+.recall-dark-mode-toggle:focus-visible {
+  outline: 2px solid #D97757;
+  outline-offset: 2px;
+}
+
+/* ============================================
    Print Styles - Force Light Mode
    ============================================ */
 @media print {
