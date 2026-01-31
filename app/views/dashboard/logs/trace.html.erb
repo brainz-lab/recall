@@ -2,8 +2,7 @@
   <!-- Header -->
   <div class="flex items-center justify-between">
     <%= link_to dashboard_project_logs_path(@project, q: "request:#{@request_id}"),
-        class: "flex items-center gap-2 text-[13px] font-medium transition-colors",
-        style: "color: #6B6760;" do %>
+        class: "flex items-center gap-2 text-[13px] font-medium transition-colors recall-text-secondary" do %>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M19 12H5M12 19l-7-7 7-7"/>
       </svg>
@@ -11,8 +10,7 @@
     <% end %>
     <% if @session_id.present? %>
       <%= link_to session_trace_dashboard_project_logs_path(@project, session_id: @session_id),
-          class: "flex items-center gap-2 text-[13px] font-medium transition-colors hover:underline",
-          style: "color: #1D4ED8;" do %>
+          class: "flex items-center gap-2 text-[13px] font-medium transition-colors hover:underline recall-link" do %>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
           <circle cx="9" cy="7" r="4"/>
@@ -23,31 +21,31 @@
   </div>
 
   <!-- Request Info Card -->
-  <div class="px-6 py-5 rounded-xl" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+  <div class="px-6 py-5 rounded-xl recall-card">
     <div class="flex flex-col gap-4">
       <div>
-        <div class="text-[12px] font-medium mb-1" style="color: #6B6760;">Request Trace</div>
-        <div class="text-[18px] font-mono font-semibold" style="color: #1A1A1A;"><%= @request_id %></div>
+        <div class="text-[12px] font-medium mb-1 recall-text-secondary">Request Trace</div>
+        <div class="text-[18px] font-mono font-semibold recall-text-primary"><%= @request_id %></div>
       </div>
-      <div class="flex flex-wrap gap-6 text-[13px]" style="color: #6B6760;">
+      <div class="flex flex-wrap gap-6 text-[13px] recall-text-secondary">
         <div class="flex items-center gap-2">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
           </svg>
-          <span><strong style="color: #1A1A1A;"><%= @duration_ms %>ms</strong> duration</span>
+          <span><strong class="recall-text-primary"><%= @duration_ms %>ms</strong> duration</span>
         </div>
         <div class="flex items-center gap-2">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8M16 17H8M10 9H8"/>
           </svg>
-          <span><strong style="color: #1A1A1A;"><%= @log_count %></strong> logs</span>
+          <span><strong class="recall-text-primary"><%= @log_count %></strong> logs</span>
         </div>
         <% if @services.any? %>
           <div class="flex items-center gap-2">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
             </svg>
-            <span><strong style="color: #1A1A1A;"><%= @services.join(', ') %></strong></span>
+            <span><strong class="recall-text-primary"><%= @services.join(', ') %></strong></span>
           </div>
         <% end %>
         <div class="flex items-center gap-2">
@@ -62,58 +60,46 @@
 
   <!-- Level Summary -->
   <div class="flex flex-wrap gap-3">
-    <%
-      level_styles = {
-        "debug" => { bg: "#F5F3F0", color: "#6B6760", border: "#E8E5E0" },
-        "info" => { bg: "#EFF6FF", color: "#1D4ED8", border: "#BFDBFE" },
-        "warn" => { bg: "#FFFBEB", color: "#B45309", border: "#FDE68A" },
-        "error" => { bg: "#FEF2F2", color: "#DC2626", border: "#FECACA" },
-        "fatal" => { bg: "#450A0A", color: "#FCA5A5", border: "#7F1D1D" }
-      }
-    %>
     <% %w[debug info warn error fatal].each do |level| %>
       <% count = @levels[level] || 0 %>
       <% next if count == 0 %>
-      <% style = level_styles[level] %>
-      <div class="px-4 py-2 rounded-lg text-[13px] font-medium"
-           style="background: <%= style[:bg] %>; color: <%= style[:color] %>; border: 1px solid <%= style[:border] %>;">
+      <div class="px-4 py-2 rounded-lg text-[13px] font-medium recall-level-<%= level %>">
         <%= level.upcase %> <span class="font-semibold"><%= count %></span>
       </div>
     <% end %>
   </div>
 
   <!-- Timeline -->
-  <div class="rounded-xl overflow-hidden" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
-    <div class="px-5 py-3" style="border-bottom: 1px solid #E8E5E0;">
-      <h3 class="text-[14px] font-semibold" style="color: #1A1A1A;">Timeline</h3>
+  <div class="rounded-xl overflow-hidden recall-card">
+    <div class="px-5 py-3" style="border-bottom: 1px solid var(--recall-border);">
+      <h3 class="text-[14px] font-semibold recall-text-primary">Timeline</h3>
     </div>
 
     <div class="relative">
       <!-- Timeline line -->
-      <div class="absolute left-[140px] top-0 bottom-0 w-px" style="background: #E8E5E0;"></div>
+      <div class="absolute left-[140px] top-0 bottom-0 w-px recall-timeline-line"></div>
 
       <% previous_time = nil %>
       <% @logs.each_with_index do |log, index| %>
         <%
           delta_ms = previous_time ? ((log.timestamp - previous_time) * 1000).round : 0
           previous_time = log.timestamp
-          style = level_styles[log.level] || level_styles["info"]
         %>
-        <div class="relative flex" style="border-bottom: 1px solid #F0EDE8;" data-controller="expand">
+        <div class="relative flex" style="border-bottom: 1px solid var(--recall-border-light);" data-controller="expand">
           <!-- Timestamp & Delta -->
           <div class="w-[140px] flex-shrink-0 px-4 py-4 text-right">
-            <div class="text-[12px] font-mono" style="color: #1A1A1A;">
-              <%= log.timestamp.strftime('%H:%M:%S') %><span style="color: #B0ACA5;">.<%= log.timestamp.strftime('%L') %></span>
+            <div class="text-[12px] font-mono recall-text-primary">
+              <%= log.timestamp.strftime('%H:%M:%S') %><span class="recall-text-placeholder">.<%= log.timestamp.strftime('%L') %></span>
             </div>
             <% if index > 0 %>
-              <div class="text-[11px] font-mono mt-0.5" style="color: <%= delta_ms > 100 ? '#D97706' : '#B0ACA5' %>;">
+              <div class="text-[11px] font-mono mt-0.5" style="color: <%= delta_ms > 100 ? '#D97706' : 'var(--recall-text-placeholder)' %>;">
                 +<%= delta_ms %>ms
               </div>
             <% end %>
           </div>
 
           <!-- Timeline dot -->
-          <div class="absolute left-[136px] top-5 w-2 h-2 rounded-full" style="background: <%= style[:color] %>;"></div>
+          <div class="absolute left-[136px] top-5 w-2 h-2 rounded-full" style="background: var(--recall-level-<%= log.level %>-text, #6B6760);"></div>
 
           <!-- Log content -->
           <div class="flex-1 py-4 pr-5 pl-6">
@@ -122,22 +108,22 @@
                 <%= log.level.upcase %>
               </span>
               <div class="flex-1 min-w-0">
-                <div class="text-[14px] font-mono" style="color: #1A1A1A;"><%= log.message %></div>
+                <div class="text-[14px] font-mono recall-text-primary"><%= log.message %></div>
                 <% if log.service %>
-                  <div class="text-[12px] mt-1" style="color: #8B8780;">
+                  <div class="text-[12px] mt-1 recall-text-muted">
                     service: <%= log.service %>
                   </div>
                 <% end %>
               </div>
               <% if log.data.present? %>
-                <svg class="w-4 h-4 flex-shrink-0 transition-transform" style="color: #B0ACA5;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 flex-shrink-0 transition-transform recall-text-placeholder" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                 </svg>
               <% end %>
             </div>
 
             <% if log.data.present? %>
-              <div class="hidden mt-3 p-3 rounded-lg" style="background: #FAF9F7;" data-expand-target="content">
+              <div class="hidden mt-3 p-3 rounded-lg recall-card-alt" data-expand-target="content">
                 <%= interactive_json(log.data) %>
               </div>
             <% end %>

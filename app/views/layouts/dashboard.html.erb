@@ -26,6 +26,19 @@
     }
   </style>
 
+  <%# Prevent flash of wrong theme on page load %>
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('recall-theme');
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.add('light');
+      }
+    })();
+  </script>
+
   <%# Google Analytics - only in production %>
   <% if Rails.env.production? %>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-CXHFR6PC8W"></script>
@@ -37,32 +50,44 @@
     </script>
   <% end %>
 </head>
-<body class="h-full antialiased" style="background: var(--color-cream-50);">
-  <div class="flex h-full">
+<body class="h-full antialiased recall-bg-page">
+  <div class="flex h-full" data-controller="dark-mode">
     <!-- Sidebar -->
-    <aside class="w-64 flex flex-col" style="background: #fff; border-right: 1px solid var(--color-cream-200);">
-      <div class="p-5" style="border-bottom: 1px solid var(--color-cream-200);">
-        <%= link_to dashboard_root_path, class: "flex items-center gap-2.5" do %>
-          <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--color-recall);">
-            <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-              <circle cx="12" cy="12" r="8"/>
+    <aside class="w-64 flex flex-col recall-sidebar">
+      <div class="p-5 recall-sidebar-section">
+        <div class="flex items-center justify-between">
+          <%= link_to dashboard_root_path, class: "flex items-center gap-2.5" do %>
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--color-recall);">
+              <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="12" cy="12" r="8"/>
+              </svg>
+            </div>
+            <span class="font-semibold recall-text-primary">Recall</span>
+          <% end %>
+          <button
+            data-action="click->dark-mode#toggle"
+            data-dark-mode-target="icon"
+            class="recall-dark-mode-toggle"
+            aria-label="Toggle dark mode"
+            title="Toggle dark mode">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
             </svg>
-          </div>
-          <span class="font-semibold" style="color: var(--color-ink-950);">Recall</span>
-        <% end %>
+          </button>
+        </div>
       </div>
 
       <% if @project&.persisted? %>
         <%# Cache sidebar navigation - only changes when project changes or route changes %>
         <% cache(["sidebar_nav", @project.cache_key, controller_name, action_name]) do %>
         <!-- Project Selector -->
-        <div class="px-4 py-3" style="border-bottom: 1px solid var(--color-cream-200);">
-          <%= link_to dashboard_projects_path, class: "flex items-center gap-2 px-2 py-1.5 rounded-lg transition", style: "color: var(--color-ink-700);" do %>
+        <div class="px-4 py-3 recall-sidebar-section">
+          <%= link_to dashboard_projects_path, class: "flex items-center gap-2 px-2 py-1.5 rounded-lg transition recall-text-secondary" do %>
             <div class="w-6 h-6 rounded flex items-center justify-center text-xs font-semibold" style="background: rgba(217, 119, 87, 0.15); color: var(--color-recall);">
               <%= @project.name.first.upcase %>
             </div>
             <span class="flex-1 text-sm font-medium truncate"><%= @project.name %></span>
-            <svg class="w-4 h-4" style="color: var(--color-ink-400);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 recall-text-placeholder" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
             </svg>
           <% end %>
@@ -107,7 +132,7 @@
         <% end %>
       <% else %>
         <nav class="p-4 flex-1">
-          <p class="px-3 text-xs font-medium uppercase tracking-wider mb-3" style="color: var(--color-ink-400);">Select a project</p>
+          <p class="px-3 text-xs font-medium uppercase tracking-wider mb-3 recall-text-placeholder">Select a project</p>
           <% if Rails.env.development? %>
             <%= link_to dashboard_dev_tools_path, class: "nav-item mt-4" do %>
               <%= icon(:dev_tools) %>
@@ -119,14 +144,14 @@
 
       <!-- User Menu -->
       <% if defined?(current_user) && current_user %>
-        <div class="p-4" style="border-top: 1px solid var(--color-cream-200);">
+        <div class="p-4" style="border-top: 1px solid var(--recall-sidebar-border);">
           <div class="flex items-center gap-3">
             <div class="avatar avatar-md avatar-primary">
               <%= current_user.name&.first&.upcase || current_user.email.first.upcase %>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium truncate" style="color: var(--color-ink-900);"><%= current_user.name || current_user.email.split('@').first %></p>
-              <p class="text-xs truncate" style="color: var(--color-ink-500);"><%= current_user.email %></p>
+              <p class="text-sm font-medium truncate recall-text-primary"><%= current_user.name || current_user.email.split('@').first %></p>
+              <p class="text-xs truncate recall-text-muted"><%= current_user.email %></p>
             </div>
           </div>
         </div>

@@ -1,20 +1,20 @@
 <%# Individual log row - optimized for fast rendering with Turbo Frame expand %>
 <% level = log.level; commit = log.commit; commit_short = commit&.slice(0, 7) %>
 <% log_frame_id = "log_details_#{log.id}" %>
-<div class="log-row" data-controller="log-expand" style="border-bottom: 1px solid #F0EDE8;">
-  <div class="flex items-center gap-4 px-5 py-3 cursor-pointer transition-colors hover:bg-[#FAF9F7]" data-action="click->log-expand#toggle">
-    <svg data-log-expand-target="chevron" class="w-4 h-4 transition-transform duration-200" style="color: #B0ACA5;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<div class="log-row" data-controller="log-expand" style="border-bottom: 1px solid var(--recall-border-light);">
+  <div class="flex items-center gap-4 px-5 py-3 cursor-pointer transition-colors recall-hover" data-action="click->log-expand#toggle">
+    <svg data-log-expand-target="chevron" class="w-4 h-4 transition-transform duration-200 recall-text-placeholder" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
     </svg>
-    <span class="text-[12px] font-mono w-24" style="color: #B0ACA5;"><%= log.timestamp.strftime('%H:%M:%S') %></span>
+    <span class="text-[12px] font-mono w-24 recall-text-placeholder"><%= log.timestamp.strftime('%H:%M:%S') %></span>
     <button data-action="click->query#filter:stop" data-query="level:<%= level %>" class="log-level log-level-<%= level %> px-2 py-0.5 text-[11px] font-medium rounded-full hover:ring-2 hover:ring-offset-1" title="Filter by <%= level %>"><%= level.upcase %></button>
-    <span class="flex-1 text-[14px] font-mono truncate" style="color: #1A1A1A;"><%= log.message %></span>
-    <% if commit_short %><button data-action="click->query#filter:stop" data-query="commit:<%= commit %>" class="text-[11px] font-mono px-2 py-1 rounded hover:ring-2 hover:ring-offset-1" style="background: #F5F3F0; color: #8B8780;" title="Filter by commit"><%= commit_short %></button><% end %>
+    <span class="flex-1 text-[14px] font-mono truncate recall-text-primary"><%= log.message %></span>
+    <% if commit_short %><button data-action="click->query#filter:stop" data-query="commit:<%= commit %>" class="text-[11px] font-mono px-2 py-1 rounded hover:ring-2 hover:ring-offset-1 recall-filter-btn" title="Filter by commit"><%= commit_short %></button><% end %>
   </div>
   <div class="hidden" data-log-expand-target="content">
     <%= turbo_frame_tag log_frame_id, data: { src: dashboard_project_log_path(project_id, log.composite_key), log_expand_target: "frame" } do %>
-      <div class="px-5 py-4" style="background: #FAF9F7;">
-        <div class="flex items-center justify-center gap-2 text-[13px]" style="color: #8B8780;">
+      <div class="px-5 py-4 recall-card-alt">
+        <div class="flex items-center justify-center gap-2 text-[13px] recall-text-muted">
           <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>

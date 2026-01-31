@@ -1,22 +1,22 @@
 <%# Query Help Modal - extracted for cleaner index template %>
 <div data-query-help-target="modal" data-action="keydown@window->query-help#closeOnEscape" class="hidden fixed inset-0 z-50">
-  <div class="absolute inset-0 bg-black/30" data-action="click->query-help#close"></div>
-  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl max-h-[80vh] overflow-y-auto p-6 rounded-xl" style="background: #FFFFFE;">
+  <div class="absolute inset-0 recall-modal-overlay" data-action="click->query-help#close"></div>
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl max-h-[80vh] overflow-y-auto p-6 rounded-xl recall-modal">
     <div class="flex justify-between items-center mb-6">
-      <h3 class="text-[18px] font-semibold" style="color: #1A1A1A;">Query Syntax</h3>
-      <button data-action="click->query-help#close" class="p-2 rounded-lg hover:bg-[#F5F3F0]" style="color: #6B6760;">
+      <h3 class="text-[18px] font-semibold recall-text-primary">Query Syntax</h3>
+      <button data-action="click->query-help#close" class="p-2 rounded-lg recall-hover recall-text-secondary">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M18 6L6 18M6 6l12 12"/>
         </svg>
       </button>
     </div>
 
-    <div class="space-y-6 text-[13px]" style="color: #1A1A1A;">
+    <div class="space-y-6 text-[13px] recall-text-primary">
       <!-- Basic Syntax -->
       <div>
         <h4 class="font-semibold mb-2" style="color: #D97757;">Basic Syntax</h4>
-        <p class="mb-2" style="color: #6B6760;">Combine filters with spaces (AND). Use <code class="px-1.5 py-0.5 rounded" style="background: #F5F3F0;">field:value</code> format.</p>
-        <div class="font-mono text-[12px] p-3 rounded-lg" style="background: #F5F3F0; color: #6B6760;">
+        <p class="mb-2 recall-text-secondary">Combine filters with spaces (AND). Use <code class="px-1.5 py-0.5 rounded recall-code-inline">field:value</code> format.</p>
+        <div class="font-mono text-[12px] p-3 rounded-lg recall-bg-input recall-text-secondary">
           level:error since:1h "payment failed"
         </div>
       </div>
@@ -24,14 +24,14 @@
       <!-- OR Operator -->
       <div>
         <h4 class="font-semibold mb-2" style="color: #D97757;">OR Operator</h4>
-        <p class="mb-2" style="color: #6B6760;">Use <code class="px-1.5 py-0.5 rounded" style="background: #F5F3F0;">OR</code> to match any of multiple conditions:</p>
+        <p class="mb-2 recall-text-secondary">Use <code class="px-1.5 py-0.5 rounded recall-code-inline">OR</code> to match any of multiple conditions:</p>
         <div class="space-y-2 font-mono text-[12px]">
-          <div class="p-2 rounded" style="background: #F5F3F0;">
-            <span style="color: #6B6760;">Errors or warnings:</span><br>
+          <div class="p-2 rounded recall-bg-input">
+            <span class="recall-text-secondary">Errors or warnings:</span><br>
             <span style="color: #D97757;">level:error OR level:warn</span>
           </div>
-          <div class="p-2 rounded" style="background: #F5F3F0;">
-            <span style="color: #6B6760;">Multiple services:</span><br>
+          <div class="p-2 rounded recall-bg-input">
+            <span class="recall-text-secondary">Multiple services:</span><br>
             <span style="color: #D97757;">service:api OR service:worker</span>
           </div>
         </div>
@@ -42,13 +42,13 @@
         <h4 class="font-semibold mb-3" style="color: #D97757;">Available Filters</h4>
         <table class="w-full text-[12px]">
           <thead>
-            <tr style="border-bottom: 1px solid #E8E5E0;">
-              <th class="text-left py-2 font-medium" style="color: #6B6760;">Filter</th>
-              <th class="text-left py-2 font-medium" style="color: #6B6760;">Example</th>
-              <th class="text-left py-2 font-medium" style="color: #6B6760;">Description</th>
+            <tr style="border-bottom: 1px solid var(--recall-border);">
+              <th class="text-left py-2 font-medium recall-text-secondary">Filter</th>
+              <th class="text-left py-2 font-medium recall-text-secondary">Example</th>
+              <th class="text-left py-2 font-medium recall-text-secondary">Description</th>
             </tr>
           </thead>
-          <tbody class="font-mono" style="color: #1A1A1A;">
+          <tbody class="font-mono recall-text-primary">
             <% [
               ["level:", "level:error", "debug, info, warn, error, fatal"],
               ["level:", "level:error,fatal", "Multiple levels (comma-separated)"],
@@ -63,10 +63,10 @@
               ["session:", "session:abc123", "Session ID"],
               ["request:", "request:req_xyz", "Request ID"]
             ].each do |filter, example, desc| %>
-              <tr style="border-bottom: 1px solid #F0EDE8;">
+              <tr style="border-bottom: 1px solid var(--recall-border-light);">
                 <td class="py-2"><%= filter %></td>
                 <td class="py-2" style="color: #D97757;"><%= example %></td>
-                <td class="py-2 font-sans" style="color: #6B6760;"><%= desc %></td>
+                <td class="py-2 font-sans recall-text-secondary"><%= desc %></td>
               </tr>
             <% end %>
           </tbody>
@@ -78,13 +78,13 @@
         <h4 class="font-semibold mb-3" style="color: #D97757;">JSON Data Filters</h4>
         <table class="w-full text-[12px]">
           <thead>
-            <tr style="border-bottom: 1px solid #E8E5E0;">
-              <th class="text-left py-2 font-medium" style="color: #6B6760;">Type</th>
-              <th class="text-left py-2 font-medium" style="color: #6B6760;">Example</th>
-              <th class="text-left py-2 font-medium" style="color: #6B6760;">Description</th>
+            <tr style="border-bottom: 1px solid var(--recall-border);">
+              <th class="text-left py-2 font-medium recall-text-secondary">Type</th>
+              <th class="text-left py-2 font-medium recall-text-secondary">Example</th>
+              <th class="text-left py-2 font-medium recall-text-secondary">Description</th>
             </tr>
           </thead>
-          <tbody class="font-mono" style="color: #1A1A1A;">
+          <tbody class="font-mono recall-text-primary">
             <% [
               ["Exact", "data.user_id:123", "Exact value match"],
               ["Nested", "data.user.email:a@b.com", "Nested JSON path"],
@@ -92,10 +92,10 @@
               ["Numeric", "data.amount:>100", "Comparison: >, <, >=, <="],
               ["Quoted", 'data.query:"SELECT * FROM"', "Values with spaces"]
             ].each do |type, example, desc| %>
-              <tr style="border-bottom: 1px solid #F0EDE8;">
+              <tr style="border-bottom: 1px solid var(--recall-border-light);">
                 <td class="py-2"><%= type %></td>
                 <td class="py-2" style="color: #D97757;"><%= example %></td>
-                <td class="py-2 font-sans" style="color: #6B6760;"><%= desc %></td>
+                <td class="py-2 font-sans recall-text-secondary"><%= desc %></td>
               </tr>
             <% end %>
           </tbody>
@@ -106,15 +106,15 @@
       <div>
         <h4 class="font-semibold mb-2" style="color: #D97757;">Commands (Pipe Syntax)</h4>
         <table class="w-full text-[12px]">
-          <tbody class="font-mono" style="color: #1A1A1A;">
+          <tbody class="font-mono recall-text-primary">
             <% [
               ["| stats", "Show count statistics"],
               ["| stats by:level", "Group by level, commit, hour, day"],
               ["| first 50", "First N results (oldest first)"]
             ].each do |cmd, desc| %>
-              <tr style="border-bottom: 1px solid #F0EDE8;">
+              <tr style="border-bottom: 1px solid var(--recall-border-light);">
                 <td class="py-2" style="color: #D97757;"><%= cmd %></td>
-                <td class="py-2 font-sans" style="color: #6B6760;"><%= desc %></td>
+                <td class="py-2 font-sans recall-text-secondary"><%= desc %></td>
               </tr>
             <% end %>
           </tbody>
@@ -130,8 +130,8 @@
             ["Payment issues for user:", '"payment" data.user_id:123 level:error,warn'],
             ["Stats by level in production:", "env:production since:24h | stats by:level"]
           ].each do |label, query| %>
-            <div class="p-2 rounded" style="background: #F5F3F0;">
-              <span style="color: #6B6760;"><%= label %></span><br>
+            <div class="p-2 rounded recall-bg-input">
+              <span class="recall-text-secondary"><%= label %></span><br>
               <span style="color: #D97757;"><%= query %></span>
             </div>
           <% end %>

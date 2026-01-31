@@ -1,10 +1,10 @@
 <%# Export Modal - extracted for cleaner index template %>
 <div data-export-target="modal" data-action="keydown@window->export#closeOnEscape" class="hidden fixed inset-0 z-50">
-  <div class="absolute inset-0 bg-black/30" data-action="click->export#close"></div>
-  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md p-6 rounded-xl" style="background: #FFFFFE;">
+  <div class="absolute inset-0 recall-modal-overlay" data-action="click->export#close"></div>
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md p-6 rounded-xl recall-modal">
     <div class="flex justify-between items-center mb-6">
-      <h3 class="text-[18px] font-semibold" style="color: #1A1A1A;">Export Logs</h3>
-      <button data-action="click->export#close" class="p-2 rounded-lg hover:bg-[#F5F3F0]" style="color: #6B6760;">
+      <h3 class="text-[18px] font-semibold recall-text-primary">Export Logs</h3>
+      <button data-action="click->export#close" class="p-2 rounded-lg recall-hover recall-text-secondary">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M18 6L6 18M6 6l12 12"/>
         </svg>
@@ -13,50 +13,44 @@
 
     <form data-export-target="form" data-action="submit->export#submit" class="space-y-4">
       <div>
-        <label class="block text-[13px] font-medium mb-1" style="color: #6B6760;">Format</label>
+        <label class="block text-[13px] font-medium mb-1 recall-text-secondary">Format</label>
         <select data-export-target="formatSelect"
-                class="w-full px-4 py-3 text-[14px] rounded-lg outline-none"
-                style="background: #F5F3F0; border: 1px solid #E8E5E0; color: #1A1A1A;">
+                class="w-full px-4 py-3 text-[14px] rounded-lg outline-none recall-input-bordered">
           <option value="json">JSON</option>
           <option value="csv">CSV</option>
         </select>
       </div>
 
       <div>
-        <label class="block text-[13px] font-medium mb-1" style="color: #6B6760;">Query Filter (optional)</label>
+        <label class="block text-[13px] font-medium mb-1 recall-text-secondary">Query Filter (optional)</label>
         <input type="text" data-export-target="queryInput"
                placeholder="level:error env:production"
-               class="w-full px-4 py-3 text-[14px] font-mono rounded-lg outline-none"
-               style="background: #F5F3F0; border: 1px solid #E8E5E0; color: #1A1A1A;">
-        <p class="text-[11px] mt-1" style="color: #8B8780;">Leave empty to export all logs</p>
+               class="w-full px-4 py-3 text-[14px] font-mono rounded-lg outline-none recall-input-bordered">
+        <p class="text-[11px] mt-1 recall-text-muted">Leave empty to export all logs</p>
       </div>
 
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <label class="block text-[13px] font-medium mb-1" style="color: #6B6760;">Since</label>
+          <label class="block text-[13px] font-medium mb-1 recall-text-secondary">Since</label>
           <input type="text" data-export-target="sinceInput"
                  placeholder="24h, 7d, or date"
-                 class="w-full px-4 py-3 text-[14px] rounded-lg outline-none"
-                 style="background: #F5F3F0; border: 1px solid #E8E5E0; color: #1A1A1A;">
+                 class="w-full px-4 py-3 text-[14px] rounded-lg outline-none recall-input-bordered">
         </div>
         <div>
-          <label class="block text-[13px] font-medium mb-1" style="color: #6B6760;">Until</label>
+          <label class="block text-[13px] font-medium mb-1 recall-text-secondary">Until</label>
           <input type="text" data-export-target="untilInput"
                  placeholder="1h, now, or date"
-                 class="w-full px-4 py-3 text-[14px] rounded-lg outline-none"
-                 style="background: #F5F3F0; border: 1px solid #E8E5E0; color: #1A1A1A;">
+                 class="w-full px-4 py-3 text-[14px] rounded-lg outline-none recall-input-bordered">
         </div>
       </div>
 
       <div class="flex gap-3 justify-end pt-2">
         <button type="button" data-action="click->export#close"
-                class="px-4 py-2 text-[14px] font-medium rounded-lg"
-                style="color: #6B6760;">
+                class="px-4 py-2 text-[14px] font-medium rounded-lg recall-btn-ghost">
           Cancel
         </button>
         <button type="submit"
-                class="px-4 py-2 text-[14px] font-medium rounded-lg cursor-pointer flex items-center gap-2"
-                style="background: #1A1A1A; color: #FFFFFE;">
+                class="px-4 py-2 text-[14px] font-medium rounded-lg cursor-pointer flex items-center gap-2 recall-btn-primary">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
             <polyline points="7 10 12 15 17 10"/>

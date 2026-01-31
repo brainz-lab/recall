@@ -1,31 +1,29 @@
 <%# Save Search Modal - extracted for cleaner index template %>
 <div data-saved-search-target="modal" class="hidden fixed inset-0 z-50">
-  <div class="absolute inset-0 bg-black/30" data-action="click->saved-search#closeModal"></div>
-  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md p-6 rounded-xl" style="background: #FFFFFE;">
-    <h3 class="text-[16px] font-semibold mb-4" style="color: #1A1A1A;">Save Search</h3>
+  <div class="absolute inset-0 recall-modal-overlay" data-action="click->saved-search#closeModal"></div>
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md p-6 rounded-xl recall-modal">
+    <h3 class="text-[16px] font-semibold mb-4 recall-text-primary">Save Search</h3>
     <%= form_with model: SavedSearch.new, url: dashboard_project_saved_searches_path(@project), method: :post do |f| %>
       <%= f.hidden_field :query, value: @query, data: { saved_search_target: "queryField" } %>
       <div class="space-y-4">
         <div>
-          <label class="block text-[13px] font-medium mb-1" style="color: #6B6760;">Name</label>
+          <label class="block text-[13px] font-medium mb-1 recall-text-secondary">Name</label>
           <%= f.text_field :name, placeholder: "e.g., Production errors",
-              class: "w-full px-4 py-3 text-[14px] rounded-lg outline-none",
-              style: "background: #F5F3F0; border: 1px solid #E8E5E0; color: #1A1A1A;",
+              class: "w-full px-4 py-3 text-[14px] rounded-lg outline-none recall-input-bordered",
               data: { saved_search_target: "nameInput" } %>
         </div>
         <div>
-          <label class="block text-[13px] font-medium mb-1" style="color: #6B6760;">Query</label>
-          <div class="px-4 py-3 rounded-lg text-[13px] font-mono" style="background: #F5F3F0; color: #6B6760;">
+          <label class="block text-[13px] font-medium mb-1 recall-text-secondary">Query</label>
+          <div class="px-4 py-3 rounded-lg text-[13px] font-mono recall-bg-input recall-text-secondary">
             <%= @query.presence || "No query" %>
           </div>
         </div>
         <div class="flex gap-3 justify-end pt-2">
           <button type="button" data-action="click->saved-search#closeModal"
-                  class="px-4 py-2 text-[14px] font-medium rounded-lg"
-                  style="color: #6B6760;">
+                  class="px-4 py-2 text-[14px] font-medium rounded-lg recall-btn-ghost">
             Cancel
           </button>
-          <%= f.submit "Save Search", class: "px-4 py-2 text-[14px] font-medium rounded-lg cursor-pointer", style: "background: #1A1A1A; color: #FFFFFE;" %>
+          <%= f.submit "Save Search", class: "px-4 py-2 text-[14px] font-medium rounded-lg cursor-pointer recall-btn-primary" %>
         </div>
       </div>
     <% end %>

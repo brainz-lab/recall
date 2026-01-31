@@ -10,17 +10,20 @@ Structured logging with total memory for Rails apps.
 [![Docs](https://img.shields.io/badge/docs-brainzlab.ai-orange)](https://docs.brainzlab.ai/products/recall/overview)
 [![License: OSAaSy](https://img.shields.io/badge/License-OSAaSy-blue.svg)](LICENSE)
 
-## Overview
-
-Recall is a structured logging service that gives you total memory of your application's behavior. Unlike traditional logging, Recall stores logs as structured JSON with powerful querying capabilities.
-
-- **Structured Logging** - JSON logs with automatic context
-- **Powerful Search** - Query DSL for filtering and aggregation
-- **Live Tail** - Real-time log streaming via WebSockets
-- **Session Tracking** - Group logs by user session or request
-- **MCP Integration** - AI-powered log analysis
-
 ## Quick Start
+
+```bash
+# Install SDK
+gem 'brainzlab'
+
+# Configure
+BrainzLab.configure { |c| c.recall_key = ENV['RECALL_API_KEY'] }
+
+# Send logs
+BrainzLab::Recall.info("User signed up", user: user.as_json)
+```
+
+## Installation
 
 ### With Docker
 
@@ -51,6 +54,36 @@ BrainzLab.configure do |config|
 end
 ```
 
+### Local Development
+
+```bash
+git clone https://github.com/brainz-lab/recall.git
+cd recall
+bundle install
+bin/rails db:create db:migrate db:seed
+bin/rails server
+```
+
+## Configuration
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `DATABASE_URL` | PostgreSQL connection | Yes |
+| `REDIS_URL` | Redis connection | Yes |
+| `RAILS_MASTER_KEY` | Rails credentials | Yes |
+| `BRAINZLAB_PLATFORM_URL` | Platform URL for auth | Yes |
+| `SERVICE_KEY` | Internal service key | Yes |
+
+### Tech Stack
+
+- **Ruby** 3.4.7 / **Rails** 8.1
+- **PostgreSQL** 16 with JSONB + pg_trgm
+- **Redis** 7
+- **Hotwire** (Turbo + Stimulus) / **Tailwind CSS**
+- **Solid Queue** / **Solid Cache** / **Solid Cable**
+
+## Usage
+
 ### Send Logs
 
 ```ruby
@@ -59,19 +92,7 @@ BrainzLab::Recall.error("Payment failed", error: e.message, amount: 99.99)
 BrainzLab::Recall.debug("Cache hit", key: "user:123", ttl: 3600)
 ```
 
-## Tech Stack
-
-- **Ruby** 3.4.7
-- **Rails** 8.1
-- **PostgreSQL** 16 with JSONB + pg_trgm
-- **Redis** 7
-- **Hotwire** (Turbo + Stimulus)
-- **Tailwind CSS**
-- **Solid Queue** / **Solid Cache** / **Solid Cable**
-
-## Query DSL
-
-Recall uses a powerful query language for searching logs:
+### Query DSL
 
 ```
 # Text search
@@ -111,48 +132,7 @@ since:1h | stats by:level
 | `until` | End time | `until:now` |
 | `data.*` | Nested fields | `data.user.email:john@example.com` |
 
-## API Endpoints
-
-### Ingest
-- `POST /api/v1/log` - Send single log
-- `POST /api/v1/logs` - Batch send logs
-
-### Query
-- `GET /api/v1/logs?q=<query>` - Search logs
-- `GET /api/v1/logs/:id` - Get single log
-
-### Sessions
-- `POST /api/v1/sessions` - Create session
-- `GET /api/v1/sessions/:id/logs` - Get session logs
-- `DELETE /api/v1/sessions/:id` - Clear session
-
-### MCP
-- `GET /mcp/tools` - List MCP tools
-- `POST /mcp/tools/:name` - Call MCP tool
-- `POST /mcp/rpc` - JSON-RPC endpoint
-
-## MCP Tools
-
-| Tool | Description |
-|------|-------------|
-| `recall_query` | Query logs with DSL |
-| `recall_errors` | Get error/fatal logs |
-| `recall_stats` | Statistics by level/commit/hour |
-| `recall_by_session` | All logs for a session |
-| `recall_new_session` | Create new session ID |
-| `recall_clear_session` | Delete session logs |
-
-## Environment Variables
-
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `DATABASE_URL` | PostgreSQL connection | Yes |
-| `REDIS_URL` | Redis connection | Yes |
-| `RAILS_MASTER_KEY` | Rails credentials | Yes |
-| `BRAINZLAB_PLATFORM_URL` | Platform URL for auth | Yes |
-| `SERVICE_KEY` | Internal service key | Yes |
-
-## Log Payload Format
+### Log Payload Format
 
 ```json
 {
@@ -177,7 +157,55 @@ since:1h | stats by:level
 }
 ```
 
-## Testing
+## API Reference
+
+### Ingest
+- `POST /api/v1/log` - Send single log
+- `POST /api/v1/logs` - Batch send logs
+
+### Query
+- `GET /api/v1/logs?q=<query>` - Search logs
+- `GET /api/v1/logs/:id` - Get single log
+
+### Sessions
+- `POST /api/v1/sessions` - Create session
+- `GET /api/v1/sessions/:id/logs` - Get session logs
+- `DELETE /api/v1/sessions/:id` - Clear session
+
+### MCP Tools
+
+| Tool | Description |
+|------|-------------|
+| `recall_query` | Query logs with DSL |
+| `recall_errors` | Get error/fatal logs |
+| `recall_stats` | Statistics by level/commit/hour |
+| `recall_by_session` | All logs for a session |
+| `recall_new_session` | Create new session ID |
+| `recall_clear_session` | Delete session logs |
+
+Full documentation: [docs.brainzlab.ai/products/recall](https://docs.brainzlab.ai/products/recall/overview)
+
+## Self-Hosting
+
+### Docker Compose
+
+```yaml
+services:
+  recall:
+    image: brainzllc/recall:latest
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgres://user:pass@db:5432/recall
+      REDIS_URL: redis://redis:6379/1
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+      BRAINZLAB_PLATFORM_URL: http://platform:3000
+    depends_on:
+      - db
+      - redis
+```
+
+### Testing
 
 ```bash
 bin/rails test              # Unit tests
@@ -185,9 +213,9 @@ bin/rails test:system       # System tests
 bin/rubocop                 # Linting
 ```
 
-## Documentation
+## Contributing
 
-Full documentation: [docs.brainzlab.ai/products/recall](https://docs.brainzlab.ai/products/recall/overview)
+See [CONTRIBUTING.md](../CONTRIBUTING.md) for development setup and contribution guidelines.
 
 ## Related
 
@@ -195,18 +223,6 @@ Full documentation: [docs.brainzlab.ai/products/recall](https://docs.brainzlab.a
 - [Reflex](https://github.com/brainz-lab/reflex) - Error tracking
 - [Pulse](https://github.com/brainz-lab/pulse) - APM
 - [Stack](https://github.com/brainz-lab/stack) - Self-hosted deployment
-
-## Contributors
-
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<!-- markdownlint-restore -->
-<!-- prettier-ignore-end -->
-<!-- ALL-CONTRIBUTORS-LIST:END -->
-
-Thanks to all our contributors! See [all-contributors](https://allcontributors.org) for how to add yourself.
-
 
 ## License
 
