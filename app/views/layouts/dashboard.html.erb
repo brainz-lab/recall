@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en" class="h-full" data-controller="dark-mode">
 <head>
   <title>Recall - <%= content_for(:title) || "Structured Logging" %></title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -29,7 +29,7 @@
   <%# Prevent flash of wrong theme on page load %>
   <script>
     (function() {
-      const savedTheme = localStorage.getItem('recall-theme');
+      const savedTheme = localStorage.getItem('brainzlab-theme');
       const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
         document.documentElement.classList.add('dark');
@@ -51,7 +51,7 @@
   <% end %>
 </head>
 <body class="h-full antialiased recall-bg-page">
-  <div class="flex h-full" data-controller="dark-mode">
+  <div class="flex h-full">
     <!-- Sidebar -->
     <aside class="w-64 flex flex-col recall-sidebar">
       <div class="p-5 recall-sidebar-section">
