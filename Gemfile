@@ -58,7 +58,7 @@ gem "brainzlab", "~> 0.1.12"
 
 # BrainzLab UI - Unified design system with Phlex components
 gem "brainzlab-ui", "~> 0.1.0"
-gem "phlex-rails", "~> 2.0"
+gem "phlex-rails", "~> 2.4"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
