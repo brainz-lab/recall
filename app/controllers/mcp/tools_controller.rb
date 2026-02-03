@@ -80,6 +80,16 @@ module Mcp
 
     def authenticate!
       raw_key = extract_api_key
+      return render json: { error: "API key required" }, status: :unauthorized if raw_key.blank?
+
+      # Try local project API key first (rcl_api_xxx format)
+      if raw_key.start_with?("rcl_api_")
+        @project = Project.find_by(api_key: raw_key)
+        return render json: { error: "Invalid API key" }, status: :unauthorized unless @project
+        return
+      end
+
+      # Fall back to Platform validation
       validation = PlatformClient.validate_key(raw_key)
 
       unless validation.valid?
