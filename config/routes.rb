@@ -40,6 +40,7 @@ Rails.application.routes.draw do
       member do
         get :setup
         get :mcp_setup
+        post :regenerate_mcp_token
         get :analytics
       end
       resources :logs, only: [ :index ] do

@@ -5,20 +5,29 @@
   </div>
 
   <!-- Step 1 -->
+  <% display_key = @raw_token || @project.api_key %>
   <div class="space-y-4">
     <div class="flex items-center gap-3">
       <span class="flex items-center justify-center w-7 h-7 rounded-full text-[13px] font-semibold recall-step-badge">1</span>
       <h2 class="text-[16px] font-medium recall-text-primary">Get your API key</h2>
     </div>
     <p class="text-[14px] recall-text-secondary">Use this API key to authenticate MCP requests:</p>
+    <% if @raw_token %>
+      <div class="mb-4 rounded-md bg-amber-50 p-3 border border-amber-200">
+        <p class="text-sm text-amber-800">New API key created. Copy it now - it won't be shown again.</p>
+      </div>
+    <% end %>
     <div class="group" style="position: relative;" data-controller="clipboard">
-      <pre class="px-5 py-4 rounded-xl text-[13px] font-mono overflow-x-auto recall-code"><code><%= @project.api_key %></code></pre>
+      <pre class="px-5 py-4 rounded-xl text-[13px] font-mono overflow-x-auto recall-code"><code><%= display_key %></code></pre>
       <button data-action="click->clipboard#copy" data-clipboard-target="source"
-              data-copy="<%= @project.api_key %>"
+              data-copy="<%= display_key %>"
               class="px-3 py-1.5 text-[12px] font-medium rounded-md transition-all opacity-0 group-hover:opacity-100 recall-code-copy-btn"
               style="position: absolute; top: 12px; right: 12px;">
         Copy
       </button>
+    </div>
+    <div class="mt-2">
+      <%= button_to "Regenerate API Key", regenerate_mcp_token_dashboard_project_path(@project), method: :post, class: "px-3 py-1.5 text-[12px] font-medium rounded-md recall-code-copy-btn", data: { turbo_confirm: "This will invalidate the current API key. Continue?" } %>
     </div>
   </div>
 
@@ -35,13 +44,13 @@
     "recall": {
       "url": "<%= request.base_url %>/mcp/rpc",
       "headers": {
-        "Authorization": "Bearer <%= @project.api_key %>"
+        "Authorization": "Bearer <%= display_key %>"
       }
     }
   }
 }</code></pre>
       <button data-action="click->clipboard#copy" data-clipboard-target="source"
-              data-copy='{"mcpServers":{"recall":{"url":"<%= request.base_url %>/mcp/rpc","headers":{"Authorization":"Bearer <%= @project.api_key %>"}}}}'
+              data-copy='{"mcpServers":{"recall":{"url":"<%= request.base_url %>/mcp/rpc","headers":{"Authorization":"Bearer <%= display_key %>"}}}}'
               class="px-3 py-1.5 text-[12px] font-medium rounded-md transition-all opacity-0 group-hover:opacity-100 recall-code-copy-btn"
               style="position: absolute; top: 12px; right: 12px;">
         Copy
@@ -146,9 +155,9 @@
     <p class="text-[14px] recall-text-secondary">List available tools with curl:</p>
     <div class="group" style="position: relative;" data-controller="clipboard">
       <pre class="px-5 py-4 rounded-xl text-[13px] font-mono overflow-x-auto recall-code"><code>curl <%= request.base_url %>/mcp/tools \
-  -H "Authorization: Bearer <%= @project.api_key %>"</code></pre>
+  -H "Authorization: Bearer <%= display_key %>"</code></pre>
       <button data-action="click->clipboard#copy" data-clipboard-target="source"
-              data-copy="curl <%= request.base_url %>/mcp/tools -H &quot;Authorization: Bearer <%= @project.api_key %>&quot;"
+              data-copy="curl <%= request.base_url %>/mcp/tools -H &quot;Authorization: Bearer <%= display_key %>&quot;"
               class="px-3 py-1.5 text-[12px] font-medium rounded-md transition-all opacity-0 group-hover:opacity-100 recall-code-copy-btn"
               style="position: absolute; top: 12px; right: 12px;">
         Copy

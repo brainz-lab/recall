@@ -1,6 +1,6 @@
 module Dashboard
   class ProjectsController < BaseController
-    before_action :set_project, only: [ :show, :edit, :update, :destroy, :setup, :mcp_setup, :analytics ]
+    before_action :set_project, only: [ :show, :edit, :update, :destroy, :setup, :mcp_setup, :regenerate_mcp_token, :analytics ]
     before_action :redirect_to_platform_in_production, only: [ :new, :create ]
 
     def index
@@ -35,11 +35,20 @@ module Dashboard
       ensure_api_key!
     end
 
+    def regenerate_mcp_token
+      new_key = "rcl_api_#{SecureRandom.hex(16)}"
+      @project.update!(api_key: new_key)
+      @raw_token = new_key
+      redirect_to mcp_setup_dashboard_project_path(@project), notice: "API key regenerated"
+    end
+
     # Ensure the project has an API key (may be missing for older projects)
     def ensure_api_key!
       return if @project.api_key.present?
 
-      @project.update!(api_key: "rcl_api_#{SecureRandom.hex(16)}")
+      new_key = "rcl_api_#{SecureRandom.hex(16)}"
+      @project.update!(api_key: new_key)
+      @raw_token = new_key
     end
 
     def analytics
