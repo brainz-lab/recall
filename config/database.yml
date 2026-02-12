@@ -19,9 +19,7 @@ default: &default
 
 development:
   <<: *default
-  database: recall_development
-  # Uses local PostgreSQL via Unix socket (no host/username needed)
-  # For Docker: set DATABASE_URL=postgres://recall:recall@localhost:5433/recall_development
+  url: <%= ENV.fetch("DATABASE_URL", "postgres://postgres:postgres@localhost:5432") %>/recall_development
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
