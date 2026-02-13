@@ -1,6 +1,6 @@
 /* BrainzLab Unified Design System */
 @import "tailwindcss";
-@import "/brainzlab-ui/app/assets/stylesheets/brainzlab_ui/base.css";
+@import "brainzlab_ui/base";
 
 /* Recall Dashboard Dark Mode Support */
 @import "./dark_mode.css";
