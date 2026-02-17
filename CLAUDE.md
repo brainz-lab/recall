@@ -181,3 +181,35 @@ kamal app logs -f         # View logs
 kamal lock release        # Release stuck lock
 kamal secrets print       # Print evaluated secrets
 ```
+
+## SSO Environment Variables
+
+Recall requires Platform SSO for dashboard authentication:
+
+```bash
+# Required in .env
+BRAINZLAB_PLATFORM_URL=http://localhost:3000           # Server-to-server SSO token validation
+BRAINZLAB_PLATFORM_EXTERNAL_URL=http://localhost:3000   # Browser redirect for login
+```
+
+Without these, users cannot log in to the Recall dashboard.
+
+## SDK API Quick Reference
+
+```ruby
+# Log levels
+BrainzLab::Recall.debug("Debug message", key: "value")
+BrainzLab::Recall.info("Info message", user_id: 123)
+BrainzLab::Recall.warn("Warning message", threshold: 90)
+BrainzLab::Recall.error("Error message", error: e.message)
+BrainzLab::Recall.fatal("Fatal error", service: "payments")
+
+# Timing block
+BrainzLab::Recall.time("external.api") { HTTP.get(url) }
+
+# Logger interface (Rails-compatible)
+logger = BrainzLab::Recall.logger("MyService")
+
+# Flush buffered logs
+BrainzLab::Recall.flush
+```
