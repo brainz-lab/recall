@@ -20,9 +20,7 @@ def random_phone
 end
 
 # Create or find the test project
-project = Project.find_or_create_by!(name: "Test Project") do |p|
-  p.description = "Demo project for testing Recall"
-end
+project = Project.find_or_create_by!(name: "Test Project")
 
 puts "Using project: #{project.name} (#{project.id})"
 
