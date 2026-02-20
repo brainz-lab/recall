@@ -1,104 +1,104 @@
 <div class="max-w-2xl mx-auto space-y-6">
   <div class="flex items-center justify-between">
     <div>
-      <h1 class="text-[24px] font-semibold recall-text-primary">Archive Settings</h1>
-      <p class="text-[14px] mt-1 recall-text-secondary"><%= @project.name %></p>
+      <h1 class="text-[24px] font-semibold dm-text">Archive Settings</h1>
+      <p class="text-[14px] mt-1 dm-text-secondary"><%= @project.name %></p>
     </div>
-    <%= link_to dashboard_project_logs_path(@project), class: "text-[14px] font-medium recall-link" do %>
+    <%= link_to dashboard_project_logs_path(@project), class: "text-[14px] font-medium dm-text-secondary" do %>
       &larr; Back to Logs
     <% end %>
   </div>
 
   <% if flash[:notice] %>
-    <div class="px-4 py-3 rounded-lg text-[14px] recall-alert-success">
+    <div class="px-4 py-3 rounded-lg text-[14px] dm-alert-success">
       <%= flash[:notice] %>
     </div>
   <% end %>
 
   <% if flash[:alert] %>
-    <div class="px-4 py-3 rounded-lg text-[14px] recall-alert-error">
+    <div class="px-4 py-3 rounded-lg text-[14px] dm-alert-error">
       <%= flash[:alert] %>
     </div>
   <% end %>
 
   <!-- Current Status -->
-  <div class="px-6 py-5 rounded-xl recall-card">
-    <h2 class="text-[16px] font-semibold mb-4 recall-text-primary">Archive Status</h2>
+  <div class="px-6 py-5 rounded-xl dm-card">
+    <h2 class="text-[16px] font-semibold mb-4 dm-text">Archive Status</h2>
 
     <div class="grid grid-cols-2 gap-4">
-      <div class="p-4 rounded-lg recall-bg-input">
-        <div class="text-[12px] font-medium mb-1 recall-text-secondary">Retention Period</div>
-        <div class="text-[18px] font-semibold recall-text-primary">
+      <div class="p-4 rounded-lg dm-surface-alt">
+        <div class="text-[12px] font-medium mb-1 dm-text-secondary">Retention Period</div>
+        <div class="text-[18px] font-semibold dm-text">
           <%= @project.retention_days %> days
         </div>
       </div>
 
-      <div class="p-4 rounded-lg recall-bg-input">
-        <div class="text-[12px] font-medium mb-1 recall-text-secondary">Auto-Archive</div>
-        <div class="text-[18px] font-semibold" style="color: <%= @project.archive_enabled? ? '#059669' : 'var(--recall-text-secondary)' %>;">
+      <div class="p-4 rounded-lg dm-surface-alt">
+        <div class="text-[12px] font-medium mb-1 dm-text-secondary">Auto-Archive</div>
+        <div class="text-[18px] font-semibold" style="color: <%= @project.archive_enabled? ? '#059669' : 'var(--dm-text-secondary)' %>;">
           <%= @project.archive_enabled? ? 'Enabled' : 'Disabled' %>
         </div>
       </div>
 
-      <div class="p-4 rounded-lg recall-bg-input">
-        <div class="text-[12px] font-medium mb-1 recall-text-secondary">Logs to Archive</div>
-        <div class="text-[18px] font-semibold" style="color: <%= @preview[:logs_to_archive] > 0 ? '#D97757' : 'var(--recall-text-primary)' %>;">
+      <div class="p-4 rounded-lg dm-surface-alt">
+        <div class="text-[12px] font-medium mb-1 dm-text-secondary">Logs to Archive</div>
+        <div class="text-[18px] font-semibold" style="color: <%= @preview[:logs_to_archive] > 0 ? '#D97757' : 'var(--dm-text)' %>;">
           <%= number_with_delimiter(@preview[:logs_to_archive]) %>
         </div>
       </div>
 
-      <div class="p-4 rounded-lg recall-bg-input">
-        <div class="text-[12px] font-medium mb-1 recall-text-secondary">Last Archived</div>
-        <div class="text-[18px] font-semibold recall-text-primary">
+      <div class="p-4 rounded-lg dm-surface-alt">
+        <div class="text-[12px] font-medium mb-1 dm-text-secondary">Last Archived</div>
+        <div class="text-[18px] font-semibold dm-text">
           <%= @project.last_archived_at ? time_ago_in_words(@project.last_archived_at) + ' ago' : 'Never' %>
         </div>
       </div>
     </div>
 
-    <div class="mt-4 p-3 rounded-lg text-[13px] recall-alert-warning">
+    <div class="mt-4 p-3 rounded-lg text-[13px] dm-alert-warning">
       Logs older than <strong><%= @preview[:cutoff_date].strftime('%B %d, %Y') %></strong> will be archived.
     </div>
   </div>
 
   <!-- Manual Archive -->
-  <div class="px-6 py-5 rounded-xl recall-card">
-    <h2 class="text-[16px] font-semibold mb-4 recall-text-primary">Manual Archive</h2>
+  <div class="px-6 py-5 rounded-xl dm-card">
+    <h2 class="text-[16px] font-semibold mb-4 dm-text">Manual Archive</h2>
 
     <% if @project.archive_enabled? %>
       <% if @preview[:logs_to_archive] > 0 %>
-        <p class="text-[14px] mb-4 recall-text-secondary">
+        <p class="text-[14px] mb-4 dm-text-secondary">
           This will permanently delete <%= number_with_delimiter(@preview[:logs_to_archive]) %> logs older than <%= @project.retention_days %> days.
         </p>
 
         <%= form_with url: dashboard_project_archive_path(@project), method: :post, class: "space-y-4" do |f| %>
           <label class="flex items-center gap-2 cursor-pointer">
-            <%= f.check_box :export_before_delete, class: "w-4 h-4 rounded recall-checkbox" %>
-            <span class="text-[14px] recall-text-primary">Export logs before deleting</span>
+            <%= f.check_box :export_before_delete, class: "w-4 h-4 rounded dm-input" %>
+            <span class="text-[14px] dm-text">Export logs before deleting</span>
           </label>
 
           <div class="flex gap-3">
             <%= f.submit "Archive Now",
-                class: "px-4 py-2 text-[14px] font-medium rounded-lg cursor-pointer recall-btn-danger-solid",
+                class: "px-4 py-2 text-[14px] font-medium rounded-lg cursor-pointer dm-btn-danger-solid",
                 data: { turbo_confirm: "Are you sure you want to archive #{number_with_delimiter(@preview[:logs_to_archive])} logs? This cannot be undone." } %>
           </div>
         <% end %>
       <% else %>
-        <p class="text-[14px] recall-text-secondary">
+        <p class="text-[14px] dm-text-secondary">
           No logs are eligible for archiving. All logs are within the retention period.
         </p>
       <% end %>
     <% else %>
-      <p class="text-[14px] mb-4 recall-text-secondary">
+      <p class="text-[14px] mb-4 dm-text-secondary">
         Archive is not enabled for this project. Enable it in project settings to archive old logs.
       </p>
       <%= link_to "Edit Project Settings", edit_dashboard_project_path(@project),
-          class: "inline-block px-4 py-2 text-[14px] font-medium rounded-lg recall-btn-primary" %>
+          class: "inline-block px-4 py-2 text-[14px] font-medium rounded-lg dm-btn-primary" %>
     <% end %>
   </div>
 
   <!-- Settings Link -->
   <div class="text-center">
     <%= link_to "Edit Archive Settings", edit_dashboard_project_path(@project),
-        class: "text-[14px] recall-link" %>
+        class: "text-[14px] dm-text-secondary" %>
   </div>
 </div>

@@ -1,719 +1,238 @@
 /* ============================================
-   DARK MODE STYLES - BrainzLab Standard
+   RECALL - Service-specific overrides
    ============================================
-   Standardized dark mode implementation for all BrainzLab products.
-   Uses `dm-*` prefix for CSS classes and `brainzlab-theme` localStorage key.
-
-   Dark mode tokens from brainzlab-ui:
-   - Dark bg: #121212
-   - Dark surface: #1e1e1e
-   - Dark surface light: #2a2a2a
-   - Dark text: #e8e1d7
-   - Dark text muted: #a0a0a0
-   - Dark border: #333333
+   Main dm-* classes come from brainzlab-ui gem dashboard.css.
+   This file adds Recall-specific components (log levels, timeline, etc.)
 */
 
-/* ============================================
-   CSS VARIABLES - Light Theme (Default)
-   ============================================ */
+/* Brand override */
 :root {
-  /* Core backgrounds */
-  --dm-bg: #FAFAF9;
-  --dm-surface: #FFFFFF;
-  --dm-surface-alt: #F5F5F0;
-  --dm-surface-hover: #F0EFED;
+  --dm-brand: #D97757;
 
-  /* Core text */
-  --dm-text: #1A1A1A;
-  --dm-text-secondary: #6B6760;
-  --dm-text-muted: #8B8780;
-  --dm-text-placeholder: #A5A29C;
+  /* Recall-specific CSS variables */
+  --recall-brand: #D97757;
+  --recall-brand-dark: #C4684A;
+  --recall-brand-light: #E89B7F;
 
-  /* Core borders */
-  --dm-border: #E8E5E0;
-  --dm-border-light: #F0EFED;
-
-  /* Interactive */
-  --dm-input-bg: #FFFFFF;
-  --dm-input-border: #E8E5E0;
-  --dm-hover-bg: #F5F5F0;
-
-  /* Code blocks */
-  --dm-code-bg: #1A1A1A;
-  --dm-code-text: #E8E5E0;
-
-  /* Shadows */
-  --dm-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --dm-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.08);
-  --dm-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-
-  /* Status colors - Light */
-  --dm-success: #16A34A;
-  --dm-success-bg: #DCFCE7;
-  --dm-success-text: #166534;
-  --dm-success-border: #A7F3D0;
-
-  --dm-warning: #D97706;
-  --dm-warning-bg: #FEF3C7;
-  --dm-warning-text: #92400E;
-  --dm-warning-border: #FDE68A;
-
-  --dm-error: #DC2626;
-  --dm-error-bg: #FEF2F2;
-  --dm-error-text: #991B1B;
-  --dm-error-border: #FECACA;
-
-  --dm-info: #2563EB;
-  --dm-info-bg: #EFF6FF;
-  --dm-info-text: #1E40AF;
-  --dm-info-border: #BFDBFE;
-
-  /* Product-specific: Recall */
-  --dm-level-debug-bg: #F5F3F0;
-  --dm-level-debug-text: #6B6760;
-  --dm-level-debug-border: #E8E5E0;
-
-  --dm-level-info-bg: #EFF6FF;
-  --dm-level-info-text: #1D4ED8;
-  --dm-level-info-border: #BFDBFE;
-
-  --dm-level-warn-bg: #FFFBEB;
-  --dm-level-warn-text: #B45309;
-  --dm-level-warn-border: #FDE68A;
-
-  --dm-level-error-bg: #FEF2F2;
-  --dm-level-error-text: #DC2626;
-  --dm-level-error-border: #FECACA;
-
-  --dm-level-fatal-bg: #450A0A;
-  --dm-level-fatal-text: #FCA5A5;
-  --dm-level-fatal-border: #7F1D1D;
+  /* Chart theming */
+  --dm-chart-tooltip-bg: #1A1A1A;
+  --dm-chart-grid: var(--dm-border);
+  --dm-chart-text: var(--dm-text-muted);
 }
 
-/* ============================================
-   CSS VARIABLES - Dark Theme (Terminal-Inspired)
-   ============================================
-   Designed for developers: true black backgrounds,
-   high contrast text, minimal borders, terminal aesthetics.
-*/
 html.dark,
-.dark {
-  /* Core backgrounds - Terminal black */
-  --dm-bg: #0a0a0a;
-  --dm-surface: #111111;
-  --dm-surface-alt: #161616;
-  --dm-surface-hover: #1c1c1c;
-  --dm-surface-light: #1a1a1a;
-
-  /* Core text - High contrast */
-  --dm-text: #e4e4e4;
-  --dm-text-secondary: #a3a3a3;
-  --dm-text-muted: #737373;
-  --dm-text-placeholder: #525252;
-  --dm-text-disabled: #404040;
-
-  /* Core borders - Subtle, almost invisible */
-  --dm-border: #262626;
-  --dm-border-light: #1f1f1f;
-
-  /* Interactive */
-  --dm-input-bg: #161616;
-  --dm-input-border: #262626;
-  --dm-hover-bg: #1c1c1c;
-
-  /* Code blocks - Pure black terminal */
-  --dm-code-bg: #000000;
-  --dm-code-text: #e4e4e4;
-
-  /* Shadows - Subtle for flat design */
-  --dm-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
-  --dm-shadow-md: 0 2px 4px rgba(0, 0, 0, 0.5);
-  --dm-shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.5);
-
-  /* Status colors - Terminal-inspired, vibrant */
-  --dm-success: #4ade80;
-  --dm-success-bg: rgba(74, 222, 128, 0.1);
-  --dm-success-text: #86efac;
-  --dm-success-border: rgba(74, 222, 128, 0.2);
-
-  --dm-warning: #fbbf24;
-  --dm-warning-bg: rgba(251, 191, 36, 0.1);
-  --dm-warning-text: #fcd34d;
-  --dm-warning-border: rgba(251, 191, 36, 0.2);
-
-  --dm-error: #f87171;
-  --dm-error-bg: rgba(248, 113, 113, 0.1);
-  --dm-error-text: #fca5a5;
-  --dm-error-border: rgba(248, 113, 113, 0.2);
-
-  --dm-info: #60a5fa;
-  --dm-info-bg: rgba(96, 165, 250, 0.1);
-  --dm-info-text: #93c5fd;
-  --dm-info-border: rgba(96, 165, 250, 0.2);
-
-  /* Product-specific: Recall */
-  --dm-level-debug-bg: #161616;
-  --dm-level-debug-text: #737373;
-  --dm-level-debug-border: #262626;
-
-  --dm-level-info-bg: rgba(96, 165, 250, 0.1);
-  --dm-level-info-text: #93c5fd;
-  --dm-level-info-border: rgba(96, 165, 250, 0.2);
-
-  --dm-level-warn-bg: rgba(251, 191, 36, 0.1);
-  --dm-level-warn-text: #fcd34d;
-  --dm-level-warn-border: rgba(251, 191, 36, 0.2);
-
-  --dm-level-error-bg: rgba(248, 113, 113, 0.1);
-  --dm-level-error-text: #fca5a5;
-  --dm-level-error-border: rgba(248, 113, 113, 0.2);
-
-  /* fatal - dark red terminal style */
-  --dm-level-fatal-bg: rgba(220, 38, 38, 0.15);
-  --dm-level-fatal-text: #fca5a5;
-  --dm-level-fatal-border: rgba(220, 38, 38, 0.3);
+.dark,
+[data-theme="dark"] {
+  --dm-chart-tooltip-bg: rgba(15, 23, 42, 0.95);
+  --dm-chart-grid: var(--dm-border);
+  --dm-chart-text: var(--dm-text-muted);
 }
 
 /* ============================================
-   System Preference Support (Terminal-Inspired)
+   LOG LEVEL BADGES
    ============================================ */
-@media (prefers-color-scheme: dark) {
-  html:not(.light) {
-    /* Core backgrounds - Terminal black */
-    --dm-bg: #0a0a0a;
-    --dm-surface: #111111;
-    --dm-surface-alt: #161616;
-    --dm-surface-hover: #1c1c1c;
-    --dm-surface-light: #1a1a1a;
+.recall-level-debug {
+  background-color: rgba(156, 163, 175, 0.12);
+  color: #6B7280;
+}
+.recall-level-info {
+  background-color: rgba(59, 130, 246, 0.12);
+  color: #2563EB;
+}
+.recall-level-warn {
+  background-color: rgba(245, 158, 11, 0.12);
+  color: #D97706;
+}
+.recall-level-error {
+  background-color: rgba(239, 68, 68, 0.12);
+  color: #DC2626;
+}
+.recall-level-fatal {
+  background-color: rgba(153, 27, 27, 0.15);
+  color: #991B1B;
+}
 
-    /* Core text - High contrast */
-    --dm-text: #e4e4e4;
-    --dm-text-secondary: #a3a3a3;
-    --dm-text-muted: #737373;
-    --dm-text-placeholder: #525252;
-    --dm-text-disabled: #404040;
+html.dark .recall-level-debug,
+.dark .recall-level-debug {
+  background-color: rgba(156, 163, 175, 0.15);
+  color: #9CA3AF;
+}
+html.dark .recall-level-info,
+.dark .recall-level-info {
+  background-color: rgba(96, 165, 250, 0.15);
+  color: #93C5FD;
+}
+html.dark .recall-level-warn,
+.dark .recall-level-warn {
+  background-color: rgba(251, 191, 36, 0.15);
+  color: #FCD34D;
+}
+html.dark .recall-level-error,
+.dark .recall-level-error {
+  background-color: rgba(248, 113, 113, 0.15);
+  color: #FCA5A5;
+}
+html.dark .recall-level-fatal,
+.dark .recall-level-fatal {
+  background-color: rgba(248, 113, 113, 0.2);
+  color: #FCA5A5;
+}
 
-    /* Core borders - Subtle */
-    --dm-border: #262626;
-    --dm-border-light: #1f1f1f;
+/* Level dot colors for timeline */
+:root {
+  --recall-level-debug-text: #9CA3AF;
+  --recall-level-info-text: #3B82F6;
+  --recall-level-warn-text: #F59E0B;
+  --recall-level-error-text: #EF4444;
+  --recall-level-fatal-text: #991B1B;
+}
 
-    /* Interactive */
-    --dm-input-bg: #161616;
-    --dm-input-border: #262626;
-    --dm-hover-bg: #1c1c1c;
-
-    /* Code blocks */
-    --dm-code-bg: #000000;
-    --dm-code-text: #e4e4e4;
-
-    /* Shadows */
-    --dm-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
-    --dm-shadow-md: 0 2px 4px rgba(0, 0, 0, 0.5);
-    --dm-shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.5);
-
-    /* Status colors - Terminal-inspired */
-    --dm-success: #4ade80;
-    --dm-success-bg: rgba(74, 222, 128, 0.1);
-    --dm-success-text: #86efac;
-    --dm-success-border: rgba(74, 222, 128, 0.2);
-
-    --dm-warning: #fbbf24;
-    --dm-warning-bg: rgba(251, 191, 36, 0.1);
-    --dm-warning-text: #fcd34d;
-    --dm-warning-border: rgba(251, 191, 36, 0.2);
-
-    --dm-error: #f87171;
-    --dm-error-bg: rgba(248, 113, 113, 0.1);
-    --dm-error-text: #fca5a5;
-    --dm-error-border: rgba(248, 113, 113, 0.2);
-
-    --dm-info: #60a5fa;
-    --dm-info-bg: rgba(96, 165, 250, 0.1);
-    --dm-info-text: #93c5fd;
-    --dm-info-border: rgba(96, 165, 250, 0.2);
-
-    /* Product-specific: Recall */
-    --dm-level-debug-bg: #161616;
-    --dm-level-debug-text: #737373;
-    --dm-level-debug-border: #262626;
-
-    --dm-level-info-bg: rgba(96, 165, 250, 0.1);
-    --dm-level-info-text: #93c5fd;
-    --dm-level-info-border: rgba(96, 165, 250, 0.2);
-
-    --dm-level-warn-bg: rgba(251, 191, 36, 0.1);
-    --dm-level-warn-text: #fcd34d;
-    --dm-level-warn-border: rgba(251, 191, 36, 0.2);
-
-    --dm-level-error-bg: rgba(248, 113, 113, 0.1);
-    --dm-level-error-text: #fca5a5;
-    --dm-level-error-border: rgba(248, 113, 113, 0.2);
-  }
+html.dark,
+.dark,
+[data-theme="dark"] {
+  --recall-level-debug-text: #9CA3AF;
+  --recall-level-info-text: #60A5FA;
+  --recall-level-warn-text: #FBBF24;
+  --recall-level-error-text: #F87171;
+  --recall-level-fatal-text: #FCA5A5;
 }
 
 /* ============================================
-   STANDARDIZED UTILITY CLASSES (dm-* prefix)
+   TIMELINE
    ============================================ */
-
-/* Background utilities */
-.dm-bg {
-  background-color: var(--dm-bg);
+.recall-timeline-line {
+  background-color: var(--dm-border);
 }
 
-.dm-surface {
-  background-color: var(--dm-surface);
+/* ============================================
+   TIP BOX (Setup page)
+   ============================================ */
+.recall-tip-box {
+  background-color: rgba(217, 119, 87, 0.08);
+  border: 1px solid rgba(217, 119, 87, 0.2);
+  color: #92400e;
 }
 
-.dm-surface-alt {
-  background-color: var(--dm-surface-alt);
+html.dark .recall-tip-box,
+.dark .recall-tip-box {
+  background-color: rgba(217, 119, 87, 0.1);
+  border-color: rgba(217, 119, 87, 0.25);
+  color: #FCD34D;
 }
 
-.dm-surface-hover:hover {
-  background-color: var(--dm-surface-hover);
+.recall-tip-code {
+  background-color: rgba(217, 119, 87, 0.12);
+  color: #78350f;
 }
 
-/* Text utilities */
-.dm-text {
-  color: var(--dm-text);
+html.dark .recall-tip-code,
+.dark .recall-tip-code {
+  background-color: rgba(2, 6, 23, 0.6);
+  color: #e2e8f0;
 }
 
-.dm-text-secondary {
-  color: var(--dm-text-secondary);
+/* ============================================
+   MCP TOOL BADGES
+   ============================================ */
+.recall-tool-query {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #2563EB;
+}
+.recall-tool-errors {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #DC2626;
+}
+.recall-tool-stats {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #D97706;
+}
+.recall-tool-session {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #059669;
+}
+.recall-tool-new {
+  background-color: rgba(139, 92, 246, 0.1);
+  color: #7C3AED;
+}
+.recall-tool-clear {
+  background-color: rgba(239, 68, 68, 0.08);
+  color: #B91C1C;
 }
 
-.dm-text-muted {
-  color: var(--dm-text-muted);
+html.dark .recall-tool-query,
+.dark .recall-tool-query {
+  background-color: rgba(96, 165, 250, 0.15);
+  color: #93C5FD;
+}
+html.dark .recall-tool-errors,
+.dark .recall-tool-errors {
+  background-color: rgba(248, 113, 113, 0.15);
+  color: #FCA5A5;
+}
+html.dark .recall-tool-stats,
+.dark .recall-tool-stats {
+  background-color: rgba(251, 191, 36, 0.15);
+  color: #FCD34D;
+}
+html.dark .recall-tool-session,
+.dark .recall-tool-session {
+  background-color: rgba(52, 211, 153, 0.15);
+  color: #6EE7B7;
+}
+html.dark .recall-tool-new,
+.dark .recall-tool-new {
+  background-color: rgba(167, 139, 250, 0.15);
+  color: #C4B5FD;
+}
+html.dark .recall-tool-clear,
+.dark .recall-tool-clear {
+  background-color: rgba(248, 113, 113, 0.12);
+  color: #FCA5A5;
 }
 
-.dm-text-placeholder {
-  color: var(--dm-text-placeholder);
+/* ============================================
+   STEP BADGE
+   ============================================ */
+.recall-step-badge {
+  background: rgba(217, 119, 87, 0.15);
+  color: #D97757;
 }
 
-/* Border utilities */
-.dm-border {
-  border-color: var(--dm-border);
+html.dark .recall-step-badge,
+.dark .recall-step-badge {
+  background: rgba(217, 119, 87, 0.2);
+  color: #E89B7F;
 }
 
-.dm-border-light {
-  border-color: var(--dm-border-light);
-}
-
-/* Card component - bordered (default) */
-.dm-card {
-  background-color: var(--dm-surface);
-  border: 1px solid var(--dm-border);
-  box-shadow: var(--dm-shadow-sm);
-}
-
-/* Card component - flat (terminal style, no visible borders) */
-.dm-card-flat {
+/* ============================================
+   DANGER BUTTON
+   ============================================ */
+.dm-btn-danger {
   background-color: transparent;
-  border: none;
-  box-shadow: none;
-}
-
-.dm-card-flat:hover {
-  background-color: var(--dm-surface-hover);
-}
-
-/* Row component - flat style for lists (terminal-inspired) */
-.dm-row {
-  padding: 1rem 1.25rem;
-  background-color: transparent;
-  border-radius: 0.75rem;
-  transition: background-color 0.15s ease;
-}
-
-.dm-row:hover {
-  background-color: var(--dm-surface-hover);
-}
-
-/* Container with subtle border for grouping flat rows */
-.dm-container {
-  background-color: var(--dm-surface);
-  border: 1px solid var(--dm-border);
-  border-radius: 1rem;
-  overflow: hidden;
-}
-
-/* Terminal-inspired list items */
-.dm-list-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 1.25rem;
-  background-color: transparent;
-  border-bottom: 1px solid var(--dm-border-light);
-  transition: background-color 0.15s ease;
-}
-
-.dm-list-item:last-child {
-  border-bottom: none;
-}
-
-.dm-list-item:hover {
-  background-color: var(--dm-surface-hover);
-}
-
-/* Input component */
-.dm-input {
-  background-color: var(--dm-input-bg);
-  border: 1px solid var(--dm-input-border);
-  color: var(--dm-text);
-}
-
-.dm-input:focus {
-  border-color: #D97757;
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(217, 119, 87, 0.2);
-}
-
-.dm-input::placeholder {
-  color: var(--dm-text-placeholder);
-}
-
-/* Button components */
-.dm-btn-primary {
-  background-color: var(--dm-text);
-  color: var(--dm-bg);
-}
-
-.dm-btn-primary:hover {
-  opacity: 0.9;
-}
-
-.dm-btn-secondary {
-  background-color: var(--dm-surface-alt);
-  border: 1px solid var(--dm-border);
-  color: var(--dm-text-secondary);
-}
-
-.dm-btn-secondary:hover {
-  background-color: var(--dm-surface-hover);
-}
-
-/* Table components */
-.dm-table-header {
-  background-color: var(--dm-surface-alt);
-  color: var(--dm-text-muted);
-  border-bottom: 1px solid var(--dm-border);
-}
-
-.dm-table-row {
-  border-bottom: 1px solid var(--dm-border-light);
-}
-
-.dm-table-row:hover {
-  background-color: var(--dm-hover-bg);
-}
-
-/* Code block */
-.dm-code {
-  background-color: var(--dm-code-bg);
-  color: var(--dm-code-text);
-}
-
-/* Sidebar */
-.dm-sidebar {
-  background-color: var(--dm-surface);
-  border-right: 1px solid var(--dm-border);
-}
-
-/* Status alerts */
-.dm-alert-success {
-  background-color: var(--dm-success-bg);
-  color: var(--dm-success-text);
-  border: 1px solid var(--dm-success-border);
-}
-
-.dm-alert-warning {
-  background-color: var(--dm-warning-bg);
-  color: var(--dm-warning-text);
-  border: 1px solid var(--dm-warning-border);
-}
-
-.dm-alert-error {
-  background-color: var(--dm-error-bg);
-  color: var(--dm-error-text);
   border: 1px solid var(--dm-error-border);
+  color: var(--dm-error);
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
 }
 
-.dm-alert-info {
-  background-color: var(--dm-info-bg);
-  color: var(--dm-info-text);
-  border: 1px solid var(--dm-info-border);
-}
-
-/* Badges */
-.dm-badge-success {
-  background-color: var(--dm-success-bg);
-  color: var(--dm-success-text);
-}
-
-.dm-badge-warning {
-  background-color: var(--dm-warning-bg);
-  color: var(--dm-warning-text);
-}
-
-.dm-badge-error {
+.dm-btn-danger:hover {
   background-color: var(--dm-error-bg);
-  color: var(--dm-error-text);
 }
 
-.dm-badge-info {
-  background-color: var(--dm-info-bg);
-  color: var(--dm-info-text);
-}
-
-.dm-badge-neutral {
-  background-color: var(--dm-surface-alt);
-  color: var(--dm-text-muted);
-}
-
-/* Product-specific: Recall Level badges */
-.dm-level-debug {
-  background-color: var(--dm-level-debug-bg);
-  color: var(--dm-level-debug-text);
-  border: 1px solid var(--dm-level-debug-border);
-}
-
-.dm-level-info {
-  background-color: var(--dm-level-info-bg);
-  color: var(--dm-level-info-text);
-  border: 1px solid var(--dm-level-info-border);
-}
-
-.dm-level-warn {
-  background-color: var(--dm-level-warn-bg);
-  color: var(--dm-level-warn-text);
-  border: 1px solid var(--dm-level-warn-border);
-}
-
-.dm-level-error {
-  background-color: var(--dm-level-error-bg);
-  color: var(--dm-level-error-text);
-  border: 1px solid var(--dm-level-error-border);
-}
-
-.dm-level-fatal {
-  background-color: var(--dm-level-fatal-bg);
-  color: var(--dm-level-fatal-text);
-  border: 1px solid var(--dm-level-fatal-border);
-}
-
-/* ============================================
-   Dark Mode Toggle Button
-   ============================================ */
-.dm-toggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  padding: 0.375rem;
-  background: transparent;
-  border: 1px solid var(--dm-border);
-  border-radius: 0.5rem;
-  color: var(--dm-text-secondary);
-  cursor: pointer;
+.dm-btn-danger-solid {
+  background-color: var(--dm-error);
+  color: #ffffff;
+  border-radius: 0.75rem;
   transition: all 0.2s ease;
 }
 
-.dm-toggle:hover {
-  background-color: var(--dm-hover-bg);
-  color: var(--dm-text);
-}
-
-.dm-toggle:focus-visible {
-  outline: 2px solid #D97757;
-  outline-offset: 2px;
-}
-
-.dm-toggle svg {
-  width: 1rem;
-  height: 1rem;
-  transition: transform 0.3s ease;
-}
-
-.dm-toggle:hover svg {
-  transform: rotate(15deg);
-}
-
-/* Sun/Moon icon visibility */
-.dm-toggle .icon-sun {
-  display: none;
-}
-
-.dm-toggle .icon-moon {
-  display: block;
-}
-
-html.dark .dm-toggle .icon-sun {
-  display: block;
-}
-
-html.dark .dm-toggle .icon-moon {
-  display: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  html:not(.light) .dm-toggle .icon-sun {
-    display: block;
-  }
-  html:not(.light) .dm-toggle .icon-moon {
-    display: none;
-  }
+.dm-btn-danger-solid:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
 }
 
 /* ============================================
-   Transition Support
-   ============================================ */
-html.transitioning,
-html.transitioning *,
-html.transitioning *::before,
-html.transitioning *::after {
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease !important;
-}
-
-/* Disable transitions on initial load */
-html.no-transitions,
-html.no-transitions * {
-  transition: none !important;
-}
-
-/* ============================================
-   Scrollbar Dark Mode
-   ============================================ */
-html.dark ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-html.dark ::-webkit-scrollbar-track {
-  background: var(--dm-surface);
-}
-
-html.dark ::-webkit-scrollbar-thumb {
-  background: var(--dm-border);
-  border-radius: 4px;
-}
-
-html.dark ::-webkit-scrollbar-thumb:hover {
-  background: #444444;
-}
-
-/* ============================================
-   RECALL LAYOUT CLASSES
+   LOG LEVEL CSS FOR TIMELINE DOTS
    ============================================
-   These classes are used in the dashboard layout and must
-   respond to dark mode via CSS variables.
+   Used via inline styles: var(--recall-level-<level>-text)
 */
-
-/* Background classes */
-.recall-bg-page {
-  background-color: var(--dm-bg);
-}
-
-/* Sidebar styling */
-.recall-sidebar {
-  background-color: var(--dm-surface);
-  border-color: var(--dm-border);
-}
-
-.recall-sidebar-section {
-  border-color: var(--dm-border);
-}
-
-/* Text classes */
-.recall-text-primary {
-  color: var(--dm-text);
-}
-
-.recall-text-secondary {
-  color: var(--dm-text-secondary);
-}
-
-.recall-text-muted {
-  color: var(--dm-text-muted);
-}
-
-.recall-text-placeholder {
-  color: var(--dm-text-placeholder);
-}
-
-/* Dark mode toggle */
-.recall-dark-mode-toggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  padding: 0.375rem;
-  background: transparent;
-  border: 1px solid var(--dm-border);
-  border-radius: 0.5rem;
-  color: var(--dm-text-secondary);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.recall-dark-mode-toggle:hover {
-  background-color: var(--dm-hover-bg);
-  color: var(--dm-text);
-}
-
-.recall-dark-mode-toggle:focus-visible {
-  outline: 2px solid #D97757;
-  outline-offset: 2px;
-}
-
-/* ============================================
-   Tailwind Color Overrides for Dark Mode
-   ============================================ */
-
-/* Text colors - Stone shades */
-.dark .text-stone-900 { color: var(--dm-text) !important; }
-.dark .text-stone-800 { color: var(--dm-text) !important; }
-.dark .text-stone-700 { color: var(--dm-text-secondary) !important; }
-.dark .text-stone-600 { color: var(--dm-text-secondary) !important; }
-.dark .text-stone-500 { color: var(--dm-text-muted) !important; }
-.dark .text-stone-400 { color: var(--dm-text-muted) !important; }
-
-/* Background colors - Stone shades */
-.dark .bg-stone-50 { background-color: var(--dm-surface-alt) !important; }
-.dark .bg-stone-100 { background-color: var(--dm-surface-hover) !important; }
-
-/* Icon backgrounds - Brand colors */
-.dark .bg-orange-100 { background-color: rgba(234, 88, 12, 0.15) !important; }
-.dark .bg-sky-100 { background-color: rgba(56, 189, 248, 0.15) !important; }
-.dark .bg-violet-100 { background-color: rgba(139, 92, 246, 0.15) !important; }
-.dark .bg-emerald-100 { background-color: rgba(52, 211, 153, 0.15) !important; }
-.dark .bg-amber-100 { background-color: rgba(251, 191, 36, 0.15) !important; }
-
-/* Border and divider colors */
-.dark .divide-stone-100 > * + * { border-color: var(--dm-border) !important; }
-.dark .border-stone-100 { border-color: var(--dm-border) !important; }
-.dark .border-stone-200 { border-color: var(--dm-border) !important; }
-
-/* Card backgrounds */
-.dark .card { background-color: var(--dm-surface) !important; border-color: var(--dm-border) !important; }
-
-/* ============================================
-   Print Styles - Force Light Mode
-   ============================================ */
-@media print {
-  :root,
-  html.dark {
-    --dm-bg: #FAFAF9;
-    --dm-surface: #FFFFFF;
-    --dm-surface-alt: #F5F5F0;
-    --dm-text: #1A1A1A;
-    --dm-text-secondary: #6B6760;
-    --dm-text-muted: #8B8780;
-    --dm-border: #E8E5E0;
-  }
-
-  .dm-toggle {
-    display: none;
-  }
-}

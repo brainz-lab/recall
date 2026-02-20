@@ -5,27 +5,27 @@
 <div class="space-y-6" data-controller="query live-tail saved-search query-help export" data-live-tail-project-id-value="<%= @project.id %>" data-export-project-id-value="<%= @project.id %>">
 
   <!-- Query Bar -->
-  <div class="px-5 py-4 rounded-xl recall-card">
+  <div class="px-5 py-4 rounded-xl dm-card">
     <%= form_with url: dashboard_project_logs_path(@project), method: :get, data: { turbo_frame: "logs" } do |f| %>
       <div class="flex gap-3">
         <%= f.text_field :q, value: @query,
             placeholder: 'level:error since:1h "payment" data.user.id:123',
-            class: "flex-1 px-4 py-3 text-[14px] font-mono rounded-lg outline-none transition-all focus:ring-2 recall-input",
+            class: "flex-1 px-4 py-3 text-[14px] font-mono rounded-lg outline-none transition-all focus:ring-2 dm-input",
             data: { query_target: "input", saved_search_target: "queryInput", live_tail_target: "input" } %>
         <button type="button" data-action="click->query-help#open"
-                class="px-3 py-3 text-[14px] font-medium rounded-lg transition-colors recall-btn-secondary"
+                class="px-3 py-3 text-[14px] font-medium rounded-lg transition-colors dm-btn-secondary"
                 title="Query syntax help">
           ?
         </button>
-        <%= f.submit "Search", class: "px-5 py-3 text-[14px] font-medium rounded-lg cursor-pointer transition-colors recall-btn-primary" %>
+        <%= f.submit "Search", class: "px-5 py-3 text-[14px] font-medium rounded-lg cursor-pointer transition-colors dm-btn-primary" %>
         <% if @query.present? %>
           <button type="button" data-action="click->saved-search#openModal"
-                  class="px-4 py-3 text-[14px] font-medium rounded-lg transition-colors recall-btn-secondary">
+                  class="px-4 py-3 text-[14px] font-medium rounded-lg transition-colors dm-btn-secondary">
             Save
           </button>
         <% end %>
         <button type="button" data-action="click->export#open"
-                class="px-4 py-3 text-[14px] font-medium rounded-lg transition-colors flex items-center gap-2 recall-btn-secondary">
+                class="px-4 py-3 text-[14px] font-medium rounded-lg transition-colors flex items-center gap-2 dm-btn-secondary">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
             <polyline points="7 10 12 15 17 10"/>
@@ -38,34 +38,34 @@
 
     <div class="flex flex-wrap items-center gap-2 mt-4">
       <button data-action="click->query#filter" data-query="level:error since:1h"
-              class="px-3 py-1.5 text-[12px] font-medium rounded-full transition-colors flex items-center gap-1.5 recall-filter-btn">
+              class="px-3 py-1.5 text-[12px] font-medium rounded-full transition-colors flex items-center gap-1.5 dm-btn-secondary">
         Errors
         <% if error_count > 0 %>
           <span class="text-[11px] font-semibold" style="color: #DC2626;"><%= error_count > 99 ? "99+" : error_count %></span>
         <% end %>
       </button>
       <button data-action="click->query#filter" data-query="level:fatal since:24h"
-              class="px-3 py-1.5 text-[12px] font-medium rounded-full transition-colors flex items-center gap-1.5 recall-filter-btn">
+              class="px-3 py-1.5 text-[12px] font-medium rounded-full transition-colors flex items-center gap-1.5 dm-btn-secondary">
         Fatal
         <% if fatal_count > 0 %>
           <span class="text-[11px] font-semibold" style="color: #991B1B;"><%= fatal_count > 99 ? "99+" : fatal_count %></span>
         <% end %>
       </button>
       <button data-action="click->query#filter" data-query="since:15m"
-              class="px-3 py-1.5 text-[12px] font-medium rounded-full transition-colors recall-filter-btn">
+              class="px-3 py-1.5 text-[12px] font-medium rounded-full transition-colors dm-btn-secondary">
         Last 15m
       </button>
       <button data-action="click->query#filter" data-query="since:1h"
-              class="px-3 py-1.5 text-[12px] font-medium rounded-full transition-colors recall-filter-btn">
+              class="px-3 py-1.5 text-[12px] font-medium rounded-full transition-colors dm-btn-secondary">
         Last hour
       </button>
 
       <% if @saved_searches.any? %>
-        <span class="mx-2 recall-border">|</span>
+        <span class="mx-2 dm-border">|</span>
         <% @saved_searches.each do |saved| %>
           <div class="group flex items-center gap-1">
             <button data-action="click->query#filter" data-query="<%= saved.query %>"
-                    class="px-3 py-1.5 text-[12px] font-medium rounded-full transition-colors recall-filter-saved">
+                    class="px-3 py-1.5 text-[12px] font-medium rounded-full transition-colors dm-btn-secondary">
               <%= saved.name %>
             </button>
             <%= button_to dashboard_project_saved_search_path(@project, saved),
@@ -94,23 +94,23 @@
   <%= turbo_frame_tag "logs" do %>
     <!-- Controls -->
     <div class="flex justify-between items-center mb-4">
-      <span class="text-[13px] recall-text-muted">
+      <span class="text-[13px] dm-text-muted">
         <%= @logs.is_a?(Hash) ? 'Statistics' : "#{@logs.size} logs" %>
       </span>
       <label class="flex items-center gap-2 cursor-pointer">
-        <input type="checkbox" data-action="change->live-tail#toggle" class="w-4 h-4 rounded recall-checkbox">
-        <span class="text-[13px] recall-text-secondary">Live tail</span>
+        <input type="checkbox" data-action="change->live-tail#toggle" class="w-4 h-4 rounded dm-input">
+        <span class="text-[13px] dm-text-secondary">Live tail</span>
       </label>
     </div>
     <% if @logs.is_a?(Hash) %>
-      <div class="px-5 py-5 rounded-xl recall-card">
-        <pre class="text-[13px] font-mono recall-text-secondary"><%= JSON.pretty_generate(@logs) %></pre>
+      <div class="px-5 py-5 rounded-xl dm-card">
+        <pre class="text-[13px] font-mono dm-text-secondary"><%= JSON.pretty_generate(@logs) %></pre>
       </div>
     <% else %>
-      <div class="rounded-xl overflow-hidden recall-card" data-live-tail-target="container">
+      <div class="rounded-xl overflow-hidden dm-card" data-live-tail-target="container">
         <% if @logs.empty? %>
           <div class="py-12 text-center" data-live-tail-target="empty">
-            <p class="text-[14px] recall-text-muted">No logs found</p>
+            <p class="text-[14px] dm-text-muted">No logs found</p>
           </div>
         <% else %>
           <%= render partial: "log_rows", locals: { logs: @logs, has_more: @has_more, next_offset: @next_offset, query: @query } %>

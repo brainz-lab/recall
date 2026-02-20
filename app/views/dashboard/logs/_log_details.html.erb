@@ -1,18 +1,18 @@
 <%# Log details partial - server-rendered for Turbo Frame %>
-<div class="px-5 pb-4 recall-card-alt">
+<div class="px-5 pb-4 dm-surface-alt">
   <%# JSON data section %>
   <% if log.data.present? && log.data.keys.any? %>
-    <div class="mb-3 p-2 rounded recall-bg-card">
+    <div class="mb-3 p-2 rounded dm-card">
       <%= interactive_json(log.data, "data") %>
     </div>
   <% end %>
 
   <%# Metadata row %>
-  <div class="flex flex-wrap gap-4 text-[12px] recall-text-muted">
+  <div class="flex flex-wrap gap-4 text-[12px] dm-text-muted">
     <%# Session link %>
     <% if log.session_id.present? %>
       <%= link_to session_trace_dashboard_project_logs_path(@project, session_id: log.session_id),
-                  class: "hover:underline cursor-pointer flex items-center gap-1 recall-link",
+                  class: "hover:underline cursor-pointer flex items-center gap-1 dm-text-secondary",
                   title: "View session trace",
                   data: { turbo_frame: "_top" } do %>
         <%= log_icon(:session) %>
@@ -25,7 +25,7 @@
     <%# Request link %>
     <% if log.request_id.present? %>
       <%= link_to trace_dashboard_project_logs_path(@project, request_id: log.request_id),
-                  class: "hover:underline cursor-pointer flex items-center gap-1 recall-link",
+                  class: "hover:underline cursor-pointer flex items-center gap-1 dm-text-secondary",
                   title: "View request trace",
                   data: { turbo_frame: "_top" } do %>
         <%= log_icon(:request) %>

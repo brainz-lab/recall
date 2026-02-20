@@ -1,6 +1,6 @@
 <%= form_with model: [:dashboard, project], class: "space-y-6" do |f| %>
   <% if project.errors.any? %>
-    <div class="px-4 py-3 rounded-lg text-[14px] recall-alert-error">
+    <div class="px-4 py-3 rounded-lg text-[14px] dm-alert-error">
       <ul class="list-disc list-inside space-y-1">
         <% project.errors.full_messages.each do |msg| %>
           <li><%= msg %></li>
@@ -10,29 +10,29 @@
   <% end %>
 
   <div class="space-y-2">
-    <%= f.label :name, class: "block text-[13px] font-medium recall-text-secondary" %>
-    <%= f.text_field :name, class: "w-full px-4 py-3 text-[15px] rounded-lg outline-none transition-all focus:ring-2 recall-input-bordered", placeholder: "My Project" %>
+    <%= f.label :name, class: "block text-[13px] font-medium dm-text-secondary" %>
+    <%= f.text_field :name, class: "w-full px-4 py-3 text-[15px] rounded-lg outline-none transition-all focus:ring-2 dm-input", placeholder: "My Project" %>
   </div>
 
   <div class="space-y-2">
-    <%= f.label :retention_days, "Log retention", class: "block text-[13px] font-medium recall-text-secondary" %>
+    <%= f.label :retention_days, "Log retention", class: "block text-[13px] font-medium dm-text-secondary" %>
     <div class="flex items-center gap-3">
-      <%= f.number_field :retention_days, class: "w-24 px-4 py-3 text-[15px] rounded-lg outline-none transition-all focus:ring-2 recall-input-bordered", min: 1, max: 365 %>
-      <span class="text-[14px] recall-text-muted">days</span>
+      <%= f.number_field :retention_days, class: "w-24 px-4 py-3 text-[15px] rounded-lg outline-none transition-all focus:ring-2 dm-input", min: 1, max: 365 %>
+      <span class="text-[14px] dm-text-muted">days</span>
     </div>
-    <p class="text-[12px] recall-text-muted">Logs older than this will be eligible for archiving</p>
+    <p class="text-[12px] dm-text-muted">Logs older than this will be eligible for archiving</p>
   </div>
 
   <div class="space-y-2">
     <label class="flex items-center gap-3 cursor-pointer">
-      <%= f.check_box :archive_enabled, class: "w-4 h-4 rounded recall-checkbox" %>
-      <span class="text-[14px] font-medium recall-text-primary">Enable auto-archive</span>
+      <%= f.check_box :archive_enabled, class: "w-4 h-4 rounded dm-input" %>
+      <span class="text-[14px] font-medium dm-text">Enable auto-archive</span>
     </label>
-    <p class="text-[12px] ml-7 recall-text-muted">Automatically delete old logs daily based on retention period</p>
+    <p class="text-[12px] ml-7 dm-text-muted">Automatically delete old logs daily based on retention period</p>
   </div>
 
   <div class="flex items-center gap-4 pt-2">
-    <%= f.submit class: "px-5 py-2.5 text-[14px] font-medium rounded-lg cursor-pointer transition-colors recall-btn-primary" %>
-    <%= link_to 'Cancel', dashboard_projects_path, class: "px-5 py-2.5 text-[14px] font-medium rounded-lg transition-colors recall-btn-ghost" %>
+    <%= f.submit class: "px-5 py-2.5 text-[14px] font-medium rounded-lg cursor-pointer transition-colors dm-btn-primary" %>
+    <%= link_to 'Cancel', dashboard_projects_path, class: "px-5 py-2.5 text-[14px] font-medium rounded-lg transition-colors dm-btn-secondary" %>
   </div>
 <% end %>

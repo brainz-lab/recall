@@ -1,7 +1,7 @@
 <div class="max-w-2xl space-y-8">
   <div>
-    <h1 class="text-[22px] font-semibold tracking-tight recall-text-primary">MCP Setup Guide</h1>
-    <p class="mt-2 text-[15px] recall-text-secondary">Connect Claude or other AI assistants to your logs using the Model Context Protocol.</p>
+    <h1 class="text-[22px] font-semibold tracking-tight dm-text">MCP Setup Guide</h1>
+    <p class="mt-2 text-[15px] dm-text-secondary">Connect Claude or other AI assistants to your logs using the Model Context Protocol.</p>
   </div>
 
   <!-- Step 1 -->
@@ -9,25 +9,25 @@
   <div class="space-y-4">
     <div class="flex items-center gap-3">
       <span class="flex items-center justify-center w-7 h-7 rounded-full text-[13px] font-semibold recall-step-badge">1</span>
-      <h2 class="text-[16px] font-medium recall-text-primary">Get your API key</h2>
+      <h2 class="text-[16px] font-medium dm-text">Get your API key</h2>
     </div>
-    <p class="text-[14px] recall-text-secondary">Use this API key to authenticate MCP requests:</p>
+    <p class="text-[14px] dm-text-secondary">Use this API key to authenticate MCP requests:</p>
     <% if @raw_token %>
       <div class="mb-4 rounded-md bg-amber-50 p-3 border border-amber-200">
         <p class="text-sm text-amber-800">New API key created. Copy it now - it won't be shown again.</p>
       </div>
     <% end %>
     <div class="group" style="position: relative;" data-controller="clipboard">
-      <pre class="px-5 py-4 rounded-xl text-[13px] font-mono overflow-x-auto recall-code"><code><%= display_key %></code></pre>
+      <pre class="px-5 py-4 rounded-xl text-[13px] font-mono overflow-x-auto dm-code"><code><%= display_key %></code></pre>
       <button data-action="click->clipboard#copy" data-clipboard-target="source"
               data-copy="<%= display_key %>"
-              class="px-3 py-1.5 text-[12px] font-medium rounded-md transition-all opacity-0 group-hover:opacity-100 recall-code-copy-btn"
+              class="px-3 py-1.5 text-[12px] font-medium rounded-md transition-all opacity-0 group-hover:opacity-100 dm-btn-secondary"
               style="position: absolute; top: 12px; right: 12px;">
         Copy
       </button>
     </div>
     <div class="mt-2">
-      <%= button_to "Regenerate API Key", regenerate_mcp_token_dashboard_project_path(@project), method: :post, class: "px-3 py-1.5 text-[12px] font-medium rounded-md recall-code-copy-btn", data: { turbo_confirm: "This will invalidate the current API key. Continue?" } %>
+      <%= button_to "Regenerate API Key", regenerate_mcp_token_dashboard_project_path(@project), method: :post, class: "px-3 py-1.5 text-[12px] font-medium rounded-md dm-btn-secondary", data: { turbo_confirm: "This will invalidate the current API key. Continue?" } %>
     </div>
   </div>
 
@@ -35,11 +35,11 @@
   <div class="space-y-4">
     <div class="flex items-center gap-3">
       <span class="flex items-center justify-center w-7 h-7 rounded-full text-[13px] font-semibold recall-step-badge">2</span>
-      <h2 class="text-[16px] font-medium recall-text-primary">Configure Claude Code</h2>
+      <h2 class="text-[16px] font-medium dm-text">Configure Claude Code</h2>
     </div>
-    <p class="text-[14px] recall-text-secondary">Add Recall as an MCP server in your Claude Code settings:</p>
+    <p class="text-[14px] dm-text-secondary">Add Recall as an MCP server in your Claude Code settings:</p>
     <div class="group" style="position: relative;" data-controller="clipboard">
-      <pre class="px-5 py-4 rounded-xl text-[13px] font-mono overflow-x-auto recall-code"><code>{
+      <pre class="px-5 py-4 rounded-xl text-[13px] font-mono overflow-x-auto dm-code"><code>{
   "mcpServers": {
     "recall": {
       "url": "<%= request.base_url %>/mcp/rpc",
@@ -51,114 +51,114 @@
 }</code></pre>
       <button data-action="click->clipboard#copy" data-clipboard-target="source"
               data-copy='{"mcpServers":{"recall":{"url":"<%= request.base_url %>/mcp/rpc","headers":{"Authorization":"Bearer <%= display_key %>"}}}}'
-              class="px-3 py-1.5 text-[12px] font-medium rounded-md transition-all opacity-0 group-hover:opacity-100 recall-code-copy-btn"
+              class="px-3 py-1.5 text-[12px] font-medium rounded-md transition-all opacity-0 group-hover:opacity-100 dm-btn-secondary"
               style="position: absolute; top: 12px; right: 12px;">
         Copy
       </button>
     </div>
-    <p class="text-[14px] recall-text-muted">Add this to <code class="px-1.5 py-0.5 rounded text-[13px] recall-code-inline">~/.claude/settings.json</code> or your project's <code class="px-1.5 py-0.5 rounded text-[13px] recall-code-inline">.claude/settings.json</code></p>
+    <p class="text-[14px] dm-text-muted">Add this to <code class="px-1.5 py-0.5 rounded text-[13px] dm-code">~/.claude/settings.json</code> or your project's <code class="px-1.5 py-0.5 rounded text-[13px] dm-code">.claude/settings.json</code></p>
   </div>
 
   <!-- Step 3 -->
   <div class="space-y-4">
     <div class="flex items-center gap-3">
       <span class="flex items-center justify-center w-7 h-7 rounded-full text-[13px] font-semibold recall-step-badge">3</span>
-      <h2 class="text-[16px] font-medium recall-text-primary">Start using Recall with Claude</h2>
+      <h2 class="text-[16px] font-medium dm-text">Start using Recall with Claude</h2>
     </div>
-    <p class="text-[14px] recall-text-secondary">Once configured, Claude can query your logs directly. Try asking:</p>
+    <p class="text-[14px] dm-text-secondary">Once configured, Claude can query your logs directly. Try asking:</p>
     <div class="space-y-3 mt-4">
-      <div class="px-4 py-3 rounded-lg recall-card">
-        <p class="text-[14px] font-medium recall-text-primary">"Show me recent errors"</p>
+      <div class="px-4 py-3 rounded-lg dm-card">
+        <p class="text-[14px] font-medium dm-text">"Show me recent errors"</p>
       </div>
-      <div class="px-4 py-3 rounded-lg recall-card">
-        <p class="text-[14px] font-medium recall-text-primary">"What happened in the last hour?"</p>
+      <div class="px-4 py-3 rounded-lg dm-card">
+        <p class="text-[14px] font-medium dm-text">"What happened in the last hour?"</p>
       </div>
-      <div class="px-4 py-3 rounded-lg recall-card">
-        <p class="text-[14px] font-medium recall-text-primary">"Get stats by log level for today"</p>
+      <div class="px-4 py-3 rounded-lg dm-card">
+        <p class="text-[14px] font-medium dm-text">"Get stats by log level for today"</p>
       </div>
     </div>
   </div>
 
   <!-- Available Tools -->
-  <div class="pt-6 recall-divider">
-    <h3 class="text-[15px] font-medium mb-4 recall-text-primary">Available MCP tools</h3>
+  <div class="pt-6 border-t dm-border">
+    <h3 class="text-[15px] font-medium mb-4 dm-text">Available MCP tools</h3>
     <div class="space-y-3">
       <div class="flex items-start gap-3">
         <code class="px-2 py-1 rounded text-[12px] font-mono shrink-0 recall-tool-query">recall_query</code>
-        <p class="text-[13px] recall-text-secondary">Query logs using Recall Query Language</p>
+        <p class="text-[13px] dm-text-secondary">Query logs using Recall Query Language</p>
       </div>
       <div class="flex items-start gap-3">
         <code class="px-2 py-1 rounded text-[12px] font-mono shrink-0 recall-tool-errors">recall_errors</code>
-        <p class="text-[13px] recall-text-secondary">Get error and fatal logs quickly</p>
+        <p class="text-[13px] dm-text-secondary">Get error and fatal logs quickly</p>
       </div>
       <div class="flex items-start gap-3">
         <code class="px-2 py-1 rounded text-[12px] font-mono shrink-0 recall-tool-stats">recall_stats</code>
-        <p class="text-[13px] recall-text-secondary">Get statistics grouped by level, commit, hour, or day</p>
+        <p class="text-[13px] dm-text-secondary">Get statistics grouped by level, commit, hour, or day</p>
       </div>
       <div class="flex items-start gap-3">
         <code class="px-2 py-1 rounded text-[12px] font-mono shrink-0 recall-tool-session">recall_by_session</code>
-        <p class="text-[13px] recall-text-secondary">Get all logs for a specific session</p>
+        <p class="text-[13px] dm-text-secondary">Get all logs for a specific session</p>
       </div>
       <div class="flex items-start gap-3">
         <code class="px-2 py-1 rounded text-[12px] font-mono shrink-0 recall-tool-new">recall_new_session</code>
-        <p class="text-[13px] recall-text-secondary">Create a new session ID for logging</p>
+        <p class="text-[13px] dm-text-secondary">Create a new session ID for logging</p>
       </div>
       <div class="flex items-start gap-3">
         <code class="px-2 py-1 rounded text-[12px] font-mono shrink-0 recall-tool-clear">recall_clear_session</code>
-        <p class="text-[13px] recall-text-secondary">Delete all logs for a session</p>
+        <p class="text-[13px] dm-text-secondary">Delete all logs for a session</p>
       </div>
     </div>
   </div>
 
   <!-- Query Language -->
-  <div class="pt-6 recall-divider">
-    <h3 class="text-[15px] font-medium mb-4 recall-text-primary">Query Language examples</h3>
+  <div class="pt-6 border-t dm-border">
+    <h3 class="text-[15px] font-medium mb-4 dm-text">Query Language examples</h3>
     <div class="space-y-3">
       <div class="group" style="position: relative;" data-controller="clipboard">
-        <pre class="px-4 py-3 rounded-lg text-[13px] font-mono recall-code"><code>level:error since:1h</code></pre>
+        <pre class="px-4 py-3 rounded-lg text-[13px] font-mono dm-code"><code>level:error since:1h</code></pre>
         <button data-action="click->clipboard#copy" data-clipboard-target="source"
                 data-copy="level:error since:1h"
-                class="px-2 py-1 text-[11px] font-medium rounded transition-all opacity-0 group-hover:opacity-100 recall-code-copy-btn"
+                class="px-2 py-1 text-[11px] font-medium rounded transition-all opacity-0 group-hover:opacity-100 dm-btn-secondary"
                 style="position: absolute; top: 8px; right: 8px;">
           Copy
         </button>
       </div>
-      <p class="text-[12px] recall-text-muted">Errors in the last hour</p>
+      <p class="text-[12px] dm-text-muted">Errors in the last hour</p>
 
       <div class="group" style="position: relative;" data-controller="clipboard">
-        <pre class="px-4 py-3 rounded-lg text-[13px] font-mono recall-code"><code>"payment failed" env:production</code></pre>
+        <pre class="px-4 py-3 rounded-lg text-[13px] font-mono dm-code"><code>"payment failed" env:production</code></pre>
         <button data-action="click->clipboard#copy" data-clipboard-target="source"
                 data-copy='"payment failed" env:production'
-                class="px-2 py-1 text-[11px] font-medium rounded transition-all opacity-0 group-hover:opacity-100 recall-code-copy-btn"
+                class="px-2 py-1 text-[11px] font-medium rounded transition-all opacity-0 group-hover:opacity-100 dm-btn-secondary"
                 style="position: absolute; top: 8px; right: 8px;">
           Copy
         </button>
       </div>
-      <p class="text-[12px] recall-text-muted">Text search in production</p>
+      <p class="text-[12px] dm-text-muted">Text search in production</p>
 
       <div class="group" style="position: relative;" data-controller="clipboard">
-        <pre class="px-4 py-3 rounded-lg text-[13px] font-mono recall-code"><code>since:24h | stats by:level</code></pre>
+        <pre class="px-4 py-3 rounded-lg text-[13px] font-mono dm-code"><code>since:24h | stats by:level</code></pre>
         <button data-action="click->clipboard#copy" data-clipboard-target="source"
                 data-copy="since:24h | stats by:level"
-                class="px-2 py-1 text-[11px] font-medium rounded transition-all opacity-0 group-hover:opacity-100 recall-code-copy-btn"
+                class="px-2 py-1 text-[11px] font-medium rounded transition-all opacity-0 group-hover:opacity-100 dm-btn-secondary"
                 style="position: absolute; top: 8px; right: 8px;">
           Copy
         </button>
       </div>
-      <p class="text-[12px] recall-text-muted">Stats grouped by level for last 24 hours</p>
+      <p class="text-[12px] dm-text-muted">Stats grouped by level for last 24 hours</p>
     </div>
   </div>
 
   <!-- Test it -->
   <div class="space-y-4">
-    <h3 class="text-[15px] font-medium recall-text-primary">Test MCP connection</h3>
-    <p class="text-[14px] recall-text-secondary">List available tools with curl:</p>
+    <h3 class="text-[15px] font-medium dm-text">Test MCP connection</h3>
+    <p class="text-[14px] dm-text-secondary">List available tools with curl:</p>
     <div class="group" style="position: relative;" data-controller="clipboard">
-      <pre class="px-5 py-4 rounded-xl text-[13px] font-mono overflow-x-auto recall-code"><code>curl <%= request.base_url %>/mcp/tools \
+      <pre class="px-5 py-4 rounded-xl text-[13px] font-mono overflow-x-auto dm-code"><code>curl <%= request.base_url %>/mcp/tools \
   -H "Authorization: Bearer <%= display_key %>"</code></pre>
       <button data-action="click->clipboard#copy" data-clipboard-target="source"
               data-copy="curl <%= request.base_url %>/mcp/tools -H &quot;Authorization: Bearer <%= display_key %>&quot;"
-              class="px-3 py-1.5 text-[12px] font-medium rounded-md transition-all opacity-0 group-hover:opacity-100 recall-code-copy-btn"
+              class="px-3 py-1.5 text-[12px] font-medium rounded-md transition-all opacity-0 group-hover:opacity-100 dm-btn-secondary"
               style="position: absolute; top: 12px; right: 12px;">
         Copy
       </button>

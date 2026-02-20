@@ -1,35 +1,35 @@
 <div class="max-w-2xl space-y-8">
   <div>
-    <h1 class="text-[22px] font-semibold tracking-tight recall-text-primary">Setup Guide</h1>
-    <p class="mt-2 text-[15px] recall-text-secondary">Get started sending logs to Recall in a few minutes.</p>
+    <h1 class="text-[22px] font-semibold tracking-tight dm-text">Setup Guide</h1>
+    <p class="mt-2 text-[15px] dm-text-secondary">Get started sending logs to Recall in a few minutes.</p>
   </div>
 
   <!-- Step 1 -->
   <div class="space-y-4">
     <div class="flex items-center gap-3">
       <span class="flex items-center justify-center w-7 h-7 rounded-full text-[13px] font-semibold recall-step-badge">1</span>
-      <h2 class="text-[16px] font-medium recall-text-primary">Add the gem to your Gemfile</h2>
+      <h2 class="text-[16px] font-medium dm-text">Add the gem to your Gemfile</h2>
     </div>
     <div class="group" style="position: relative;" data-controller="clipboard">
-      <pre class="px-5 py-4 rounded-xl text-[13px] font-mono overflow-x-auto recall-code"><code>gem 'brainzlab-sdk'</code></pre>
+      <pre class="px-5 py-4 rounded-xl text-[13px] font-mono overflow-x-auto dm-code"><code>gem 'brainzlab-sdk'</code></pre>
       <button data-action="click->clipboard#copy" data-clipboard-target="source" data-copy="gem 'brainzlab-sdk'"
-              class="px-3 py-1.5 text-[12px] font-medium rounded-md transition-all opacity-0 group-hover:opacity-100 recall-code-copy-btn"
+              class="px-3 py-1.5 text-[12px] font-medium rounded-md transition-all opacity-0 group-hover:opacity-100 dm-btn-secondary"
               style="position: absolute; top: 12px; right: 12px;">
         Copy
       </button>
     </div>
-    <p class="text-[14px] recall-text-muted">Then run <code class="px-1.5 py-0.5 rounded text-[13px] recall-code-inline">bundle install</code></p>
+    <p class="text-[14px] dm-text-muted">Then run <code class="px-1.5 py-0.5 rounded text-[13px] dm-code">bundle install</code></p>
   </div>
 
   <!-- Step 2 -->
   <div class="space-y-4">
     <div class="flex items-center gap-3">
       <span class="flex items-center justify-center w-7 h-7 rounded-full text-[13px] font-semibold recall-step-badge">2</span>
-      <h2 class="text-[16px] font-medium recall-text-primary">Create an initializer</h2>
+      <h2 class="text-[16px] font-medium dm-text">Create an initializer</h2>
     </div>
-    <p class="text-[14px] recall-text-secondary">Create <code class="px-1.5 py-0.5 rounded text-[13px] recall-code-inline">config/initializers/recall.rb</code></p>
+    <p class="text-[14px] dm-text-secondary">Create <code class="px-1.5 py-0.5 rounded text-[13px] dm-code">config/initializers/recall.rb</code></p>
     <div class="group" style="position: relative;" data-controller="clipboard">
-      <pre class="px-5 py-4 rounded-xl text-[13px] font-mono overflow-x-auto recall-code"><code>BrainzLab::Recall.configure do |config|
+      <pre class="px-5 py-4 rounded-xl text-[13px] font-mono overflow-x-auto dm-code"><code>BrainzLab::Recall.configure do |config|
   config.key = ENV['RECALL_KEY']
   config.url = '<%= request.base_url %>'
 end</code></pre>
@@ -38,7 +38,7 @@ end</code></pre>
   config.key = ENV['RECALL_KEY']
   config.url = '<%= request.base_url %>'
 end"
-              class="px-3 py-1.5 text-[12px] font-medium rounded-md transition-all opacity-0 group-hover:opacity-100 recall-code-copy-btn"
+              class="px-3 py-1.5 text-[12px] font-medium rounded-md transition-all opacity-0 group-hover:opacity-100 dm-btn-secondary"
               style="position: absolute; top: 12px; right: 12px;">
         Copy
       </button>
@@ -49,14 +49,14 @@ end"
   <div class="space-y-4">
     <div class="flex items-center gap-3">
       <span class="flex items-center justify-center w-7 h-7 rounded-full text-[13px] font-semibold recall-step-badge">3</span>
-      <h2 class="text-[16px] font-medium recall-text-primary">Set your environment variable</h2>
+      <h2 class="text-[16px] font-medium dm-text">Set your environment variable</h2>
     </div>
-    <p class="text-[14px] recall-text-secondary">Add your ingest key to your environment:</p>
+    <p class="text-[14px] dm-text-secondary">Add your ingest key to your environment:</p>
     <div class="group" style="position: relative;" data-controller="clipboard">
-      <pre class="px-5 py-4 rounded-xl text-[13px] font-mono overflow-x-auto recall-code"><code>RECALL_KEY=<%= @project.ingest_key %></code></pre>
+      <pre class="px-5 py-4 rounded-xl text-[13px] font-mono overflow-x-auto dm-code"><code>RECALL_KEY=<%= @project.ingest_key %></code></pre>
       <button data-action="click->clipboard#copy" data-clipboard-target="source"
               data-copy="RECALL_KEY=<%= @project.ingest_key %>"
-              class="px-3 py-1.5 text-[12px] font-medium rounded-md transition-all opacity-0 group-hover:opacity-100 recall-code-copy-btn"
+              class="px-3 py-1.5 text-[12px] font-medium rounded-md transition-all opacity-0 group-hover:opacity-100 dm-btn-secondary"
               style="position: absolute; top: 12px; right: 12px;">
         Copy
       </button>
@@ -67,11 +67,11 @@ end"
   <div class="space-y-4">
     <div class="flex items-center gap-3">
       <span class="flex items-center justify-center w-7 h-7 rounded-full text-[13px] font-semibold recall-step-badge">4</span>
-      <h2 class="text-[16px] font-medium recall-text-primary">Start logging</h2>
+      <h2 class="text-[16px] font-medium dm-text">Start logging</h2>
     </div>
-    <p class="text-[14px] recall-text-secondary">Use Recall anywhere in your app:</p>
+    <p class="text-[14px] dm-text-secondary">Use Recall anywhere in your app:</p>
     <div class="group" style="position: relative;" data-controller="clipboard">
-      <pre class="px-5 py-4 rounded-xl text-[13px] font-mono overflow-x-auto recall-code"><code><span style="color: #9B8BF4;">BrainzLab::Recall</span>.info(<span style="color: #98C379;">"User signed up"</span>, user_id: user.id)
+      <pre class="px-5 py-4 rounded-xl text-[13px] font-mono overflow-x-auto dm-code"><code><span style="color: #9B8BF4;">BrainzLab::Recall</span>.info(<span style="color: #98C379;">"User signed up"</span>, user_id: user.id)
 
 <span style="color: #9B8BF4;">BrainzLab::Recall</span>.error(<span style="color: #98C379;">"Payment failed"</span>,
   error: e.message,
@@ -80,7 +80,7 @@ end"
 )</code></pre>
       <button data-action="click->clipboard#copy" data-clipboard-target="source"
               data-copy="BrainzLab::Recall.info(&quot;User signed up&quot;, user_id: user.id)"
-              class="px-3 py-1.5 text-[12px] font-medium rounded-md transition-all opacity-0 group-hover:opacity-100 recall-code-copy-btn"
+              class="px-3 py-1.5 text-[12px] font-medium rounded-md transition-all opacity-0 group-hover:opacity-100 dm-btn-secondary"
               style="position: absolute; top: 12px; right: 12px;">
         Copy
       </button>
@@ -101,15 +101,15 @@ end"
       <button data-action="click->clipboard#copy" data-clipboard-target="source"
               data-copy="Rails.logger = BrainzLab::Recall.logger"
               class="px-3 py-1.5 text-[12px] font-medium rounded-md transition-all opacity-0 group-hover:opacity-100"
-              style="position: absolute; top: 8px; right: 8px; background: var(--recall-tip-text); color: var(--recall-tip-code-bg);">
+              style="position: absolute; top: 8px; right: 8px; background: var(--dm-text-secondary); color: var(--dm-surface);">
         Copy
       </button>
     </div>
   </div>
 
   <!-- Log Levels -->
-  <div class="pt-6 recall-divider">
-    <h3 class="text-[15px] font-medium mb-4 recall-text-primary">Available log levels</h3>
+  <div class="pt-6 border-t dm-border">
+    <h3 class="text-[15px] font-medium mb-4 dm-text">Available log levels</h3>
     <div class="flex flex-wrap gap-2">
       <code class="px-3 py-1.5 rounded-md text-[13px] font-mono recall-level-debug">.debug</code>
       <code class="px-3 py-1.5 rounded-md text-[13px] font-mono recall-level-info">.info</code>
@@ -121,16 +121,16 @@ end"
 
   <!-- Test it -->
   <div class="space-y-4">
-    <h3 class="text-[15px] font-medium recall-text-primary">Test your integration</h3>
-    <p class="text-[14px] recall-text-secondary">Send a test log with curl:</p>
+    <h3 class="text-[15px] font-medium dm-text">Test your integration</h3>
+    <p class="text-[14px] dm-text-secondary">Send a test log with curl:</p>
     <div class="group" style="position: relative;" data-controller="clipboard">
-      <pre class="px-5 py-4 rounded-xl text-[13px] font-mono overflow-x-auto recall-code"><code>curl -X POST <%= request.base_url %>/api/v1/log \
+      <pre class="px-5 py-4 rounded-xl text-[13px] font-mono overflow-x-auto dm-code"><code>curl -X POST <%= request.base_url %>/api/v1/log \
   -H "Authorization: Bearer <%= @project.ingest_key %>" \
   -H "Content-Type: application/json" \
   -d '{"level": "info", "message": "Hello from Recall!"}'</code></pre>
       <button data-action="click->clipboard#copy" data-clipboard-target="source"
               data-copy="curl -X POST <%= request.base_url %>/api/v1/log -H &quot;Authorization: Bearer <%= @project.ingest_key %>&quot; -H &quot;Content-Type: application/json&quot; -d '{&quot;level&quot;: &quot;info&quot;, &quot;message&quot;: &quot;Hello from Recall!&quot;}'"
-              class="px-3 py-1.5 text-[12px] font-medium rounded-md transition-all opacity-0 group-hover:opacity-100 recall-code-copy-btn"
+              class="px-3 py-1.5 text-[12px] font-medium rounded-md transition-all opacity-0 group-hover:opacity-100 dm-btn-secondary"
               style="position: absolute; top: 12px; right: 12px;">
         Copy
       </button>

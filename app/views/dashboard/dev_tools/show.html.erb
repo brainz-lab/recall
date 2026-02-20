@@ -1,51 +1,51 @@
 <div class="space-y-8">
   <div class="flex items-center justify-between">
     <div>
-      <h1 class="text-[22px] font-semibold tracking-tight recall-text-primary">Dev Tools</h1>
-      <p class="text-[14px] mt-1 recall-text-muted">Development utilities for cleaning up test data</p>
+      <h1 class="text-[22px] font-semibold tracking-tight dm-text">Dev Tools</h1>
+      <p class="text-[14px] mt-1 dm-text-muted">Development utilities for cleaning up test data</p>
     </div>
-    <span class="px-3 py-1 text-[12px] font-medium rounded-full recall-alert-warning">
+    <span class="px-3 py-1 text-[12px] font-medium rounded-full dm-alert-warning">
       Development Only
     </span>
   </div>
 
   <% if notice %>
-    <div class="px-4 py-3 rounded-lg text-[14px] recall-alert-success">
+    <div class="px-4 py-3 rounded-lg text-[14px] dm-alert-success">
       <%= notice %>
     </div>
   <% end %>
 
   <!-- Current Stats -->
-  <div class="rounded-xl p-6 recall-card">
-    <h2 class="text-[15px] font-medium mb-4 recall-text-primary">Current Data</h2>
+  <div class="rounded-xl p-6 dm-card">
+    <h2 class="text-[15px] font-medium mb-4 dm-text">Current Data</h2>
     <div class="grid grid-cols-3 gap-4">
       <% @stats.each do |name, count| %>
-        <div class="p-4 rounded-lg recall-card-alt">
-          <p class="text-[24px] font-semibold recall-text-primary"><%= number_with_delimiter(count) %></p>
-          <p class="text-[13px] recall-text-muted"><%= name.to_s.titleize %></p>
+        <div class="p-4 rounded-lg dm-surface-alt">
+          <p class="text-[24px] font-semibold dm-text"><%= number_with_delimiter(count) %></p>
+          <p class="text-[13px] dm-text-muted"><%= name.to_s.titleize %></p>
         </div>
       <% end %>
     </div>
   </div>
 
   <!-- Clean Actions -->
-  <div class="rounded-xl p-6 recall-card">
-    <h2 class="text-[15px] font-medium mb-4 recall-text-primary">Clean Up Actions</h2>
+  <div class="rounded-xl p-6 dm-card">
+    <h2 class="text-[15px] font-medium mb-4 dm-text">Clean Up Actions</h2>
     <div class="space-y-4">
       <!-- Clean Logs -->
-      <div class="flex items-center justify-between p-4 rounded-lg recall-card-alt">
+      <div class="flex items-center justify-between p-4 rounded-lg dm-surface-alt">
         <div>
-          <h3 class="text-[14px] font-medium recall-text-primary">Clean Logs</h3>
-          <p class="text-[13px] recall-text-muted">Removes all log entries. Keeps projects and saved searches.</p>
+          <h3 class="text-[14px] font-medium dm-text">Clean Logs</h3>
+          <p class="text-[13px] dm-text-muted">Removes all log entries. Keeps projects and saved searches.</p>
         </div>
         <%= button_to "Clean Logs", clean_logs_dashboard_dev_tools_path,
             method: :post,
             data: { turbo_confirm: "This will delete all log entries. Continue?" },
-            class: "px-4 py-2 text-[13px] font-medium rounded-lg transition-colors recall-alert-warning" %>
+            class: "px-4 py-2 text-[13px] font-medium rounded-lg transition-colors dm-alert-warning" %>
       </div>
 
       <!-- Clean All -->
-      <div class="flex items-center justify-between p-4 rounded-lg recall-alert-error">
+      <div class="flex items-center justify-between p-4 rounded-lg dm-alert-error">
         <div>
           <h3 class="text-[14px] font-medium">Clean Everything</h3>
           <p class="text-[13px]">Removes all data except projects. Use with caution!</p>
@@ -53,7 +53,7 @@
         <%= button_to "Clean All", clean_all_dashboard_dev_tools_path,
             method: :post,
             data: { turbo_confirm: "This will delete ALL log data and saved searches. Are you sure?" },
-            class: "px-4 py-2 text-[13px] font-medium rounded-lg transition-colors recall-btn-danger-solid" %>
+            class: "px-4 py-2 text-[13px] font-medium rounded-lg transition-colors dm-btn-danger-solid" %>
       </div>
     </div>
   </div>
