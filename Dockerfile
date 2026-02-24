@@ -40,7 +40,7 @@ COPY Gemfile Gemfile.lock vendor ./
 
 RUN --mount=type=secret,id=bundle_github \
     export BUNDLE_RUBYGEMS__PKG__GITHUB__COM=$(cat /run/secrets/bundle_github) && \
-    bundle lock --update fluyenta-ui && \
+    bundle lock && \
     cp Gemfile.lock /tmp/Gemfile.lock.resolved && \
     bundle install && \
     rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
