@@ -33,6 +33,7 @@ gem "tzinfo-data", platforms: %i[ windows jruby ]
 # Use the database-backed adapters for Rails.cache, Active Job, and Action Cable
 gem "solid_cache"
 gem "solid_queue"
+gem "sidekiq"
 gem "solid_cable"
 
 # Redis for ActionCable in development (needed for live tail to work across requests)
