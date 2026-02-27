@@ -78,6 +78,12 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+
+  # Testing
+  gem "rspec-rails"
+  gem "factory_bot_rails"
+  gem "simplecov", require: false
+  gem "simplecov-json", require: false
 end
 
 group :development do
@@ -91,10 +97,13 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 
-  # Code coverage
-  gem "simplecov", require: false
-
   # Pin minitest to 5.x for Rails 8 compatibility
   gem "minitest", "~> 5.25"
   gem "mocha"
+
+  # RSpec helpers
+  gem "shoulda-matchers"
+  gem "database_cleaner-active_record"
+  gem "webmock"
+  gem "timecop"
 end
