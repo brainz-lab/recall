@@ -21,7 +21,7 @@ module Api
         accepted = 0
 
         unless @project
-          render json: { error: "Project not found" }, status: :not_found
+          render json: { error: @auth_error || "Project not found" }, status: :unauthorized
           return
         end
 
@@ -97,18 +97,24 @@ module Api
 
       def find_project_from_token
         token = extract_browser_token
-        return unless token
+
+        unless token
+          @auth_error = "Authorization required. Use a rcl_ingest_* token for browser endpoints."
+          return
+        end
 
         # Accept ingest_key (preferred for browser) or api_key
         if token.start_with?("rcl_ingest_")
           @project = Project.find_by(ingest_key: token)
+          @auth_error = "Invalid ingest key" unless @project
         elsif token.start_with?("rcl_api_")
           @project = Project.find_by(api_key: token)
+          @auth_error = "Invalid API key" unless @project
           Rails.logger.warn("[BrowserController] API key used for browser endpoint - consider using ingest_key")
         else
-          # Try to find by project_id from context
-          project_id = params.dig(:context, :projectId)
-          # no-op for now
+          @auth_error = "Browser endpoint requires a rcl_ingest_* or rcl_api_* token. " \
+                        "sk_live_* keys are not accepted here for security reasons - " \
+                        "they should not be exposed in browser JavaScript."
         end
       end
 

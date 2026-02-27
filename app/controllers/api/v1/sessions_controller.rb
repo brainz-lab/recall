@@ -3,22 +3,29 @@ module Api
     class SessionsController < BaseController
       # GET /api/v1/sessions
       def index
-        sessions = @project.log_entries
-          .where.not(session_id: nil)
-          .select(:session_id)
-          .distinct
-          .order(Arel.sql("MAX(timestamp) DESC"))
-          .group(:session_id)
-          .limit(params[:limit] || 50)
+        limit = (params[:limit] || 50).to_i
 
-        session_stats = sessions.map do |entry|
-          logs = @project.log_entries.where(session_id: entry.session_id)
+        session_rows = @project.log_entries
+          .unscope(:order)
+          .where.not(session_id: nil)
+          .group(:session_id)
+          .select(
+            "session_id",
+            "COUNT(*) as log_count",
+            "MIN(timestamp) as first_log",
+            "MAX(timestamp) as last_log"
+          )
+          .order(Arel.sql("MAX(timestamp) DESC"))
+          .limit(limit)
+
+        session_stats = session_rows.map do |row|
+          levels = @project.log_entries.unscope(:order).where(session_id: row.session_id).group(:level).count
           {
-            session_id: entry.session_id,
-            log_count: logs.count,
-            first_log: logs.minimum(:timestamp),
-            last_log: logs.maximum(:timestamp),
-            levels: logs.group(:level).count
+            session_id: row.session_id,
+            log_count: row.log_count,
+            first_log: row.first_log,
+            last_log: row.last_log,
+            levels: levels
           }
         end
 
