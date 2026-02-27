@@ -16,7 +16,13 @@ module Api
       end
 
       def show
-        log = @project.log_entries.find_by_composite_key(params[:id])
+        log = if params[:id].match?(/\A.+_\d{4}-\d{2}-\d{2}.+\z/)
+                # Composite key format: uuid_timestamp
+                @project.log_entries.find_by_composite_key(params[:id])
+        else
+                # Plain UUID lookup
+                @project.log_entries.find_by!(id: params[:id])
+        end
         render json: log
       rescue ActiveRecord::RecordNotFound
         render json: { error: "Not found" }, status: :not_found
@@ -77,11 +83,12 @@ module Api
 
         # Get hourly counts for the baseline window
         hourly_counts = @project.log_entries
+                                .unscope(:order)
                                 .where("timestamp >= ?", window.ago)
                                 .where(level: log_level)
+                                .select("date_trunc('hour', timestamp) as hour_bucket, COUNT(*) as count")
                                 .group("date_trunc('hour', timestamp)")
-                                .count
-                                .values
+                                .map(&:count)
 
         if hourly_counts.empty?
           render json: { mean: 0, stddev: 1 }
