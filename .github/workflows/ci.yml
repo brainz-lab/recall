@@ -80,7 +80,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres
+        image: timescale/timescaledb:latest-pg17
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -131,7 +131,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres
+        image: timescale/timescaledb:latest-pg17
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
