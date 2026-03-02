@@ -114,7 +114,7 @@ jobs:
           PGHOST: postgres
           PGUSER: postgres
           PGPASSWORD: postgres
-        run: bin/rails db:test:prepare test
+        run: bin/rails db:drop db:create db:migrate && bundle exec rspec
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
@@ -165,7 +165,7 @@ jobs:
           PGHOST: postgres
           PGUSER: postgres
           PGPASSWORD: postgres
-        run: bin/rails db:test:prepare test:system
+        run: bin/rails db:drop db:create db:migrate && bin/rails test:system
 
       - name: Keep screenshots from failed system tests
         uses: actions/upload-artifact@v7
