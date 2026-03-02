@@ -26,7 +26,7 @@ class FixSolidCacheByteSizeColumn < ActiveRecord::Migration[8.1]
     add_column :solid_cache_entries, :byte_size, :integer, null: false, default: 0
 
     # Recreate the index
-    add_index :solid_cache_entries, [:key_hash, :byte_size]
+    add_index :solid_cache_entries, [ :key_hash, :byte_size ]
   end
 
   def down

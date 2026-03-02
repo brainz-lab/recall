@@ -4,9 +4,9 @@ module Api
   module V1
     # Receives browser console logs from brainzlab-js SDK
     class BrowserController < BaseController
-      skip_before_action :authenticate!, only: [:preflight, :create]
+      skip_before_action :authenticate!, only: [ :preflight, :create ]
       before_action :set_cors_headers
-      before_action :find_project_from_token, only: [:create]
+      before_action :find_project_from_token, only: [ :create ]
 
       # OPTIONS /api/v1/browser (CORS preflight)
       def preflight

@@ -93,8 +93,8 @@ class SsoControllerTest < ActionDispatch::IntegrationTest
 
     Net::HTTP.stub :new, ->(*) {
       mock_http = Minitest::Mock.new
-      mock_http.expect :use_ssl=, nil, [false]
-      mock_http.expect :request, mock_response, [Net::HTTP::Post]
+      mock_http.expect :use_ssl=, nil, [ false ]
+      mock_http.expect :request, mock_response, [ Net::HTTP::Post ]
       mock_http
     } do
       yield if block_given?
@@ -107,8 +107,8 @@ class SsoControllerTest < ActionDispatch::IntegrationTest
 
     Net::HTTP.stub :new, ->(*) {
       mock_http = Minitest::Mock.new
-      mock_http.expect :use_ssl=, nil, [false]
-      mock_http.expect :request, mock_response, [Net::HTTP::Post]
+      mock_http.expect :use_ssl=, nil, [ false ]
+      mock_http.expect :request, mock_response, [ Net::HTTP::Post ]
       mock_http
     } do
       yield if block_given?

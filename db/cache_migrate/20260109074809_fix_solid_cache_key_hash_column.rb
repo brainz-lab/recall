@@ -32,7 +32,7 @@ class FixSolidCacheKeyHashColumn < ActiveRecord::Migration[8.1]
 
     # Recreate indexes
     add_index :solid_cache_entries, :key_hash, unique: true
-    add_index :solid_cache_entries, [:key_hash, :byte_size]
+    add_index :solid_cache_entries, [ :key_hash, :byte_size ]
   end
 
   def down
