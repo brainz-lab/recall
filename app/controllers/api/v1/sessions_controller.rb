@@ -46,7 +46,7 @@ module Api
           log_count: logs.count,
           first_log: logs.first.timestamp,
           last_log: logs.last.timestamp,
-          levels: logs.group(:level).count,
+          levels: logs.unscope(:order).group(:level).count,
           logs: logs.limit(100).as_json
         }
       end
