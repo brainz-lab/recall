@@ -22,7 +22,7 @@ RSpec.describe "Api::V1::Browser", type: :request, timescaledb: true do
         data: {
           level: "error",
           message: "Uncaught TypeError: Cannot read property",
-          args: ["error details"]
+          args: [ "error details" ]
         }
       }
     end
@@ -31,7 +31,7 @@ RSpec.describe "Api::V1::Browser", type: :request, timescaledb: true do
       it "accepts console events and creates log entries" do
         expect {
           post "/api/v1/browser",
-               params: { events: [console_event], context: { environment: "production" } },
+               params: { events: [ console_event ], context: { environment: "production" } },
                headers: { "Authorization" => "Bearer #{project.ingest_key}" }
         }.to change(LogEntry, :count).by(1)
 
@@ -45,7 +45,7 @@ RSpec.describe "Api::V1::Browser", type: :request, timescaledb: true do
         %w[error warn info debug].each do |level|
           event = console_event.deep_merge(data: { level: level })
           post "/api/v1/browser",
-               params: { events: [event], context: {} },
+               params: { events: [ event ], context: {} },
                headers: { "Authorization" => "Bearer #{project.ingest_key}" }
         end
 
@@ -55,7 +55,7 @@ RSpec.describe "Api::V1::Browser", type: :request, timescaledb: true do
 
       it "stores browser source in data" do
         post "/api/v1/browser",
-             params: { events: [console_event], context: {} },
+             params: { events: [ console_event ], context: {} },
              headers: { "Authorization" => "Bearer #{project.ingest_key}" }
 
         entry = LogEntry.order(timestamp: :desc).first
@@ -67,7 +67,7 @@ RSpec.describe "Api::V1::Browser", type: :request, timescaledb: true do
         non_console = { type: "navigation", url: "/page" }
         expect {
           post "/api/v1/browser",
-               params: { events: [non_console], context: {} },
+               params: { events: [ non_console ], context: {} },
                headers: { "Authorization" => "Bearer #{project.ingest_key}" }
         }.not_to change(LogEntry, :count)
 
@@ -87,7 +87,7 @@ RSpec.describe "Api::V1::Browser", type: :request, timescaledb: true do
 
       it "includes CORS headers in response" do
         post "/api/v1/browser",
-             params: { events: [console_event], context: {} },
+             params: { events: [ console_event ], context: {} },
              headers: { "Authorization" => "Bearer #{project.ingest_key}" }
 
         expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
@@ -98,7 +98,7 @@ RSpec.describe "Api::V1::Browser", type: :request, timescaledb: true do
       it "also accepts rcl_api_ keys" do
         expect {
           post "/api/v1/browser",
-               params: { events: [console_event], context: {} },
+               params: { events: [ console_event ], context: {} },
                headers: { "Authorization" => "Bearer #{project.api_key}" }
         }.to change(LogEntry, :count).by(1)
       end
@@ -107,7 +107,7 @@ RSpec.describe "Api::V1::Browser", type: :request, timescaledb: true do
     context "without authentication" do
       it "returns 401" do
         post "/api/v1/browser",
-             params: { events: [console_event], context: {} }
+             params: { events: [ console_event ], context: {} }
 
         expect(response).to have_http_status(:unauthorized)
       end
@@ -116,7 +116,7 @@ RSpec.describe "Api::V1::Browser", type: :request, timescaledb: true do
     context "with sk_live_ key (Platform key)" do
       it "rejects browser-side Platform keys for security" do
         post "/api/v1/browser",
-             params: { events: [console_event], context: {} },
+             params: { events: [ console_event ], context: {} },
              headers: { "Authorization" => "Bearer sk_live_test123" }
 
         expect(response).to have_http_status(:unauthorized)
@@ -127,7 +127,7 @@ RSpec.describe "Api::V1::Browser", type: :request, timescaledb: true do
       it "extracts trace context from traceparent" do
         traceparent = "00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01"
         post "/api/v1/browser",
-             params: { events: [console_event], context: {} },
+             params: { events: [ console_event ], context: {} },
              headers: {
                "Authorization" => "Bearer #{project.ingest_key}",
                "traceparent" => traceparent

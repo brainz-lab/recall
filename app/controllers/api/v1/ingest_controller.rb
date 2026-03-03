@@ -68,17 +68,20 @@ module Api
       def bulk_insert_logs(entries)
         return if entries.empty?
 
+        conn = ActiveRecord::Base.connection
         columns = entries.first.keys
+        quoted_columns = columns.map { |col| conn.quote_column_name(col) }
+
         values = entries.map do |entry|
-          columns.map { |col| ActiveRecord::Base.connection.quote(entry[col]) }.join(", ")
+          columns.map { |col| conn.quote(entry[col]) }.join(", ")
         end
 
         sql = <<~SQL
-          INSERT INTO log_entries (#{columns.join(', ')})
+          INSERT INTO log_entries (#{quoted_columns.join(', ')})
           VALUES #{values.map { |v| "(#{v})" }.join(', ')}
         SQL
 
-        ActiveRecord::Base.connection.execute(sql)
+        conn.execute(sql)
       end
     end
   end

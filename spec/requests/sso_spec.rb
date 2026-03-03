@@ -32,7 +32,7 @@ RSpec.describe "SSO", type: :request do
 
         stub_request(:get, "#{platform_internal_url}/api/v1/user/projects")
           .to_return(status: 200,
-                     body: { projects: [{ id: sso_response[:project_id], name: "my-project", slug: "my-project" }] }.to_json,
+                     body: { projects: [ { id: sso_response[:project_id], name: "my-project", slug: "my-project" } ] }.to_json,
                      headers: { "Content-Type" => "application/json" })
       end
 
