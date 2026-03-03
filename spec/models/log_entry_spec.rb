@@ -80,11 +80,10 @@ RSpec.describe LogEntry, type: :model, timescaledb: true do
   describe "#composite_key" do
     it "returns id_timestamp in ISO 8601 with microseconds" do
       ts = Time.zone.parse("2025-06-15T10:30:00.123456+00:00")
-      entry = build(:log_entry, timestamp: ts)
-      entry.id = "abc-123"
+      entry = create(:log_entry, timestamp: ts)
 
       key = entry.composite_key
-      expect(key).to start_with("abc-123_")
+      expect(key).to start_with("#{entry.id}_")
       expect(key).to include("2025-06-15")
     end
 

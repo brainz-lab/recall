@@ -6,9 +6,9 @@ RSpec.describe PlatformClient, type: :service do
   let(:valid_response_body) do
     {
       valid: true,
-      project_id: "plat-proj-uuid",
+      project_id: "550e8400-e29b-41d4-a716-446655440000",
       project_slug: "my-project",
-      organization_id: "org-uuid",
+      organization_id: "660e8400-e29b-41d4-a716-446655440001",
       organization_slug: "my-org",
       environment: "production",
       plan: "pro",
@@ -44,7 +44,7 @@ RSpec.describe PlatformClient, type: :service do
       it "returns a valid ValidationResult" do
         result = PlatformClient.validate_key(valid_key)
         expect(result.valid?).to be true
-        expect(result.project_id).to eq("plat-proj-uuid")
+        expect(result.project_id).to eq("550e8400-e29b-41d4-a716-446655440000")
         expect(result.project_slug).to eq("my-project")
         expect(result.environment).to eq("production")
         expect(result.plan).to eq("pro")
@@ -52,11 +52,17 @@ RSpec.describe PlatformClient, type: :service do
       end
 
       it "caches the result on repeat calls" do
+        # Test env uses null_store cache. Use memory_store temporarily for caching test.
+        original_cache = Rails.cache
+        Rails.cache = ActiveSupport::Cache::MemoryStore.new
+
         PlatformClient.validate_key(valid_key)
         PlatformClient.validate_key(valid_key)
 
         # Only 1 HTTP request despite 2 calls
         expect(WebMock).to have_requested(:post, "#{platform_url}/api/v1/keys/validate").once
+      ensure
+        Rails.cache = original_cache
       end
     end
 
@@ -93,9 +99,9 @@ RSpec.describe PlatformClient, type: :service do
     let(:valid_result) do
       PlatformClient::ValidationResult.new(
         valid: true,
-        project_id: "plat-proj-uuid",
+        project_id: "550e8400-e29b-41d4-a716-446655440000",
         project_slug: "my-project",
-        organization_id: "org-uuid",
+        organization_id: "660e8400-e29b-41d4-a716-446655440001",
         organization_slug: "my-org",
         environment: "production",
         plan: "pro",
@@ -116,7 +122,7 @@ RSpec.describe PlatformClient, type: :service do
           PlatformClient.find_or_create_project(valid_result, valid_key)
         }.to change(Project, :count).by(1)
 
-        project = Project.find_by(platform_project_id: "plat-proj-uuid")
+        project = Project.find_by(platform_project_id: "550e8400-e29b-41d4-a716-446655440000")
         expect(project).to be_present
         expect(project.name).to eq("my-project")
         expect(project.api_key).to eq(valid_key)
@@ -128,7 +134,7 @@ RSpec.describe PlatformClient, type: :service do
     context "when project already exists" do
       let!(:existing) do
         create(:project,
-               platform_project_id: "plat-proj-uuid",
+               platform_project_id: "550e8400-e29b-41d4-a716-446655440000",
                api_key: valid_key,
                ingest_key: valid_key)
       end

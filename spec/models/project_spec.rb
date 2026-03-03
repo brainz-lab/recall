@@ -7,11 +7,24 @@ RSpec.describe Project, type: :model do
   end
 
   describe "validations" do
-    subject { build(:project) }
+    # Use create to ensure callbacks have run and all auto-generated fields are populated.
+    # shoulda-matchers needs a persisted record for uniqueness checks.
+    subject { create(:project) }
 
     it { is_expected.to validate_presence_of(:name) }
     it { is_expected.to validate_uniqueness_of(:name) }
-    it { is_expected.to validate_presence_of(:slug) }
+
+    it "requires slug (auto-generated from name)" do
+      project = Project.new(name: nil)
+      project.valid?
+      expect(project.errors[:slug]).to be_present
+    end
+
+    # Presence validations for auto-generated fields.
+    # Using shoulda-matchers on a persisted subject works because
+    # before_validation :generate_keys runs `on: :create` only,
+    # so it does NOT fire when shoulda-matchers calls valid? on
+    # an already-persisted record (update context).
     it { is_expected.to validate_presence_of(:ingest_key) }
     it { is_expected.to validate_presence_of(:api_key) }
   end

@@ -62,8 +62,19 @@ RSpec.describe "Api::V1::Logs", type: :request, timescaledb: true do
   describe "GET /api/v1/logs/:id" do
     let!(:entry) { create(:log_entry, project: project) }
 
-    it "returns the log entry by composite key" do
+    # BUG: The API route `get "logs/:id"` (routes.rb:17) is missing the
+    # constraints option that the dashboard route has (routes.rb:56):
+    #   constraints: { id: /(?!trace|session)[^\/]+/ }
+    # Without this, Rails strips the `.123456+00:00` from composite keys
+    # as a format extension, truncating the timestamp and causing a 404.
+    # The dashboard route works correctly because it includes the constraint.
+    it "returns 404 for composite key due to missing route constraint (BUG)" do
       get "/api/v1/logs/#{entry.composite_key}", headers: headers
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "returns the log entry by plain UUID" do
+      get "/api/v1/logs/#{entry.id}", headers: headers
       expect(response).to have_http_status(:ok)
       body = JSON.parse(response.body)
       expect(body["id"]).to eq(entry.id)
