@@ -9,7 +9,7 @@ module Api
 
       def batch
         logs = params[:logs] || params[:_json] || []
-        entries = logs.map { |l| build_entry(l) }.compact
+        entries = logs.filter_map { |l| build_entry(l) if l.is_a?(Hash) || l.is_a?(ActionController::Parameters) }
 
         if entries.any?
           # Use raw SQL for bulk inserts to avoid Rails 8.1 unique index validation

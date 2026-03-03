@@ -14,7 +14,7 @@ Rails.application.routes.draw do
       get "logs/query", to: "logs#query"
       get "logs/baseline", to: "logs#baseline"
       get "logs/last", to: "logs#last"
-      get "logs/:id", to: "logs#show"
+      get "logs/:id", to: "logs#show", constraints: { id: /[^\/]+/ }
       resources :sessions, only: [ :index, :show, :create, :destroy ] do
         member do
           get :logs
