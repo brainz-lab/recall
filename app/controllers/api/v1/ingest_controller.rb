@@ -4,6 +4,8 @@ module Api
       def create
         entry = @project.log_entries.create!(log_params)
         broadcast_log(entry)
+        track_usage!(1)
+        track_bytes!(request.body.size)
         render json: { id: entry.id }, status: :created
       end
 
@@ -17,6 +19,8 @@ module Api
           bulk_insert_logs(entries)
           broadcast_batch(entries)
         end
+        track_usage!(entries.size)
+        track_bytes!(request.body.size)
         render json: { ingested: entries.size }, status: :created
       end
 
