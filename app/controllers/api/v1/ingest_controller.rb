@@ -4,6 +4,8 @@ module Api
       def create
         entry = @project.log_entries.create!(log_params)
         broadcast_log(entry)
+        track_usage!(1)
+        track_bytes!(request.body.size)
         render json: { id: entry.id }, status: :created
       end
 
@@ -17,6 +19,8 @@ module Api
           bulk_insert_logs(entries)
           broadcast_batch(entries)
         end
+        track_usage!(entries.size)
+        track_bytes!(request.body.size)
         render json: { ingested: entries.size }, status: :created
       end
 
@@ -68,17 +72,20 @@ module Api
       def bulk_insert_logs(entries)
         return if entries.empty?
 
+        conn = ActiveRecord::Base.connection
         columns = entries.first.keys
+        quoted_columns = columns.map { |col| conn.quote_column_name(col) }
+
         values = entries.map do |entry|
-          columns.map { |col| ActiveRecord::Base.connection.quote(entry[col]) }.join(", ")
+          columns.map { |col| conn.quote(entry[col]) }.join(", ")
         end
 
         sql = <<~SQL
-          INSERT INTO log_entries (#{columns.join(', ')})
+          INSERT INTO log_entries (#{quoted_columns.join(', ')})
           VALUES #{values.map { |v| "(#{v})" }.join(', ')}
         SQL
 
-        ActiveRecord::Base.connection.execute(sql)
+        conn.execute(sql)
       end
     end
   end

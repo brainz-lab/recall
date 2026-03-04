@@ -127,16 +127,15 @@ RSpec.describe "Api::V1::Ingest", type: :request, timescaledb: true do
         expect(body["ingested"]).to eq(3)
       end
 
-      # BUG: Sending `logs: []` via form params gets converted to `[""]` by Rails,
-      # which causes `build_entry` to call `log[:data]` on a String, raising:
-      #   TypeError: no implicit conversion of Symbol into Integer
-      # The controller's `batch` action should guard against non-hash entries.
-      it "returns 500 for empty logs array due to param coercion bug (BUG)" do
+      # FIXED: Sending `logs: []` via form params gets converted to `[""]` by Rails.
+      # The controller now guards against non-hash entries with filter_map.
+      it "returns 0 ingested for empty logs array" do
         post "/api/v1/logs",
              params: { logs: [] },
              headers: ingest_headers(project)
 
-        expect(response).to have_http_status(:internal_server_error)
+        expect(response).to have_http_status(:created)
+        expect(JSON.parse(response.body)["ingested"]).to eq(0)
       end
 
       it "returns 0 ingested when logs param is missing" do
