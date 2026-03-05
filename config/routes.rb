@@ -39,6 +39,12 @@ Rails.application.routes.draw do
 
   # Dashboard
   namespace :dashboard do
+    resources :assistant, only: [:index, :show, :create] do
+      member do
+        post :message
+      end
+    end
+
     resources :projects do
       member do
         get :setup
