@@ -2,7 +2,7 @@
 
 class CreateSolidCacheEntries < ActiveRecord::Migration[8.1]
   def change
-    create_table :solid_cache_entries do |t|
+    create_table :solid_cache_entries, if_not_exists: true do |t|
       t.binary :key, limit: 1024, null: false
       t.binary :value, limit: 536870912, null: false
       t.datetime :created_at, null: false
