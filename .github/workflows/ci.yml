@@ -88,6 +88,12 @@ jobs:
           - 5432:5432
         options: --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=3
 
+    env:
+      RAILS_ENV: test
+      PGHOST: postgres
+      PGUSER: postgres
+      PGPASSWORD: postgres
+
     steps:
       - name: Install PostgreSQL client libraries
         run: apt-get update -qq && apt-get install --no-install-recommends -y libpq-dev postgresql-client
@@ -108,13 +114,14 @@ jobs:
       - name: Install dependencies
         run: bundle install --jobs 4
 
-      - name: Run tests
-        env:
-          RAILS_ENV: test
-          PGHOST: postgres
-          PGUSER: postgres
-          PGPASSWORD: postgres
-        run: bin/rails db:drop db:create db:migrate && bundle exec rspec
+      - name: Prepare database
+        run: bin/rails db:drop db:create db:migrate
+
+      - name: Run RSpec tests
+        run: bundle exec rspec
+
+      - name: Run system tests
+        run: bin/rails test:system
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
@@ -123,49 +130,6 @@ jobs:
           slug: brainz-lab/recall
           files: ./coverage/.resultset.json
           fail_ci_if_error: false
-
-  system-test:
-    runs-on: arc-runner-set
-    container:
-      image: ruby:3.4.7
-
-    services:
-      postgres:
-        image: timescale/timescaledb:latest-pg17
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-        ports:
-          - 5432:5432
-        options: --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=3
-
-    steps:
-      - name: Install PostgreSQL client libraries
-        run: apt-get update -qq && apt-get install --no-install-recommends -y libpq-dev postgresql-client
-
-      - name: Checkout code
-        uses: actions/checkout@v5
-
-      - name: Re-resolve fluyenta-ui from GitHub Packages
-        run: bundle lock --update fluyenta-ui
-
-      - name: Cache bundle gems
-        uses: actions/cache@v4
-        with:
-          path: /usr/local/bundle
-          key: bundle-pg-${{ runner.os }}-${{ hashFiles('Gemfile.lock') }}
-          restore-keys: bundle-pg-${{ runner.os }}-
-
-      - name: Install dependencies
-        run: bundle install --jobs 4
-
-      - name: Run System Tests
-        env:
-          RAILS_ENV: test
-          PGHOST: postgres
-          PGUSER: postgres
-          PGPASSWORD: postgres
-        run: bin/rails db:drop db:create db:migrate && bin/rails test:system
 
       - name: Keep screenshots from failed system tests
         uses: actions/upload-artifact@v7

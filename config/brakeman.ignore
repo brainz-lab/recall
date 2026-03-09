@@ -1,0 +1,22 @@
+{
+  "ignored_warnings": [
+    {
+      "fingerprint": "336b3a61a9b9c3c8bb41dfdb4e9142dcde3d7dbbd01b1859ed8e5b4b900c89ff",
+      "note": "SQL operator validated by regex /^([><]=?)/ — only allows >, >=, <, <="
+    },
+    {
+      "fingerprint": "a3324e30c1827ceba4a4d83c0fa6bcd082fb4fe8690c7d7540000852c6d7c753",
+      "note": "SQL operator validated by regex /^([><]=?)/ — only allows >, >=, <, <="
+    },
+    {
+      "fingerprint": "b01e20e3183b989b5655faf0b76dbdb1fcc4a76a1e910cc21114d268a1fb224b",
+      "note": "Bulk INSERT uses quote_column_name and quote for all values — columns are controller-internal"
+    },
+    {
+      "fingerprint": "d65e148c1929b1a2906f64bafed72dd8bad89a4504a07589ad73a549dce9a0f1",
+      "note": "MCP tool params are passed to tool classes which handle their own validation"
+    }
+  ],
+  "updated": "2026-03-09",
+  "brakeman_version": "8.0.4"
+}
