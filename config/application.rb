@@ -38,5 +38,8 @@ module Recall
 
     # Use SQL schema format for TimescaleDB compatibility
     config.active_record.schema_format = :sql
+
+    # Rate limiting middleware (rack-attack does not auto-insert via Railtie)
+    config.middleware.use Rack::Attack
   end
 end
