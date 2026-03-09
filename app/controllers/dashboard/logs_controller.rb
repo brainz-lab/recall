@@ -81,7 +81,7 @@ module Dashboard
     private
 
     def set_project
-      @project = Project.find(params[:project_id])
+      @project = find_scoped_project(params[:project_id])
     end
   end
 end

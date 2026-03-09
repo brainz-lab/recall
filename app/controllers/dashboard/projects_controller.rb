@@ -4,7 +4,7 @@ module Dashboard
     before_action :redirect_to_platform_in_production, only: [ :new, :create ]
 
     def index
-      @projects = Project.order(created_at: :desc)
+      @projects = current_organization_projects.order(created_at: :desc)
     end
 
     def show
@@ -116,7 +116,7 @@ module Dashboard
     private
 
     def set_project
-      @project = Project.find(params[:id])
+      @project = find_scoped_project(params[:id])
     end
 
     def project_params

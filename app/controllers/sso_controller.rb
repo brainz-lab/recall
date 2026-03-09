@@ -25,7 +25,7 @@ class SsoController < ApplicationController
       # Ensure at least the current project exists (fallback if full sync failed)
       ensure_project_exists(user_info)
 
-      redirect_to params[:return_to] || project_redirect_path(user_info) || dashboard_root_path
+      redirect_to safe_return_path(params[:return_to]) || project_redirect_path(user_info) || dashboard_root_path
     else
       redirect_to "#{platform_external_url}/login?error=sso_failed", allow_other_host: true
     end
@@ -37,6 +37,8 @@ class SsoController < ApplicationController
     uri = URI("#{platform_internal_url}/api/v1/sso/validate")
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = uri.scheme == "https"
+    http.open_timeout = 5
+    http.read_timeout = 10
 
     request = Net::HTTP::Post.new(uri.path)
     request["Content-Type"] = "application/json"
@@ -114,6 +116,16 @@ class SsoController < ApplicationController
     end
   rescue => e
     Rails.logger.error("[SSO] fetch_user_projects failed: #{e.message}")
+    nil
+  end
+
+  # Prevent open redirect — only allow relative paths
+  def safe_return_path(raw)
+    return nil if raw.blank?
+    uri = URI.parse(raw)
+    return nil if uri.host.present? # reject absolute URLs
+    uri.path
+  rescue URI::InvalidURIError
     nil
   end
 
