@@ -29,15 +29,35 @@ export default class extends Controller {
     const since = this.sinceInputTarget.value
     const until = this.untilInputTarget.value
 
-    // Build export URL
-    const params = new URLSearchParams()
-    params.set('format', format)
-    if (query) params.set('q', query)
-    if (since) params.set('since', since)
-    if (until) params.set('until', until)
+    // Build and submit a POST form for download
+    const form = document.createElement("form")
+    form.method = "POST"
+    form.action = `/dashboard/projects/${this.projectIdValue}/exports`
+    form.style.display = "none"
 
-    // Trigger download
-    window.location.href = `/dashboard/projects/${this.projectIdValue}/exports?${params.toString()}`
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content
+    if (csrfToken) {
+      const tokenInput = document.createElement("input")
+      tokenInput.type = "hidden"
+      tokenInput.name = "authenticity_token"
+      tokenInput.value = csrfToken
+      form.appendChild(tokenInput)
+    }
+
+    const fields = { format, q: query, since, until }
+    for (const [name, value] of Object.entries(fields)) {
+      if (value) {
+        const input = document.createElement("input")
+        input.type = "hidden"
+        input.name = name
+        input.value = value
+        form.appendChild(input)
+      }
+    }
+
+    document.body.appendChild(form)
+    form.submit()
+    form.remove()
     this.close()
   }
 }

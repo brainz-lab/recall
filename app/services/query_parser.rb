@@ -101,10 +101,16 @@ class QueryParser
       filters[field] = { value: clean_value, negated: neg == "!" }
     end
 
-    # Then extract standalone quoted text searches (not part of field:value)
-    # Remove field:value patterns first, then find remaining quoted strings
+    # Then extract standalone text searches (not part of field:value)
+    # Remove field:value patterns first, then find remaining text
     remaining = part.gsub(/\w+(?:\.\w+)*:!?(?:"[^"]*"|[^\s]+)/, "")
+
+    # Extract quoted text searches
     remaining.scan(/"([^"]+)"/) { |m| text_searches << m[0] }
+
+    # Extract unquoted plain text (after removing quoted strings)
+    unquoted = remaining.gsub(/"[^"]*"/, "").strip
+    unquoted.split(/\s+/).each { |word| text_searches << word } if unquoted.present?
   end
 
   def apply_filters_from(scope, filters, text_searches)
