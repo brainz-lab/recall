@@ -3,6 +3,7 @@ require "test_helper"
 class LogsChannelTest < ActionCable::Channel::TestCase
   def setup
     @project = projects(:one)
+    stub_connection current_user_id: "user-1", current_organization_id: nil
   end
 
   test "subscribes to project stream" do
