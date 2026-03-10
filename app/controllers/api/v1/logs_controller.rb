@@ -83,7 +83,6 @@ module Api
 
         # Get hourly counts for the baseline window
         hourly_counts = @project.log_entries
-                                .unscope(:order)
                                 .where("timestamp >= ?", window.ago)
                                 .where(level: log_level)
                                 .select("date_trunc('hour', timestamp) as hour_bucket, COUNT(*) as count")

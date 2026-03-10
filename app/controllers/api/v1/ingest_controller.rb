@@ -9,8 +9,20 @@ module Api
         render json: { id: entry.id }, status: :created
       end
 
+      MAX_BATCH_SIZE = 1000
+      MAX_MESSAGE_LENGTH = 10_000
+
       def batch
         logs = params[:logs] || params[:_json] || []
+
+        unless logs.is_a?(Array)
+          return render json: { error: "logs must be an array" }, status: :unprocessable_entity
+        end
+
+        if logs.size > MAX_BATCH_SIZE
+          return render json: { error: "Batch too large (max #{MAX_BATCH_SIZE})" }, status: :request_entity_too_large
+        end
+
         entries = logs.filter_map { |l| build_entry(l) if l.is_a?(Hash) || l.is_a?(ActionController::Parameters) }
 
         if entries.any?
@@ -38,12 +50,18 @@ module Api
         data = data.to_unsafe_h if data.respond_to?(:to_unsafe_h)
         data = (data || {}).to_json
 
+        level = log[:level].to_s.downcase
+        level = "info" unless LogEntry::LEVELS.include?(level)
+
+        message = log[:message].to_s
+        message = message.truncate(MAX_MESSAGE_LENGTH) if message.length > MAX_MESSAGE_LENGTH
+
         {
           id: SecureRandom.uuid,
           project_id: @project.id,
           timestamp: log[:timestamp] || Time.current,
-          level: log[:level] || "info",
-          message: log[:message],
+          level: level,
+          message: message,
           commit: log[:commit],
           branch: log[:branch],
           environment: log[:environment],

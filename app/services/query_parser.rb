@@ -66,8 +66,6 @@ class QueryParser
   def apply_stats(scope)
     cmd = @commands.find { |c| c[:command] == "stats" }
     group_by = cmd&.dig(:args)&.find { |a| a.start_with?("by:") }&.sub("by:", "")
-
-    # Remove default ordering for GROUP BY operations
     scope = scope.unscope(:order)
 
     case group_by

@@ -76,8 +76,18 @@ Rails.application.routes.draw do
   # SSO from Platform
   get "sso/callback", to: "sso#callback"
 
-  # Health check
+  # Health check (basic)
   get "up", to: ->(_) { [ 200, {}, [ "ok" ] ] }
+
+  # Health check (with DB connectivity)
+  get "health", to: ->(_) {
+    begin
+      ActiveRecord::Base.connection.execute("SELECT 1")
+      [ 200, { "Content-Type" => "application/json" }, [ { status: "ok", db: "connected" }.to_json ] ]
+    rescue => e
+      [ 503, { "Content-Type" => "application/json" }, [ { status: "degraded", db: "disconnected", error: e.message }.to_json ] ]
+    end
+  }
 
   # WebSocket
   mount ActionCable.server => "/cable"

@@ -67,13 +67,13 @@ module Dashboard
       @service_filter = params[:service].presence
 
       # Base query with filters
-      logs = @project.log_entries.unscope(:order).where("timestamp >= ?", @since)
+      logs = @project.log_entries.where("timestamp >= ?", @since)
       logs = logs.where(level: @level_filter) if @level_filter
       logs = logs.where(environment: @env_filter) if @env_filter
       logs = logs.where(service: @service_filter) if @service_filter
 
       # Available filter options (from all logs, not filtered)
-      all_logs = @project.log_entries.unscope(:order).where("timestamp >= ?", @since)
+      all_logs = @project.log_entries.where("timestamp >= ?", @since)
       @available_levels = all_logs.distinct.pluck(:level).compact.sort
       @available_envs = all_logs.where.not(environment: nil).distinct.pluck(:environment).compact.sort
       @available_services = all_logs.where.not(service: nil).distinct.pluck(:service).compact.sort

@@ -20,12 +20,11 @@ module Dashboard
       end
 
       # Get log counts in a single optimized query
-      # Use unscoped to remove default ordering which conflicts with GROUP BY
       @log_counts = Rails.cache.fetch([ "log_counts", @project.id, "1h", Time.current.beginning_of_hour ], expires_in: 5.minutes) do
-        @project.log_entries.unscope(:order).where("timestamp > ?", 1.hour.ago).group(:level).count
+        @project.log_entries.where("timestamp > ?", 1.hour.ago).group(:level).count
       end
       @log_counts_24h = Rails.cache.fetch([ "log_counts", @project.id, "24h", Time.current.beginning_of_hour ], expires_in: 15.minutes) do
-        @project.log_entries.unscope(:order).where("timestamp > ?", 24.hours.ago).where(level: "fatal").count
+        @project.log_entries.where("timestamp > ?", 24.hours.ago).where(level: "fatal").count
       end
       @log_counts_24h = { "fatal" => @log_counts_24h } if @log_counts_24h.is_a?(Integer)
 
@@ -44,7 +43,7 @@ module Dashboard
 
     def trace
       @request_id = params[:request_id]
-      @logs = @project.log_entries.where(request_id: @request_id).reorder(timestamp: :asc)
+      @logs = @project.log_entries.where(request_id: @request_id).order(timestamp: :asc)
 
       if @logs.empty?
         redirect_to dashboard_project_logs_path(@project), alert: "No logs found for request #{@request_id}"
@@ -55,14 +54,14 @@ module Dashboard
       @last_log = @logs.last
       @log_count = @logs.size
       @duration_ms = ((@last_log.timestamp - @first_log.timestamp) * 1000).round
-      @levels = @logs.unscope(:order).group(:level).count
-      @services = @logs.unscope(:order).where.not(service: nil).distinct.pluck(:service)
+      @levels = @logs.group(:level).count
+      @services = @logs.where.not(service: nil).distinct.pluck(:service)
       @session_id = @first_log.session_id
     end
 
     def session_trace
       @session_id = params[:session_id]
-      @logs = @project.log_entries.where(session_id: @session_id).reorder(timestamp: :asc)
+      @logs = @project.log_entries.where(session_id: @session_id).order(timestamp: :asc)
 
       if @logs.empty?
         redirect_to dashboard_project_logs_path(@project), alert: "No logs found for session #{@session_id}"
@@ -73,9 +72,9 @@ module Dashboard
       @last_log = @logs.last
       @log_count = @logs.size
       @duration_ms = ((@last_log.timestamp - @first_log.timestamp) * 1000).round
-      @levels = @logs.unscope(:order).group(:level).count
-      @services = @logs.unscope(:order).where.not(service: nil).distinct.pluck(:service)
-      @request_ids = @logs.unscope(:order).where.not(request_id: nil).distinct.pluck(:request_id)
+      @levels = @logs.group(:level).count
+      @services = @logs.where.not(service: nil).distinct.pluck(:service)
+      @request_ids = @logs.where.not(request_id: nil).distinct.pluck(:request_id)
     end
 
     private

@@ -25,17 +25,27 @@ RSpec.describe LogEntry, type: :model, timescaledb: true do
     end
   end
 
-  describe "default_scope" do
+  describe "scopes" do
     let(:project) { create(:project) }
 
-    it "orders by timestamp descending" do
+    it ".recent orders by timestamp descending" do
       old = create(:log_entry, project: project, timestamp: 2.hours.ago)
       mid = create(:log_entry, project: project, timestamp: 1.hour.ago)
       recent = create(:log_entry, project: project, timestamp: Time.current)
 
-      ordered = project.log_entries.to_a
+      ordered = project.log_entries.recent.to_a
       expect(ordered.first).to eq(recent)
       expect(ordered.last).to eq(old)
+    end
+
+    it ".chronological orders by timestamp ascending" do
+      old = create(:log_entry, project: project, timestamp: 2.hours.ago)
+      mid = create(:log_entry, project: project, timestamp: 1.hour.ago)
+      recent = create(:log_entry, project: project, timestamp: Time.current)
+
+      ordered = project.log_entries.chronological.to_a
+      expect(ordered.first).to eq(old)
+      expect(ordered.last).to eq(recent)
     end
   end
 

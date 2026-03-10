@@ -12,6 +12,7 @@ class SsoController < ApplicationController
     user_info = validate_sso_token(token)
 
     if user_info[:valid]
+      reset_session  # Prevent session fixation
       session[:platform_user_id] = user_info[:user_id]
       session[:platform_project_id] = user_info[:project_id]
       session[:platform_organization_id] = user_info[:organization_id]

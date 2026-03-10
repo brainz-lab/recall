@@ -18,6 +18,13 @@ class Project < ApplicationRecord
     platform_project_id.present?
   end
 
+  # Prevent accidental key exposure in JSON serialization
+  def as_json(options = {})
+    options[:except] ||= []
+    options[:except] += [ :api_key, :ingest_key ]
+    super(options)
+  end
+
   private
 
   def generate_slug

@@ -71,6 +71,9 @@ Rails.application.configure do
   # Highlight code that triggered redirect in logs.
   config.action_dispatch.verbose_redirect_logs = true
 
+  # Tag logs with request_id for tracing (matches production)
+  config.log_tags = [ :request_id ]
+
   # Suppress logger output for asset requests.
   config.assets.quiet = true
 

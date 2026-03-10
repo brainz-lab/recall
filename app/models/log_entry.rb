@@ -11,16 +11,17 @@ class LogEntry < ApplicationRecord
   validates :timestamp, presence: true
   validates :level, presence: true, inclusion: { in: LEVELS }
 
-  default_scope { order(timestamp: :desc) }
+  scope :recent, -> { order(timestamp: :desc) }
+  scope :chronological, -> { order(timestamp: :asc) }
 
   # Get counts by level for a given scope
   def self.counts_by_level
-    unscoped.where(id: all.select(:id)).group(:level).count
+    where(id: all.select(:id)).group(:level).count
   end
 
   # Get counts for recent time periods
   def self.recent_counts(since: 1.hour.ago)
-    unscope(:order).where("timestamp >= ?", since).group(:level).count
+    where("timestamp >= ?", since).group(:level).count
   end
 
   # Generate composite key for URL-safe identification (id_timestamp format)
