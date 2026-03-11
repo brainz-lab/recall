@@ -1,7 +1,7 @@
 PATH
   remote: ../brainzlab-platform-client
   specs:
-    brainzlab-platform-client (0.1.1)
+    brainzlab-platform-client (0.1.2)
       rails (>= 7.0)
 
 PATH

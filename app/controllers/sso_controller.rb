@@ -67,6 +67,7 @@ class SsoController < ApplicationController
       project = Project.find_or_initialize_by(platform_project_id: data["id"].to_s)
       project.name = data["name"]
       project.slug = data["slug"]
+      project.platform_organization_id = data["organization_id"].to_s if data["organization_id"].present?
       project.archived_at = nil
       project.save!
     end
@@ -86,10 +87,18 @@ class SsoController < ApplicationController
     return unless user_info[:project_id].present?
 
     project = Project.find_or_initialize_by(platform_project_id: user_info[:project_id].to_s)
-    return if project.persisted? # Already exists
+
+    if project.persisted?
+      # Backfill organization_id for projects created before tenant isolation
+      if project.platform_organization_id.blank? && user_info[:organization_id].present?
+        project.update!(platform_organization_id: user_info[:organization_id].to_s)
+      end
+      return
+    end
 
     project.name = user_info[:project_slug] || "Project #{user_info[:project_id]}"
     project.slug = user_info[:project_slug]
+    project.platform_organization_id = user_info[:organization_id].to_s if user_info[:organization_id].present?
     project.save!
     Rails.logger.info("[SSO] Created project from SSO validation: #{project.name}")
   rescue => e
