@@ -2,18 +2,8 @@ module Api
   module V1
     class BaseController < ActionController::API
       before_action :authenticate!
-      after_action :set_trace_headers
 
       private
-
-      def set_trace_headers
-        response.headers["X-Request-Id"] = request.request_id
-        response.headers["X-Runtime"] = "%.6f" % (Time.current - request_start_time) if request_start_time
-      end
-
-      def request_start_time
-        @_request_start_time ||= Time.current
-      end
 
       def authenticate!
         key = extract_key
