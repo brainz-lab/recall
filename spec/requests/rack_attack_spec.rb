@@ -8,8 +8,10 @@ RSpec.describe "Rack::Attack rate limiting", type: :request do
   # and replace each throttle with a low limit (2 req/period) for fast tests.
   # -------------------------------------------------------------------------
   before do
+    # Use a real MemoryStore for rack-attack so counters work (Rails.cache is NullStore in test)
+    @original_store = Rack::Attack.cache.store
+    Rack::Attack.cache.store = ActiveSupport::Cache::MemoryStore.new
     Rack::Attack.safelists.clear
-    Rack::Attack.cache.store.clear
 
     # Re-define every throttle with limit: 2 to avoid looping hundreds of times.
     {
@@ -43,7 +45,7 @@ RSpec.describe "Rack::Attack rate limiting", type: :request do
   after do
     # Restore the original initializer so other specs are unaffected.
     Rack::Attack.clear_configuration
-    Rack::Attack.cache.store.clear
+    Rack::Attack.cache.store = @original_store
     load Rails.root.join("config/initializers/rack_attack.rb")
   end
 

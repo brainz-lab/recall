@@ -3,13 +3,8 @@
 # Rack::Attack rate limiting for Recall service.
 # S-08: Protects ingest, read, SSO callback, MCP, and dashboard endpoints.
 
-# In production, use Rails.cache (SolidCache/Redis) so rate limits are shared
-# across all Puma workers. MemoryStore is per-process and won't work multi-process.
-Rack::Attack.cache.store = if Rails.env.production?
-  Rails.cache
-else
-  ActiveSupport::Cache::MemoryStore.new
-end
+# Use Rails.cache in all environments so rate limits are shared across Puma workers.
+Rack::Attack.cache.store = Rails.cache
 
 # ---------------------------------------------------------------------------
 # Safelists

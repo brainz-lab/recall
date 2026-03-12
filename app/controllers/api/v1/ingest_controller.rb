@@ -1,16 +1,14 @@
 module Api
   module V1
     class IngestController < BaseController
+      MAX_BATCH_SIZE = 1000
+      MAX_MESSAGE_LENGTH = 10_000
+
       def create
         entry = @project.log_entries.create!(log_params)
         broadcast_log(entry)
-        track_usage!(1)
-        track_bytes!(request.body.size)
         render json: { id: entry.id }, status: :created
       end
-
-      MAX_BATCH_SIZE = 1000
-      MAX_MESSAGE_LENGTH = 10_000
 
       def batch
         logs = params[:logs] || params[:_json] || []
@@ -31,8 +29,6 @@ module Api
           bulk_insert_logs(entries)
           broadcast_batch(entries)
         end
-        track_usage!(entries.size)
-        track_bytes!(request.body.size)
         render json: { ingested: entries.size }, status: :created
       end
 

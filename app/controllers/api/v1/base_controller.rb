@@ -42,28 +42,8 @@ module Api
         params[:api_key]
       end
 
-      def track_usage!(count = 1)
-        return unless @project&.platform_project_id
-
-        PlatformClient.track_usage(
-          project_id: @project.platform_project_id,
-          product: "recall",
-          metric: "logs",
-          count: count
-        )
-      end
-
-      def track_bytes!(byte_count)
-        return unless @project&.platform_project_id
-        return unless byte_count.to_i > 0
-
-        PlatformClient.track_usage(
-          project_id: @project.platform_project_id,
-          product: "recall",
-          metric: "bytes",
-          count: byte_count.to_i
-        )
-      end
+      # Usage tracking (logs, bytes) is now handled automatically by
+      # brainzlab-platform-client gem via Rack middleware and ActiveJob hooks.
     end
   end
 end

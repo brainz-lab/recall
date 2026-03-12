@@ -115,18 +115,6 @@ class PlatformClient
       Project.find_by(platform_project_id: result.project_id)
     end
 
-    # Track usage metrics (for billing) via background job
-    def track_usage(project_id:, product:, metric:, count:)
-      return if count <= 0
-
-      TrackUsageJob.perform_later(
-        project_id: project_id,
-        product: product,
-        metric: metric,
-        count: count
-      )
-    end
-
     private
 
     def execute_request(uri, request)
