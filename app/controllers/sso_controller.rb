@@ -26,7 +26,7 @@ class SsoController < ApplicationController
       # Ensure at least the current project exists (fallback if full sync failed)
       ensure_project_exists(user_info)
 
-      redirect_to params[:return_to] || project_redirect_path(user_info) || dashboard_root_path
+      redirect_to safe_return_path(params[:return_to]) || project_redirect_path(user_info) || dashboard_root_path
     else
       redirect_to "#{platform_external_url}/login?error=sso_failed", allow_other_host: true
     end
@@ -38,6 +38,8 @@ class SsoController < ApplicationController
     uri = URI("#{platform_internal_url}/api/v1/sso/validate")
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = uri.scheme == "https"
+    http.open_timeout = 5
+    http.read_timeout = 10
 
     request = Net::HTTP::Post.new(uri.path)
     request["Content-Type"] = "application/json"
@@ -66,6 +68,7 @@ class SsoController < ApplicationController
       project = Project.find_or_initialize_by(platform_project_id: data["id"].to_s)
       project.name = data["name"]
       project.slug = data["slug"]
+      project.platform_organization_id = data["organization_id"].to_s if data["organization_id"].present?
       project.archived_at = nil
       project.save!
     end
@@ -85,10 +88,18 @@ class SsoController < ApplicationController
     return unless user_info[:project_id].present?
 
     project = Project.find_or_initialize_by(platform_project_id: user_info[:project_id].to_s)
-    return if project.persisted? # Already exists
+
+    if project.persisted?
+      # Backfill organization_id for projects created before tenant isolation
+      if project.platform_organization_id.blank? && user_info[:organization_id].present?
+        project.update!(platform_organization_id: user_info[:organization_id].to_s)
+      end
+      return
+    end
 
     project.name = user_info[:project_slug] || "Project #{user_info[:project_id]}"
     project.slug = user_info[:project_slug]
+    project.platform_organization_id = user_info[:organization_id].to_s if user_info[:organization_id].present?
     project.save!
     Rails.logger.info("[SSO] Created project from SSO validation: #{project.name}")
   rescue => e
@@ -115,6 +126,16 @@ class SsoController < ApplicationController
     end
   rescue => e
     Rails.logger.error("[SSO] fetch_user_projects failed: #{e.message}")
+    nil
+  end
+
+  # Prevent open redirect — only allow relative paths
+  def safe_return_path(raw)
+    return nil if raw.blank?
+    uri = URI.parse(raw)
+    return nil if uri.host.present? # reject absolute URLs
+    uri.path
+  rescue URI::InvalidURIError
     nil
   end
 

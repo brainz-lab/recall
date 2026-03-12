@@ -44,7 +44,7 @@ module Dashboard
     end
 
     def set_chat
-      @chat = AssistantChat.find(params[:id])
+      @chat = AssistantChat.where(user_id: assistant_user_id).find(params[:id])
     end
   end
 end

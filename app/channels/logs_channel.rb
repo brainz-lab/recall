@@ -1,12 +1,28 @@
 class LogsChannel < ApplicationCable::Channel
   # Live tail - streams new logs to the dashboard
   def subscribed
-    project = Project.find(params[:project_id])
-    stream_for project
+    project = find_authorized_project(params[:project_id])
+
+    if project
+      stream_for project
+    else
+      reject
+    end
   end
 
   def unsubscribed
     stop_all_streams
+  end
+
+  private
+
+  def find_authorized_project(project_id)
+    scope = if connection.current_organization_id.present?
+      Project.where(platform_organization_id: connection.current_organization_id)
+    else
+      Project
+    end
+    scope.find_by(id: project_id)
   end
 
   # Broadcast helpers for use throughout the application

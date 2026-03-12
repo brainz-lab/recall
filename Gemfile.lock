@@ -122,10 +122,6 @@ GEM
     bindex (0.8.1)
     bootsnap (1.20.1)
       msgpack (~> 1.2)
-    brainzlab (0.1.12)
-      concurrent-ruby (~> 1.0)
-      logger (~> 1.5)
-      sqlite3 (~> 2.0)
     brakeman (8.0.4)
       racc
     builder (3.3.0)
@@ -186,6 +182,10 @@ GEM
     ffi (1.17.3-arm64-darwin)
     ffi (1.17.3-x86_64-linux-gnu)
     ffi (1.17.3-x86_64-linux-musl)
+    fluyenta-ruby (0.1.15)
+      concurrent-ruby (~> 1.0)
+      logger (~> 1.5)
+      sqlite3 (~> 2.0)
     fugit (1.12.1)
       et-orbi (~> 1.4)
       raabro (~> 1.4)
@@ -539,7 +539,6 @@ DEPENDENCIES
   aws-sdk-s3
   bcrypt (~> 3.1.7)
   bootsnap
-  brainzlab (~> 0.1.12)
   brainzlab-platform-client!
   brakeman
   bundler-audit
@@ -548,6 +547,7 @@ DEPENDENCIES
   database_cleaner-active_record
   debug
   factory_bot_rails
+  fluyenta-ruby (~> 0.1.15)
   fluyenta-ui!
   image_processing (~> 1.2)
   importmap-rails

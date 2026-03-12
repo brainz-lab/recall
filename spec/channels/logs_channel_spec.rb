@@ -3,6 +3,10 @@ require "rails_helper"
 RSpec.describe LogsChannel, type: :channel do
   let(:project) { create(:project) }
 
+  before do
+    stub_connection current_user_id: "user-1", current_organization_id: nil
+  end
+
   describe "#subscribed" do
     it "streams for the given project" do
       subscribe(project_id: project.id)
@@ -11,9 +15,8 @@ RSpec.describe LogsChannel, type: :channel do
     end
 
     it "rejects with invalid project_id" do
-      expect {
-        subscribe(project_id: "nonexistent")
-      }.to raise_error(ActiveRecord::RecordNotFound)
+      subscribe(project_id: "nonexistent")
+      expect(subscription).to be_rejected
     end
   end
 
