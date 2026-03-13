@@ -1,5 +1,6 @@
 module Dashboard
   class AssistantController < BaseController
+    before_action :set_project
     before_action :set_chat, only: [ :show, :message ]
 
     def index
@@ -45,6 +46,10 @@ module Dashboard
 
     def set_chat
       @chat = AssistantChat.where(user_id: assistant_user_id).find(params[:id])
+    end
+
+    def set_project
+      @project = current_organization_projects.first
     end
   end
 end
